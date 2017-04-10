@@ -20,7 +20,7 @@ public class EasierCrafting
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-        MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(OpenCraftEventHandler.getInstance());
     }
 
     @EventHandler
