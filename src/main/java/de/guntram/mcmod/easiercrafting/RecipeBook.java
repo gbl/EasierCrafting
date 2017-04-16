@@ -43,6 +43,7 @@ public class RecipeBook {
     private final int xOffset=-itemSize*8-10; // offset of list to standard gui
     private final int itemLift=5;               // how many pixels to display items above where they would be normally
     private int listSize;
+    private long recipeUpdateTime;
     
     RecipeBook(GuiContainer craftinv, int firstCraftSlot, int gridsize, int resultSlot) {
         this.container=craftinv;
@@ -59,7 +60,13 @@ public class RecipeBook {
     // However, if our height is larger than the GUI container height,
     // adjust our Y position accordingly.
     void drawRecipeList(FontRenderer fontRenderer, RenderItem itemRenderer,
-            int left, int height, int mouseX, int mouseY) {        
+            int left, int height, int mouseX, int mouseY) {
+        
+        if (recipeUpdateTime!=0 && System.currentTimeMillis() > recipeUpdateTime) {
+            updateRecipes();
+            recipeUpdateTime=0;
+        }
+
         int xpos=0, ypos=0;
         if (listSize>height)
             ypos-=(listSize-height)/2;
@@ -376,9 +383,8 @@ public class RecipeBook {
         
         if (mouseButton==0) {
             slotClick(resultSlotNo, mouseButton, ClickType.QUICK_MOVE);     // which is really PICKUP ALL
-            updateRecipes();
+            recipeUpdateTime=System.currentTimeMillis()+ConfigurationHandler.getAutoUpdateRecipeTimer()*1000;
         }
-        return;
     }
     
     /**
