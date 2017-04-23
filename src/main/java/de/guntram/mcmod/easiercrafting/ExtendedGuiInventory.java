@@ -24,7 +24,15 @@ public class ExtendedGuiInventory extends GuiInventory {
     
     @Override
     protected void mouseClicked(final int mouseX, final int mouseY, final int mouseButton) throws IOException {
-        recipeBook.mouseClicked(mouseX, mouseY, mouseButton);
         super.mouseClicked(mouseX, mouseY, mouseButton);
+        recipeBook.mouseClicked(mouseX, mouseY, mouseButton);
+    }
+
+    @Override
+    public void keyTyped(char c, int i) throws IOException {
+        if (c==27)
+            super.keyTyped(c, i);
+        else
+            recipeBook.keyTyped(c, i);
     }
 }

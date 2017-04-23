@@ -27,11 +27,11 @@ public class OpenCraftEventHandler {
     public void guiOpenEvent(GuiOpenEvent event) {
         if (event.getGui() instanceof GuiCrafting) {
             ExtendedGuiCrafting egc = new ExtendedGuiCrafting(mc.player.inventory, mc.world);
-            egc.setRecipeBook(new RecipeBook(egc, 1, 3, 0));
+            egc.setRecipeBook(new RecipeBook(egc, 1, 3, 0, 10));
             event.setGui(egc);
         } else if (event.getGui() instanceof GuiInventory) {
             ExtendedGuiInventory egi = new ExtendedGuiInventory(mc.player);
-            egi.setRecipeBook(new RecipeBook(egi, 1, 2, 0));
+            egi.setRecipeBook(new RecipeBook(egi, 1, 2, 0, 9));
             event.setGui(egi);
         } else {
             if (event.getGui() != null)
