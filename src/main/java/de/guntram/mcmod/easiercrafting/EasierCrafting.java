@@ -9,8 +9,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 @Mod(modid = EasierCrafting.MODID, 
         version = EasierCrafting.VERSION,
 	clientSideOnly = true, 
-	// guiFactory = "de.guntram.mcmod.easiercrafting.config.XXGuiFactory",
-	acceptedMinecraftVersions = "[1.11.2]"
+	acceptedMinecraftVersions = "[1.12]"
 )
 
 public class EasierCrafting

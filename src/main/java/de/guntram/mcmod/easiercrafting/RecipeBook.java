@@ -5,11 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -28,6 +27,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.util.NonNullList;
@@ -35,7 +35,7 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 public class RecipeBook {
-    private GuiContainer container;
+    private final GuiContainer container;
     private final int firstCraftSlot;
     private final int gridSize;
     private final int resultSlotNo;
@@ -86,7 +86,7 @@ public class RecipeBook {
             recipeUpdateTime=0;
         }
 
-        int xpos=0, ypos=0;
+        int xpos, ypos=0;
         int neededHeight=patternListSize+listSize;
         
         if (neededHeight>height)
@@ -96,7 +96,7 @@ public class RecipeBook {
 
         underMouse=null;
 
-        pattern.yPosition=ypos;
+        pattern.y=ypos;
         pattern.drawTextBox();
         ypos+=itemSize*3/2;
         ypos=drawRecipeOutputs(patternMatchingRecipes, itemRenderer, fontRenderer, 0, ypos, mouseX, mouseY);
@@ -114,30 +114,29 @@ public class RecipeBook {
                 fontRenderer.drawString("sr", left-20, height, 0x202020);
                 for (int x=0; x<((ShapedRecipes)underMouse).recipeWidth; x++) {
                     for (int y=0; y<((ShapedRecipes)underMouse).recipeHeight; y++) {
-                        ItemStack stack = ((ShapedRecipes)underMouse).recipeItems[x+y*((ShapedRecipes)underMouse).recipeWidth];
-                        renderIngredient(itemRenderer, fontRenderer, stack, itemSize*x, height+itemSize+itemSize*y);                        
+                        NonNullList<Ingredient> ingredients = underMouse.getIngredients();
+                        renderIngredient(itemRenderer, fontRenderer, ingredients.get(x+y*((ShapedRecipes)underMouse).recipeWidth), itemSize*x, height+itemSize+itemSize*y);                        
                     }
                 }
             } else if (underMouse instanceof ShapelessRecipes) {
                 fontRenderer.drawString("slr", left-20, height, 0x202020);
                 xpos=0;
-                for (ItemStack stack: ((ShapelessRecipes)underMouse).recipeItems) {
-                    renderIngredient(itemRenderer, fontRenderer, stack, itemSize*xpos, height+itemSize);
+                for (Ingredient ingredient: ((ShapelessRecipes)underMouse).getIngredients()) {
+                    renderIngredient(itemRenderer, fontRenderer, ingredient, itemSize*xpos, height+itemSize);
                     xpos++;
                 }
             } else if (underMouse instanceof ShapedOreRecipe) {
                 fontRenderer.drawString("sor", left-20, height, 0x202020);
-                Object[] ingredients = ((ShapedOreRecipe)underMouse).getInput();
+                NonNullList<Ingredient> ingredients = underMouse.getIngredients();
                 for (int x=0; x<((ShapedOreRecipe)underMouse).getWidth(); x++) {
                     for (int y=0; y<((ShapedOreRecipe)underMouse).getHeight(); y++) {
-                        Object ingredient = ingredients[x+y*((ShapedOreRecipe)underMouse).getWidth()];
-                        renderIngredient(itemRenderer, fontRenderer, ingredient, itemSize*x, height+itemSize+itemSize*y);
+                        renderIngredient(itemRenderer, fontRenderer, ingredients.get(x+y*((ShapedOreRecipe)underMouse).getWidth()), itemSize*x, height+itemSize+itemSize*y);
                     }
                 }
             } else if (underMouse instanceof ShapelessOreRecipe) {
                 fontRenderer.drawString("slor", left-20, height, 0x202020);
                 xpos=0;
-                for (Object ingredient: ((ShapelessOreRecipe)underMouse).getInput()) {
+                for (Ingredient ingredient: ((ShapelessOreRecipe)underMouse).getIngredients()) {
                     renderIngredient(itemRenderer, fontRenderer, ingredient, itemSize*xpos, height+itemSize);
                     xpos++;
                 }
@@ -173,39 +172,23 @@ public class RecipeBook {
         return ypos;
     }
     
-    public void renderIngredient(RenderItem itemRenderer, FontRenderer fontRenderer, Object ingredient, int x, int y) {
-        ItemStack stack;
-        if (ingredient instanceof ItemStack)
-            stack=(ItemStack) ingredient;
-        else if (ingredient instanceof NonNullList)
-            stack=(((NonNullList<ItemStack>)ingredient).get(0));
-        else
+    public void renderIngredient(RenderItem itemRenderer, FontRenderer fontRenderer, Ingredient ingredient, int x, int y) {
+        ItemStack[] stacks=ingredient.getMatchingStacks();
+        if (stacks.length==0)
             return;
-        if (stack.getItemDamage()==32767) {
-            stack=stack.copy();
-            NonNullList<ItemStack> subitems=NonNullList.<ItemStack>create();
-            stack.setItemDamage(0);
-            stack.getItem().getSubItems(stack.getItem(), CreativeTabs.MISC, subitems);
-            if (subitems.size()>1)
-                stack.setItemDamage((int) ((System.currentTimeMillis()/333)%subitems.size()));
-        }
-        itemRenderer.renderItemAndEffectIntoGUI(stack, x, y);
-        itemRenderer.renderItemOverlays(fontRenderer, stack, x, y);
+        int toRender=0;
+        if (stacks.length>1)
+            toRender=(int) ((System.currentTimeMillis()/333)%stacks.length);
+        itemRenderer.renderItemAndEffectIntoGUI(stacks[toRender], x, y);
+        itemRenderer.renderItemOverlays(fontRenderer, stacks[toRender], x, y);
     }
     
     public final void updateRecipes() {
         Container inventory=container.inventorySlots;
-        List<IRecipe> recipes = CraftingManager.getInstance().getRecipeList();
-/*
-        HashSet<String> known=new HashSet<String>();
-        for (IRecipe recipe:recipes) {
-            String cls=recipe.getClass().getCanonicalName();
-            if (!known.contains(cls)) {
-                known.add(cls);
-                System.out.println("Found recipe class "+cls);
-            }
-        }
-*/        
+        List<IRecipe> recipes = new ArrayList<>();
+        for (Iterator<IRecipe> i= CraftingManager.REGISTRY.iterator(); i.hasNext();)
+            recipes.add(i.next());
+
         craftableCategories=new TreeMap();
         for (IRecipe recipe:recipes) {
             if (!canCraftRecipe(recipe, inventory, gridSize))
@@ -223,7 +206,7 @@ public class RecipeBook {
                 category=I18n.format(tab.getTranslatedTabLabel(), new Object[0]);
             TreeSet<IRecipe> catRecipes=craftableCategories.get(category);
             if (catRecipes==null) {
-                catRecipes=new TreeSet<IRecipe>(new Comparator<IRecipe>() {
+                catRecipes=new TreeSet<>(new Comparator<IRecipe>() {
                     @Override
                     public int compare(IRecipe a, IRecipe b) {
                         return a.getRecipeOutput().getDisplayName().compareToIgnoreCase(b.getRecipeOutput().getDisplayName());
@@ -244,7 +227,7 @@ public class RecipeBook {
     public final void updatePatternMatch() {
         
         patternListSize=0;
-        patternMatchingRecipes=new TreeSet<IRecipe>(new Comparator<IRecipe>() {
+        patternMatchingRecipes=new TreeSet<>(new Comparator<IRecipe>() {
             @Override
             public int compare(IRecipe a, IRecipe b) {
                 return a.getRecipeOutput().getDisplayName().compareToIgnoreCase(b.getRecipeOutput().getDisplayName());
@@ -258,7 +241,9 @@ public class RecipeBook {
             return;
 
         Container inventory=container.inventorySlots;
-        List<IRecipe> recipes = CraftingManager.getInstance().getRecipeList();
+        List<IRecipe> recipes = new ArrayList<>();
+        for (Iterator<IRecipe> i= CraftingManager.REGISTRY.iterator(); i.hasNext();)
+            recipes.add(i.next());
         Pattern regex=Pattern.compile(patternText, Pattern.CASE_INSENSITIVE);
         for (IRecipe recipe:recipes) {
             ItemStack result=recipe.getRecipeOutput();
@@ -296,7 +281,7 @@ public class RecipeBook {
     }
     
     private boolean canCraftShapeless(ShapelessRecipes recipe, Container inventory) {
-        List<ItemStack> neededList = recipe.recipeItems;
+        NonNullList<Ingredient> neededList = recipe.getIngredients();
         return canCraft(recipe, neededList, inventory);
     }
 
@@ -305,7 +290,7 @@ public class RecipeBook {
             //System.out.println("Can't do "+recipe.getRecipeOutput().getDisplayName()+" as it needs "+recipe.recipeWidth+"/"+recipe.recipeHeight);
             return false;
         }
-        List<ItemStack> neededList = Arrays.asList(recipe.recipeItems);
+        NonNullList<Ingredient> neededList = recipe.getIngredients();
         return canCraft(recipe, neededList, inventory);
     }
 
@@ -314,38 +299,25 @@ public class RecipeBook {
             //System.out.println("Can't do "+recipe.getRecipeOutput().getDisplayName()+" as it needs "+recipe.getWidth()+"/"+recipe.getHeight());
             return false;
         }
-        return canCraftOre(recipe, Arrays.asList(recipe.getInput()), inventory);
+        return canCraftOre(recipe, recipe.getIngredients(), inventory);
     }
 
     private boolean canCraftShapelessOre(ShapelessOreRecipe recipe, Container inventory, int gridSize) {
-        return canCraftOre(recipe, recipe.getInput(), inventory);
+        return canCraftOre(recipe, recipe.getIngredients(), inventory);
     }
     
-    private boolean canCraftOre(IRecipe recipe, List<Object>input, Container inventory) {
-        List<ItemStack>neededList=new ArrayList<ItemStack>();
-        for (Object o: input) {
-            if (o==null)
-                continue;
-            if (o instanceof ItemStack)
-                neededList.add((ItemStack)o);
-            else if (o instanceof NonNullList) {
-                neededList.add(((NonNullList<ItemStack>)o).get(0));
-            }
-            else {
-                //System.out.println("Can't do "+recipe.getRecipeOutput().getDisplayName()+" as it needs a "+o+" ("+o.getClass().getCanonicalName()+")");
-                return false;
-            }
-        }
-        return canCraft(recipe, neededList, inventory);
+    private boolean canCraftOre(IRecipe recipe, NonNullList<Ingredient>input, Container inventory) {
+        return canCraft(recipe, input, inventory);
     }
 
-    private boolean canCraft(IRecipe recipe, List<ItemStack> neededList, Container inventory) {
-        ArrayList<Takefrom> source=new ArrayList<Takefrom>(neededList.size());
-        for (ItemStack neededItem: neededList) {                                // iterate over needed items
-            int neededAmount=neededItem.getCount();
-            if (neededAmount==0)
-                continue;           // can happen with shaped recipes
-            //System.out.println("need "+neededAmount+" "+neededItem.getDisplayName()+" for "+recipe.getRecipeOutput().getDisplayName());
+    private boolean canCraft(IRecipe recipe, List<Ingredient> neededList, Container inventory) {
+        ArrayList<Takefrom> source=new ArrayList<>(neededList.size());
+        for (Ingredient neededItem: neededList) {                                // iterate over needed items
+            ItemStack[] stacks=neededItem.getMatchingStacks();
+            if (stacks.length==0)
+                continue;
+            int neededAmount=stacks[0].getCount();
+            // System.out.println("need "+neededAmount+" "+stacks[0].getDisplayName()+" for "+recipe.getRecipeOutput().getDisplayName());
             for (int i=0; i<36; i++) {
                 Slot invitem=inventory.getSlot(i+firstInventorySlotNo);
                 ItemStack slotcontent=invitem.getStack();
@@ -392,7 +364,7 @@ public class RecipeBook {
                 return;
         }
 
-        List<ItemStack> recipeInput=getIngredientsAsList(underMouse);
+        NonNullList<Ingredient> recipeInput=getIngredientsAsList(underMouse);
         
         int maxCraftableStacks=64;
         if (isShiftKeyDown()) {
@@ -403,13 +375,14 @@ public class RecipeBook {
             // more than floor(64/5)=12 lanters)
 
             // this assumes a recipe never needs more than one item in a single input slot (unless more than 1 output item)
-            HashMap<String,InputCount> inputCount=new HashMap<String,InputCount>();
-            for (ItemStack stack:recipeInput) {
-                if (stack==null || stack.isEmpty())
+            HashMap<String,InputCount> inputCount=new HashMap<>();
+            for (Ingredient ingr:recipeInput) {
+                ItemStack[] stacks = ingr.getMatchingStacks();
+                if (stacks.length==0)
                     continue;
-                if (stack.getMaxStackSize()<maxCraftableStacks)                 // limit type a
-                    maxCraftableStacks=stack.getMaxStackSize();
-                String descriptor=stack.getDisplayName()+":"+stack.getItemDamage();
+                if (stacks[0].getMaxStackSize()<maxCraftableStacks)                 // limit type a
+                    maxCraftableStacks=stacks[0].getMaxStackSize();
+                String descriptor=stacks[0].getDisplayName()+":"+stacks[0].getItemDamage();
                 if (inputCount.containsKey(descriptor)) {
                     InputCount previous = inputCount.get(descriptor);
                     previous.count++;
@@ -418,7 +391,7 @@ public class RecipeBook {
                     for (int slot=0; slot<36; slot++) {
                         Slot invitem=container.inventorySlots.getSlot(slot+firstInventorySlotNo);
                         ItemStack slotcontent=invitem.getStack();
-                        if (canActAsIngredient(stack, slotcontent))
+                        if (canActAsIngredient(ingr, slotcontent))
                             totalInInv+=slotcontent.getCount();
                     }
                     InputCount current=new InputCount();
@@ -446,13 +419,13 @@ public class RecipeBook {
         //System.out.println("Crafting "+maxCraftableStacks+" items");
         for (int craftslot=0; craftslot<recipeInput.size(); craftslot++) {
             int remaining=maxCraftableStacks;
-            ItemStack stack=recipeInput.get(craftslot);
-            if (stack==null)
-                continue;
+            Ingredient ingr=recipeInput.get(craftslot);
+//            if (ingr==null)
+//                continue;
             for (int slot=0; remaining>0 && slot<36; slot++) {
                 Slot invitem=container.inventorySlots.getSlot(slot+firstInventorySlotNo);
                 ItemStack slotcontent=invitem.getStack();
-                if (canActAsIngredient(stack, slotcontent)) {
+                if (canActAsIngredient(ingr, slotcontent)) {
                     // TODO: && (isempty(craftslot) || ismergeable(slot,craftslot))
                     transfer(slot+firstInventorySlotNo, craftslot+firstCraftSlot, remaining);
                     remaining=maxCraftableStacks-container.inventorySlots.getSlot(craftslot+firstCraftSlot).getStack().getCount();
@@ -473,69 +446,14 @@ public class RecipeBook {
             pattern.textboxKeyTyped(c, i);
     }
     
-    /**
-     * Gets the ingredient list for a recipe as a List of ItemStacks, no matter
-     * what kind of recipe it is. This list may include null entries on shaped
-     * recipes to allow easier matching of list indexes to grid positions.
-     * @param recipe
-     * the recipe we want to get the ingredients for
-     * @return
-     * a list of ItemStacks
-     */
-    private List<ItemStack> getIngredientsAsList(IRecipe recipe) {
-        // bah, what a mess .. normalize the ingredient datatype to an arraylist
-        List<ItemStack> ingredientsList=new ArrayList<ItemStack>();
-        if (recipe instanceof ShapedRecipes) {
-            for (int y=0; y<gridSize; y++) {
-                for (int x=0; x<gridSize; x++) {
-                    ItemStack stack;
-                    if (x<((ShapedRecipes)recipe).recipeWidth && y<((ShapedRecipes)recipe).recipeHeight)
-                        stack = ((ShapedRecipes)recipe).recipeItems[x+y*((ShapedRecipes)recipe).recipeWidth];
-                    else
-                        stack=null;
-                    ingredientsList.add(stack);
-                }
-            }
-        } else if (recipe instanceof ShapelessRecipes) {
-            for (ItemStack stack: ((ShapelessRecipes)recipe).recipeItems) {
-                ingredientsList.add(stack);
-            }
-        } else if (recipe instanceof ShapedOreRecipe) {
-            Object[] ingredients = ((ShapedOreRecipe)recipe).getInput();
-            for (int y=0; y<gridSize; y++) {
-                for (int x=0; x<gridSize; x++) {
-                    if (x>=((ShapedOreRecipe)recipe).getWidth()
-                    ||  y>=((ShapedOreRecipe)recipe).getHeight()) {
-                        ingredientsList.add(null);
-                        continue;
-                    }
-                    Object ingredient = ingredients[x+y*((ShapedOreRecipe)recipe).getWidth()];
-                    if (ingredient instanceof ItemStack)
-                        ingredientsList.add((ItemStack) ingredient);
-                    else if (ingredient instanceof NonNullList)
-                        ingredientsList.add(((NonNullList<ItemStack>)ingredient).get(0));
-                    else
-                        ingredientsList.add(null);
-                }
-            }
-        } else if (recipe instanceof ShapelessOreRecipe) {
-            for (Object ingredient: ((ShapelessOreRecipe)recipe).getInput()) {
-                    if (ingredient instanceof ItemStack)
-                        ingredientsList.add((ItemStack) ingredient);
-                    else if (ingredient instanceof NonNullList)
-                        ingredientsList.add(((NonNullList<ItemStack>)ingredient).get(0));
-            }
-        }
-        return ingredientsList;
+
+    private NonNullList<Ingredient> getIngredientsAsList(IRecipe recipe) {
+        // Wow. This was so much harder before 1.12.
+        return recipe.getIngredients();
     }
     
-    private boolean canActAsIngredient(ItemStack recipeComponent, ItemStack inventoryItem) {
-        return 
-           (recipeComponent.getItem()==inventoryItem.getItem()                 // that can act as source
-        &&  !inventoryItem.hasTagCompound()                               // don't use enchanted items as source
-        &&  ( recipeComponent.getItemDamage() == 32767
-        ||    recipeComponent.getItemDamage() == inventoryItem.getItemDamage()));
-        
+    private boolean canActAsIngredient(Ingredient recipeComponent, ItemStack inventoryItem) {
+        return !inventoryItem.hasTagCompound() && recipeComponent.apply(inventoryItem);
     }
     
     private void transfer(int from, int to, int amount) {
@@ -573,7 +491,7 @@ public class RecipeBook {
     
     private void slotClick(int slot, int mouseButton, ClickType clickType) {
         Minecraft mc=Minecraft.getMinecraft();
-        //System.out.println("Clicking slot "+slot+" "+(mouseButton==0 ? "left" : "right"));
+        System.out.println("Clicking slot "+slot+" "+(mouseButton==0 ? "left" : "right")+" type:"+clickType.toString());
         mc.playerController.windowClick(mc.player.openContainer.windowId, slot, mouseButton, clickType, mc.player);
     }
     

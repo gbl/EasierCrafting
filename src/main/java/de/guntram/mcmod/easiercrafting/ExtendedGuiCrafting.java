@@ -20,7 +20,7 @@ class ExtendedGuiCrafting extends GuiCrafting {
     @Override
     protected void drawGuiContainerForegroundLayer(final int mouseX, final int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-        recipeBook.drawRecipeList(fontRendererObj, itemRender, xSize, ySize, mouseX-guiLeft, mouseY-guiTop);
+        recipeBook.drawRecipeList(fontRenderer, itemRender, xSize, ySize, mouseX-guiLeft, mouseY-guiTop);
     }
     
     @Override
