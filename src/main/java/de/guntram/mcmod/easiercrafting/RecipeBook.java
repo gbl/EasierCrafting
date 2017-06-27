@@ -2,7 +2,6 @@ package de.guntram.mcmod.easiercrafting;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -78,7 +77,7 @@ public class RecipeBook {
         // We can't do this in the constructor as we don't yet know various stuff there.
         if (pattern==null) {
             pattern=new GuiTextField(1, fontRenderer, xOffset, 0, 150, 20);
-            pattern.setFocused(true);
+            pattern.setFocused(ConfigurationHandler.getAutoFocusSearch());
         }
 
         if (recipeUpdateTime!=0 && System.currentTimeMillis() > recipeUpdateTime) {
@@ -348,10 +347,11 @@ public class RecipeBook {
         int items;
     }
 
-    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        // don't do this, have the pattern in focus all the time
-//        if (pattern!=null)
-//            pattern.mouseClicked(mouseX, mouseY, mouseButton);
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton, int guiLeft, int guiTop) {
+        if (pattern!=null) {
+            //System.out.println("x="+(mouseX-guiLeft)+", y="+(mouseY-guiTop)+"; patternx="+pattern.x+", patterny="+pattern.y);
+            pattern.mouseClicked(mouseX-guiLeft, mouseY-guiTop, mouseButton);
+        }
 
         // we assume the mouse is clicked where it was when we updated the screen last ...
         if (underMouse==null)
@@ -416,20 +416,21 @@ public class RecipeBook {
             maxCraftableStacks=1;
         }
 
-        //System.out.println("Crafting "+maxCraftableStacks+" items");
+        int rowadjust=0;
         for (int craftslot=0; craftslot<recipeInput.size(); craftslot++) {
             int remaining=maxCraftableStacks;
             Ingredient ingr=recipeInput.get(craftslot);
-//            if (ingr==null)
-//                continue;
             for (int slot=0; remaining>0 && slot<36; slot++) {
                 Slot invitem=container.inventorySlots.getSlot(slot+firstInventorySlotNo);
                 ItemStack slotcontent=invitem.getStack();
                 if (canActAsIngredient(ingr, slotcontent)) {
                     // TODO: && (isempty(craftslot) || ismergeable(slot,craftslot))
-                    transfer(slot+firstInventorySlotNo, craftslot+firstCraftSlot, remaining);
+                    transfer(slot+firstInventorySlotNo, craftslot+firstCraftSlot+rowadjust, remaining);
                     remaining=maxCraftableStacks-container.inventorySlots.getSlot(craftslot+firstCraftSlot).getStack().getCount();
                 }
+            }
+            if (underMouse instanceof ShapedRecipes && ((craftslot+1)%((ShapedRecipes)underMouse).recipeWidth)==0) {
+                rowadjust+=gridSize-((ShapedRecipes)underMouse).recipeWidth;
             }
         }
         
@@ -439,11 +440,17 @@ public class RecipeBook {
         }
     }
     
-    public void keyTyped(char c, int i) throws IOException {
-        if (c=='\r' || c=='\n')
+    public boolean keyTyped(char c, int i) throws IOException {
+        if (c=='\r' || c=='\n') {
             updatePatternMatch();
-        else //tif (pattern.isFocused())
+            pattern.setFocused(false);
+            return true;
+        } else if (pattern.isFocused()) {
             pattern.textboxKeyTyped(c, i);
+            return true;
+        } else {
+            return false;
+        }
     }
     
 
@@ -491,8 +498,7 @@ public class RecipeBook {
     
     private void slotClick(int slot, int mouseButton, ClickType clickType) {
         Minecraft mc=Minecraft.getMinecraft();
-        System.out.println("Clicking slot "+slot+" "+(mouseButton==0 ? "left" : "right")+" type:"+clickType.toString());
+        // System.out.println("Clicking slot "+slot+" "+(mouseButton==0 ? "left" : "right")+" type:"+clickType.toString());
         mc.playerController.windowClick(mc.player.openContainer.windowId, slot, mouseButton, clickType, mc.player);
     }
-    
 }

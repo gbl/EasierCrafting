@@ -12,6 +12,13 @@ class ExtendedGuiCrafting extends GuiCrafting {
     public ExtendedGuiCrafting(InventoryPlayer playerInv, World worldIn) {
         super(playerInv, worldIn);
     }
+    
+    @Override
+    public void initGui() {
+        super.initGui();
+        if (!ConfigurationHandler.getAllowMinecraftRecipeBook())
+            this.buttonList.clear();
+    }
 
     void setRecipeBook(RecipeBook recipeBook) {
         this.recipeBook=recipeBook;
@@ -26,14 +33,16 @@ class ExtendedGuiCrafting extends GuiCrafting {
     @Override
     protected void mouseClicked(final int mouseX, final int mouseY, final int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        recipeBook.mouseClicked(mouseX, mouseY, mouseButton);
+        recipeBook.mouseClicked(mouseX, mouseY, mouseButton, guiLeft, guiTop);
     }
 
     @Override
     public void keyTyped(char c, int i) throws IOException {
         if (c==27)
             super.keyTyped(c, i);
+        else if (recipeBook.keyTyped(c, i))
+            ;
         else
-            recipeBook.keyTyped(c, i);
+            super.keyTyped(c, i);
     }
 }

@@ -34,8 +34,8 @@ public class OpenCraftEventHandler {
             egi.setRecipeBook(new RecipeBook(egi, 1, 2, 0, 9));
             event.setGui(egi);
         } else {
-            if (event.getGui() != null)
-                System.out.println("opened "+event.getGui().getClass().getCanonicalName());
+//            if (event.getGui() != null)
+//                System.out.println("opened "+event.getGui().getClass().getCanonicalName());
         }
     }
 }
