@@ -424,9 +424,10 @@ public class RecipeBook {
                 Slot invitem=container.inventorySlots.getSlot(slot+firstInventorySlotNo);
                 ItemStack slotcontent=invitem.getStack();
                 if (canActAsIngredient(ingr, slotcontent)) {
+                    // System.out.println("craftslot is "+craftslot+", first is "+firstCraftSlot+", rowadjust is "+rowadjust+", transferring "+remaining+" items");
                     // TODO: && (isempty(craftslot) || ismergeable(slot,craftslot))
                     transfer(slot+firstInventorySlotNo, craftslot+firstCraftSlot+rowadjust, remaining);
-                    remaining=maxCraftableStacks-container.inventorySlots.getSlot(craftslot+firstCraftSlot).getStack().getCount();
+                    remaining=maxCraftableStacks-container.inventorySlots.getSlot(craftslot+firstCraftSlot+rowadjust).getStack().getCount();
                 }
             }
             if (underMouse instanceof ShapedRecipes && ((craftslot+1)%((ShapedRecipes)underMouse).recipeWidth)==0) {
