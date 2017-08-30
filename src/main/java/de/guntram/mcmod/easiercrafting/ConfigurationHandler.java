@@ -15,6 +15,7 @@ public class ConfigurationHandler {
     private boolean autoFocusSearch;
     private int autoUpdateRecipeTimer;
     private boolean allowRecipeBook;
+    private boolean showGuiRight;
 
     public static ConfigurationHandler getInstance() {
         if (instance==null)
@@ -41,6 +42,7 @@ public class ConfigurationHandler {
         autoUpdateRecipeTimer=config.getInt("Auto update recipe timer", Configuration.CATEGORY_CLIENT, 5, 0, 300, "Update recipe list after this many seconds after last click");
         autoFocusSearch=config.getBoolean("Auto focus search text", Configuration.CATEGORY_CLIENT, false, "Automatically focus the search box when opening craft GUI");
         allowRecipeBook=config.getBoolean("Allow MC internal recipe book", Configuration.CATEGORY_CLIENT, true, "Allow opening the MC internal recipe book (since 1.12)");
+        showGuiRight=config.getBoolean("Show GUI right of inventory", Configuration.CATEGORY_CLIENT, true, "Show the GUI right of the inventory, when it could conflict with Just Enough Items, instead of left, where it conflicts with active buffs");
         
         if (config.hasChanged())
             config.save();
@@ -65,4 +67,9 @@ public class ConfigurationHandler {
     public static boolean getAllowMinecraftRecipeBook() {
         return getInstance().allowRecipeBook;
     }
+    
+    public static boolean getShowGuiRight() {
+        return getInstance().showGuiRight;
+    }
+
 }

@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class EasierCrafting
 {
     static final String MODID="easiercrafting";
-    static final String VERSION="1.1";
+    static final String VERSION="1.2";
     @EventHandler
     public void init(FMLInitializationEvent event)
     {

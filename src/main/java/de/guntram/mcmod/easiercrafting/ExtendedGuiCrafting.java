@@ -4,6 +4,7 @@ import java.io.IOException;
 import net.minecraft.client.gui.inventory.GuiCrafting;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.world.World;
+import org.lwjgl.input.Mouse;
 
 class ExtendedGuiCrafting extends GuiCrafting {
 
@@ -18,6 +19,7 @@ class ExtendedGuiCrafting extends GuiCrafting {
         super.initGui();
         if (!ConfigurationHandler.getAllowMinecraftRecipeBook())
             this.buttonList.clear();
+        this.recipeBook.afterInitGui();
     }
 
     void setRecipeBook(RecipeBook recipeBook) {
@@ -29,6 +31,12 @@ class ExtendedGuiCrafting extends GuiCrafting {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
         recipeBook.drawRecipeList(fontRenderer, itemRender, xSize, ySize, mouseX-guiLeft, mouseY-guiTop);
     }
+    
+    @Override
+    public void handleMouseInput() throws IOException {
+        recipeBook.scrollBy(Mouse.getDWheel());
+        super.handleMouseInput();
+    }    
     
     @Override
     protected void mouseClicked(final int mouseX, final int mouseY, final int mouseButton) throws IOException {

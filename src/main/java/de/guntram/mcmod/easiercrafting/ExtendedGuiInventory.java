@@ -1,9 +1,9 @@
 package de.guntram.mcmod.easiercrafting;
 
 import java.io.IOException;
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.player.EntityPlayer;
+import org.lwjgl.input.Mouse;
 
 public class ExtendedGuiInventory extends GuiInventory {
     
@@ -18,6 +18,7 @@ public class ExtendedGuiInventory extends GuiInventory {
         super.initGui();
         if (!ConfigurationHandler.getAllowMinecraftRecipeBook())
             this.buttonList.clear();
+        this.recipeBook.afterInitGui();
     }
 
     void setRecipeBook(RecipeBook recipeBook) {
@@ -28,6 +29,12 @@ public class ExtendedGuiInventory extends GuiInventory {
     protected void drawGuiContainerForegroundLayer(final int mouseX, final int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
         recipeBook.drawRecipeList(fontRenderer, itemRender, xSize, ySize, mouseX-guiLeft, mouseY-guiTop);
+    }
+    
+    @Override
+    public void handleMouseInput() throws IOException {
+        recipeBook.scrollBy(Mouse.getDWheel());        
+        super.handleMouseInput();
     }
     
     @Override
