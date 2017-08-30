@@ -16,8 +16,10 @@ import net.minecraft.client.gui.FontRenderer;
 import static net.minecraft.client.gui.GuiScreen.isShiftKeyDown;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import static net.minecraft.client.gui.inventory.GuiContainer.INVENTORY_BACKGROUND;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
@@ -31,6 +33,7 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
@@ -44,16 +47,34 @@ public class RecipeBook {
     private IRecipe underMouse;
     
     private final int itemSize=20;
-    private final int xOffset=-itemSize*8-10; // offset of list to standard gui
-    private final int itemLift=5;               // how many pixels to display items above where they would be normally
+    private final int itemLift=5;         // how many pixels to display items above where they would be normally
+
     private int listSize;
+    private int itemsPerRow;                // # of items per row. Normally 8.
+    private int xOffset;                    // offset of list to standard gui. itemSize*itemsPerRow+10.
+    private int mouseScroll;
+    private boolean mouseScrollEnabled;
+    private int minYtoDraw=0;               // implements clipping top part of the item list
+    private int textBoxSize;
     private long recipeUpdateTime;
     
     private GuiTextField pattern;
     private TreeSet<IRecipe> patternMatchingRecipes;
     private int patternListSize;
     
+    static ResourceLocation arrows;
     
+/**
+ * 
+ * @param craftinv          The container the recipe book is attached to - this
+ *      can be a GuiCrafting or a GuiInventory container
+ * @param firstCraftSlot    The slot number of the first slot that is a craft
+ *      slot in craftinv
+ * @param gridsize          2 (for inventory) or 3 (for workbench)
+ * @param resultSlot        the slot number of the craft result slot
+ * @param firstInventorySlot
+ *                          the slot number of the first inventory slot
+ */    
     RecipeBook(GuiContainer craftinv, int firstCraftSlot, int gridsize, int resultSlot, int firstInventorySlot) {
         this.container=craftinv;
         this.firstCraftSlot=firstCraftSlot;
@@ -63,7 +84,30 @@ public class RecipeBook {
         // player inventory has 9-44; 45 is offhand
         this.firstInventorySlotNo=firstInventorySlot;
         this.pattern=null;
-        underMouse=null;
+        this.underMouse=null;
+        
+        if (arrows==null) {
+            arrows=new ResourceLocation(EasierCrafting.MODID, "textures/arrows.png");
+            SimpleTexture x=new SimpleTexture(arrows);
+            boolean flag = Minecraft.getMinecraft().getTextureManager().loadTexture(arrows, x);
+            //System.out.println("loading "+arrows.toString()+": "+flag);
+        }
+    }
+    
+    void afterInitGui() {
+        int tempItemsPerRow = 8;
+        int tempXOffset=-itemSize*tempItemsPerRow -10;
+        if (tempXOffset+container.getGuiLeft() < 0) {
+            tempItemsPerRow=(container.getGuiLeft()-10)/itemSize;
+            tempXOffset=-itemSize*tempItemsPerRow-10;
+        }
+        textBoxSize=-tempXOffset-15;
+        if (ConfigurationHandler.getShowGuiRight())
+            tempXOffset=container.getXSize()+10;
+        this.itemsPerRow=tempItemsPerRow;
+        this.xOffset=tempXOffset;
+        this.mouseScroll=0;
+        //System.out.println("left="+container.getGuiLeft()+", items="+itemsPerRow+", offset="+tempXOffset+", textbox="+textBoxSize);
         updatePatternMatch();
         updateRecipes();
     }
@@ -73,14 +117,14 @@ public class RecipeBook {
     // adjust our Y position accordingly.
     void drawRecipeList(FontRenderer fontRenderer, RenderItem itemRenderer,
             int left, int height, int mouseX, int mouseY) {
-
-        boolean underMouseIsCraftable=true;
-        // We can't do this in the constructor as we don't yet know various stuff there.
+        // We can't do this in the constructor as we don't yet know sizes from initGui.
+        // Also, not in afterInitGui() because we don't know fontRender there.
         if (pattern==null) {
-            pattern=new GuiTextField(1, fontRenderer, xOffset, 0, 150, 20);
-            pattern.setFocused(true);
+            pattern=new GuiTextField(1, fontRenderer, xOffset, 0, textBoxSize, 20);
+            pattern.setFocused(ConfigurationHandler.getAutoFocusSearch());
         }
 
+        boolean underMouseIsCraftable=true;
         if (recipeUpdateTime!=0 && System.currentTimeMillis() > recipeUpdateTime) {
             updateRecipes();
             recipeUpdateTime=0;
@@ -89,8 +133,26 @@ public class RecipeBook {
         int xpos=0, ypos=0;
         int neededHeight=patternListSize+listSize;
         
-        if (neededHeight>height)
+        if (neededHeight>height) {
             ypos-=(neededHeight-height)/2;
+            //System.out.println("ypos is now "+ypos);
+            if (ypos < -container.getGuiTop()) {
+                ypos = -container.getGuiTop();
+                //System.out.println("mouse wheel text at"+ypos);
+                // fontRenderer.drawString(I18n.format("message.usemouse"), xOffset+itemSize, ypos, 0xff0000);
+                Minecraft.getMinecraft().getTextureManager().bindTexture(arrows);
+                container.drawTexturedModalRect(xOffset,                ypos,  0, 0, 20, 20);
+                container.drawTexturedModalRect(xOffset+textBoxSize-20, ypos, 20, 0, 20, 20);
+                mouseScrollEnabled=true;
+                ypos+=itemSize;
+            } else {
+                mouseScrollEnabled=false;
+                mouseScroll=0;
+            }
+        } else {
+            mouseScrollEnabled=false;
+            mouseScroll=0;
+        }
         RenderHelper.enableStandardItemLighting();
         RenderHelper.enableGUIStandardItemLighting();
 
@@ -99,12 +161,15 @@ public class RecipeBook {
         pattern.yPosition=ypos;
         pattern.drawTextBox();
         ypos+=itemSize*3/2;
+        minYtoDraw=ypos;
+        ypos-=mouseScroll*itemSize;
         ypos=drawRecipeOutputs(patternMatchingRecipes, itemRenderer, fontRenderer, 0, ypos, mouseX, mouseY);
         if (underMouse!=null)
             underMouseIsCraftable=false;
         
         for (String category: craftableCategories.keySet()) {
-            fontRenderer.drawString(category, xOffset, ypos, 0xffff00);
+            if (ypos>=minYtoDraw)
+                fontRenderer.drawString(category, xOffset, ypos, 0xffff00);
             ypos+=itemSize;
             ypos=drawRecipeOutputs(craftableCategories.get(category), itemRenderer, fontRenderer, 0, ypos, mouseX, mouseY);
         }
@@ -156,14 +221,16 @@ public class RecipeBook {
 
         for (IRecipe recipe: recipes) {
             ItemStack items=recipe.getRecipeOutput();
-            itemRenderer.renderItemAndEffectIntoGUI(items, xOffset+xpos, ypos-itemLift);
-            itemRenderer.renderItemOverlays(fontRenderer, items, xOffset+xpos, ypos-itemLift);
-            if (mouseX>=xpos+xOffset  && mouseX<=xpos+xOffset+itemSize-1
-            &&  mouseY>=ypos-itemLift && mouseY<=ypos-itemLift+itemSize-1) {
-                underMouse=recipe;
+            if (ypos>=minYtoDraw) {
+                itemRenderer.renderItemAndEffectIntoGUI(items, xOffset+xpos, ypos-itemLift);
+                itemRenderer.renderItemOverlays(fontRenderer, items, xOffset+xpos, ypos-itemLift);
+                if (mouseX>=xpos+xOffset  && mouseX<=xpos+xOffset+itemSize-1
+                &&  mouseY>=ypos-itemLift && mouseY<=ypos-itemLift+itemSize-1) {
+                    underMouse=recipe;
+                }
             }
             xpos+=itemSize;
-            if (xpos>=itemSize*8) {
+            if (xpos>=itemSize*itemsPerRow) {
                 ypos+=itemSize;
                 xpos=0;
             }
@@ -237,8 +304,9 @@ public class RecipeBook {
         }
         listSize=craftableCategories.size();
         for (TreeSet<IRecipe> tree: craftableCategories.values())
-            listSize+=((tree.size()+7)/8);
+            listSize+=((tree.size()+(itemsPerRow-1))/itemsPerRow);
         listSize*=itemSize;
+        mouseScroll=0;
     }
     
     public final void updatePatternMatch() {
@@ -272,7 +340,8 @@ public class RecipeBook {
             //System.out.println("adding "+result.getDisplayName()+" to pattern match "+patternText);
             patternMatchingRecipes.add(recipe);
         }
-        patternListSize=((patternMatchingRecipes.size()+7)/8)*itemSize;
+        patternListSize=((patternMatchingRecipes.size()+(itemsPerRow-1))/itemsPerRow)*itemSize;
+        mouseScroll=0;
     }
     
     class Takefrom { 
@@ -375,12 +444,30 @@ public class RecipeBook {
         int count;
         int items;
     }
+    
+    public void scrollBy(int ticks) {
+        int old=mouseScroll;
+        if (ticks<=-100 && mouseScroll*itemSize < listSize+patternListSize)      mouseScroll++;
+        if (ticks>= 100 && mouseScroll>0)                                        mouseScroll--;
+//        if (mouseScroll!=old)
+//            System.out.println("mouseScroll is now "+mouseScroll+" vs height "+(listSize+patternListSize));
+    }
 
-    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        // don't do this, have the pattern in focus all the time
-//        if (pattern!=null)
-//            pattern.mouseClicked(mouseX, mouseY, mouseButton);
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton, int guiLeft, int guiTop) {
+        if (pattern!=null) {
+            pattern.mouseClicked(mouseX-guiLeft, mouseY-guiTop, mouseButton);
+        }
 
+        // mouseXY are screen coords here!
+        //System.out.println("mouseY="+mouseY+", guiTop="+guiTop+", mouseX="+mouseX+", xOffset+guiLeft="+(xOffset+container.getGuiLeft()));
+        if (mouseY>0 && mouseY<20 && mouseX>xOffset+container.getGuiLeft() && mouseX<xOffset+container.getGuiLeft()+textBoxSize) {
+            if (mouseX<xOffset+container.getGuiLeft()+20)
+                scrollBy(-100);
+            else if (mouseX>xOffset+container.getGuiLeft()+textBoxSize-20)
+                scrollBy(100);
+            return;
+        }
+        
         // we assume the mouse is clicked where it was when we updated the screen last ...
         if (underMouse==null)
             return;
@@ -466,13 +553,19 @@ public class RecipeBook {
         }
     }
     
-    public void keyTyped(char c, int i) throws IOException {
-        if (c=='\r' || c=='\n')
+   public boolean keyTyped(char c, int i) throws IOException {
+        if (c=='\r' || c=='\n') {
             updatePatternMatch();
-        else //tif (pattern.isFocused())
+            pattern.setFocused(false);
+            return true;
+        } else if (pattern.isFocused()) {
             pattern.textboxKeyTyped(c, i);
+            return true;
+        } else {
+            return false;
+        }
     }
-    
+   
     /**
      * Gets the ingredient list for a recipe as a List of ItemStacks, no matter
      * what kind of recipe it is. This list may include null entries on shaped

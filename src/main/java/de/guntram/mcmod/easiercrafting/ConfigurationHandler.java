@@ -12,7 +12,9 @@ public class ConfigurationHandler {
     private Configuration config;
     private String configFileName;
     
+    private boolean autoFocusSearch;
     private int autoUpdateRecipeTimer;
+    private boolean showGuiRight;
 
     public static ConfigurationHandler getInstance() {
         if (instance==null)
@@ -36,11 +38,9 @@ public class ConfigurationHandler {
     }
     
     private void loadConfig() {
-//        allowUpload=config.getBoolean("Allow Upload", Configuration.CATEGORY_CLIENT, allowUpload, "Allow Upload to central database");
-//        allowDownload=config.getBoolean("Allow Download", Configuration.CATEGORY_CLIENT, allowDownload, "Allow Download from central database (only if Upload is enabled as well)");
-//        saveEveryXMinutes=config.getInt("Save every X minutes", Configuration.CATEGORY_CLIENT, 1, 1, 60, "How often sign data will be saved locally");
-//        uploadEveryXMinutes=config.getInt("Upload every X minutes", Configuration.CATEGORY_CLIENT, 5, 5, 60, "How often sign data will be uploaded");
         autoUpdateRecipeTimer=config.getInt("Auto update recipe timer", Configuration.CATEGORY_CLIENT, 5, 0, 300, "Update recipe list after this many seconds after last click");
+        autoFocusSearch=config.getBoolean("Auto focus search text", Configuration.CATEGORY_CLIENT, false, "Automatically focus the search box when opening craft GUI");
+        showGuiRight=config.getBoolean("Show GUI right of inventory", Configuration.CATEGORY_CLIENT, true, "Show the GUI right of the inventory, when it could conflict with Just Enough Items, instead of left, where it conflicts with active buffs");
         
         if (config.hasChanged())
             config.save();
@@ -57,4 +57,13 @@ public class ConfigurationHandler {
     public static int getAutoUpdateRecipeTimer() {
         return getInstance().autoUpdateRecipeTimer;
     }
+
+    public static boolean getAutoFocusSearch() {
+        return getInstance().autoFocusSearch;
+    }
+    
+    public static boolean getShowGuiRight() {
+        return getInstance().showGuiRight;
+    }
+
 }
