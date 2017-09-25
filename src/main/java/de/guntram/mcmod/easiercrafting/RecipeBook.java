@@ -398,6 +398,11 @@ public class RecipeBook {
             if (o instanceof ItemStack)
                 neededList.add((ItemStack)o);
             else if (o instanceof NonNullList) {
+                if (((NonNullList<ItemStack>)o).isEmpty()) {
+                    System.out.println(recipe.getRecipeOutput().getDisplayName()+" has an empty component alternatives list!");
+                    System.out.println("This shouldn't happen and is probably due to a different mod doing weird things.");
+                    return false;
+                }
                 neededList.add(((NonNullList<ItemStack>)o).get(0));
             }
             else {
