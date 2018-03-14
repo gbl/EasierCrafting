@@ -10,13 +10,14 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
         version = EasierCrafting.VERSION,
 	clientSideOnly = true, 
 	guiFactory = "de.guntram.mcmod.easiercrafting.GuiFactory",
-	acceptedMinecraftVersions = "[1.12]"
+	acceptedMinecraftVersions = "[1.12]",
+        updateJSON = "https://raw.githubusercontent.com/gbl/EasierCrafting/master/versioncheck.json"        
 )
 
 public class EasierCrafting
 {
     static final String MODID="easiercrafting";
-    static final String VERSION="1.2";
+    static final String VERSION="@VERSION@";
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
