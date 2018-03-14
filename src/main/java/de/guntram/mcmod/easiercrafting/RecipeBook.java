@@ -14,7 +14,6 @@ import net.minecraft.client.gui.FontRenderer;
 import static net.minecraft.client.gui.GuiScreen.isShiftKeyDown;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import static net.minecraft.client.gui.inventory.GuiContainer.INVENTORY_BACKGROUND;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.texture.SimpleTexture;
@@ -31,6 +30,8 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
+import net.minecraft.potion.PotionType;
+import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.oredict.ShapedOreRecipe;
@@ -254,6 +255,10 @@ public class RecipeBook {
         List<IRecipe> recipes = new ArrayList<>();
         for (Iterator<IRecipe> i= CraftingManager.REGISTRY.iterator(); i.hasNext();)
             recipes.add(i.next());
+        
+        if (ConfigurationHandler.getAllowGeneratedRecipes()) {
+            recipes.addAll(InventoryRecipeScanner.findUnusualRecipes(inventory, firstInventorySlotNo));
+        }
 
         craftableCategories=new TreeMap();
         for (IRecipe recipe:recipes) {
@@ -266,8 +271,12 @@ public class RecipeBook {
                 continue;
             CreativeTabs tab = item.getCreativeTab();
             String category;
-            if (tab==null)
-                category="(none?)";
+            if (tab==null) {
+                if (item==Items.FIREWORKS)
+                    category = "Fireworks";
+                else
+                    category="(none?)";
+            }
             else
                 category=I18n.format(tab.getTranslatedTabLabel(), new Object[0]);
             TreeSet<IRecipe> catRecipes=craftableCategories.get(category);
@@ -342,6 +351,10 @@ public class RecipeBook {
             return canCraftShapedOre((ShapedOreRecipe) recipe, inventory, gridSize);
         } else if (recipe instanceof ShapelessOreRecipe) {
             return canCraftShapelessOre((ShapelessOreRecipe) recipe, inventory, gridSize);
+        } else if (recipe instanceof InventoryGeneratedRecipe) {
+            // We just generated the recipe so we should be able to craft it
+            return true;
+            // return canCraft(recipe, recipe.getIngredients(), inventory);
         } else {
             //System.out.println(recipe.getRecipeOutput().getDisplayName()+" is a "+recipe.getClass().getCanonicalName());
         }
@@ -547,7 +560,19 @@ public class RecipeBook {
     }
     
     private boolean canActAsIngredient(Ingredient recipeComponent, ItemStack inventoryItem) {
-        return !inventoryItem.hasTagCompound() && recipeComponent.apply(inventoryItem);
+        if (!inventoryItem.hasTagCompound() && recipeComponent.apply(inventoryItem))
+            return true;
+        
+        if (inventoryItem.getItem()!=Items.LINGERING_POTION)
+            return false;
+        
+        PotionType neededType = PotionUtils.getPotionFromItem(inventoryItem);
+        ItemStack[] possiblePotions = recipeComponent.getMatchingStacks();
+        for (ItemStack stack: possiblePotions) {
+            if (PotionUtils.getPotionFromItem(stack) == neededType)
+                return true;
+        }
+        return false;
     }
     
     private void transfer(int from, int to, int amount) {

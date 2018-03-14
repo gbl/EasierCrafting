@@ -16,6 +16,7 @@ public class ConfigurationHandler {
     private int autoUpdateRecipeTimer;
     private boolean allowRecipeBook;
     private boolean showGuiRight;
+    private boolean allowGeneratedRecipes;
 
     public static ConfigurationHandler getInstance() {
         if (instance==null)
@@ -43,6 +44,7 @@ public class ConfigurationHandler {
         autoFocusSearch=config.getBoolean("Auto focus search text", Configuration.CATEGORY_CLIENT, false, "Automatically focus the search box when opening craft GUI");
         allowRecipeBook=config.getBoolean("Allow MC internal recipe book", Configuration.CATEGORY_CLIENT, true, "Allow opening the MC internal recipe book (since 1.12)");
         showGuiRight=config.getBoolean("Show GUI right of inventory", Configuration.CATEGORY_CLIENT, true, "Show the GUI right of the inventory, when it could conflict with Just Enough Items, instead of left, where it conflicts with active buffs");
+        allowGeneratedRecipes=config.getBoolean("Allow EXPERIMENTAL special recipes", Configuration.CATEGORY_CLIENT, false, "Add Shulker box coloring, tipped arrows, and fireworks to the craftable list");
         
         if (config.hasChanged())
             config.save();
@@ -72,4 +74,7 @@ public class ConfigurationHandler {
         return getInstance().showGuiRight;
     }
 
+    public static boolean getAllowGeneratedRecipes() {
+        return getInstance().allowGeneratedRecipes;
+    }
 }
