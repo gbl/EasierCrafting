@@ -352,8 +352,9 @@ public class RecipeBook {
         } else if (recipe instanceof ShapelessOreRecipe) {
             return canCraftShapelessOre((ShapelessOreRecipe) recipe, inventory, gridSize);
         } else if (recipe instanceof InventoryGeneratedRecipe) {
-            // We just generated the recipe so we should be able to craft it
-            return true;
+            // We just generated the recipe so we should be able to craft it,
+            // but make sure the grid is big enough
+            return recipe.canFit(gridSize, gridSize);
             // return canCraft(recipe, recipe.getIngredients(), inventory);
         } else {
             //System.out.println(recipe.getRecipeOutput().getDisplayName()+" is a "+recipe.getClass().getCanonicalName());
