@@ -351,7 +351,7 @@ public class RecipeBook {
             return canCraftShapedOre((ShapedOreRecipe) recipe, inventory, gridSize);
         } else if (recipe instanceof ShapelessOreRecipe) {
             return canCraftShapelessOre((ShapelessOreRecipe) recipe, inventory, gridSize);
-        } else if (recipe instanceof InventoryGeneratedRecipe) {
+        } else if (recipe instanceof InventoryGeneratedRecipe || recipe instanceof RepairRecipe) {
             // We just generated the recipe so we should be able to craft it,
             // but make sure the grid is big enough
             return recipe.canFit(gridSize, gridSize);
@@ -463,7 +463,21 @@ public class RecipeBook {
             if (stack!=null && !stack.isEmpty())
                 return;
         }
+        
+        if (underMouse instanceof RepairRecipe) {
+            fillCraftSlotsWithBestRepair((RepairRecipe)underMouse);
+        } else {
+            fillCraftSlotsWithAnyMaterials(underMouse);
+        }
 
+        
+        if (mouseButton==0) {
+            slotClick(resultSlotNo, mouseButton, ClickType.QUICK_MOVE);     // which is really PICKUP ALL
+            recipeUpdateTime=System.currentTimeMillis()+ConfigurationHandler.getAutoUpdateRecipeTimer()*1000;
+        }
+    }
+    
+    private void fillCraftSlotsWithAnyMaterials(IRecipe underMouse) {
         NonNullList<Ingredient> recipeInput=getIngredientsAsList(underMouse);
         
         int maxCraftableStacks=64;
@@ -534,11 +548,70 @@ public class RecipeBook {
                 rowadjust+=gridSize-((ShapedRecipes)underMouse).recipeWidth;
             }
         }
-        
-        if (mouseButton==0) {
-            slotClick(resultSlotNo, mouseButton, ClickType.QUICK_MOVE);     // which is really PICKUP ALL
-            recipeUpdateTime=System.currentTimeMillis()+ConfigurationHandler.getAutoUpdateRecipeTimer()*1000;
+    }
+    
+    private void fillCraftSlotsWithBestRepair(RepairRecipe repairRecipe) {
+        // Search for item that has least damage. Put in first slot.
+        // Search for second item that
+        //   a) repairs first item fully, taking the one that is damaged most
+        //   b) does not repair first item fully but adds as much as possible
+        int firstSlot=-1, secondSlot=-1;
+        for (int slot=0; slot<36; slot++) {
+            Slot invitem=container.inventorySlots.getSlot(slot+firstInventorySlotNo);
+            ItemStack slotcontent=invitem.getStack();
+            if (slotcontent.getItem() == repairRecipe.getItem()
+            &&  slotcontent.getItemDamage()>0) {
+                if (firstSlot==-1)
+                    firstSlot=slot;
+                else if (container.inventorySlots.getSlot(firstSlot+firstInventorySlotNo).getStack().getItemDamage() > slotcontent.getItemDamage())
+                    firstSlot=slot;
+            }
+            System.out.println("ToRepair checked slot "+slot+", best first item is now in "+firstSlot+", damage value is "+
+                    (firstSlot==-1 ? "unknown" : container.inventorySlots.getSlot(firstSlot+firstInventorySlotNo).getStack().getItemDamage()));
         }
+        if (firstSlot==-1) {
+            System.out.println("Wanted to repair a "+repairRecipe.getItem().getUnlocalizedName()+" but found none?");
+            return;
+        }
+        int neededRepair=container.inventorySlots.getSlot(firstSlot+firstInventorySlotNo).getStack().getItemDamage();
+        transfer(firstSlot+firstInventorySlotNo, firstCraftSlot, 1);
+
+        for (int slot=0; slot<36; slot++) {
+            if (slot==firstSlot)
+                continue;
+            Slot invitem=container.inventorySlots.getSlot(slot+firstInventorySlotNo);
+            ItemStack slotcontent=invitem.getStack();
+            if (slotcontent.getItem() == repairRecipe.getItem()
+            &&  slotcontent.getItemDamage()>0) {
+                if (secondSlot==-1)
+                    secondSlot=slot;
+                else {
+                    ItemStack currentRepairStack = container.inventorySlots.getSlot(secondSlot+firstInventorySlotNo).getStack();
+                    int currentRepairValue=currentRepairStack.getMaxDamage()-currentRepairStack.getItemDamage();
+                    ItemStack testedRepairStack = container.inventorySlots.getSlot(slot+firstInventorySlotNo).getStack();
+                    int testedRepairValue=testedRepairStack.getMaxDamage()-testedRepairStack.getItemDamage();
+
+                    if (currentRepairValue > neededRepair           // Does the item we remember repair this
+                    &&  testedRepairValue > neededRepair            // And does the current item repair as well
+                    &&  testedRepairValue < currentRepairValue) {   // but the current item is more damaged so we sacrifice less
+                        secondSlot=slot;
+                    }
+                    else if (testedRepairValue > currentRepairValue) {  // will this item repair more than the remembered one?
+                        secondSlot=slot;
+                    }
+                }
+            }
+            System.out.println("RepairWith checked slot "+slot+", repair with "+secondSlot+", repairing by "+
+                (secondSlot==-1 ? "unknown" : 
+                (container.inventorySlots.getSlot(secondSlot+firstInventorySlotNo).getStack().getMaxDamage()-
+                 container.inventorySlots.getSlot(secondSlot+firstInventorySlotNo).getStack().getItemDamage()))
+            );
+        }
+        if (secondSlot==-1) {
+            System.out.println("Repair with a "+repairRecipe.getItem().getUnlocalizedName()+" but found none?");
+            return;
+        }
+        transfer(secondSlot+firstInventorySlotNo, firstCraftSlot+1, 1);
     }
     
     public boolean keyTyped(char c, int i) throws IOException {

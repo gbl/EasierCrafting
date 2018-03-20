@@ -7,8 +7,10 @@ package de.guntram.mcmod.easiercrafting;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockShulkerBox;
 import net.minecraft.inventory.Container;
@@ -16,6 +18,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionType;
 import net.minecraft.potion.PotionUtils;
@@ -27,8 +30,8 @@ import net.minecraft.tileentity.TileEntityBanner;
  */
 public class InventoryRecipeScanner {
     
-    static List<InventoryGeneratedRecipe> findUnusualRecipes(Container inventory, int firstInventorySlotNo) {
-        ArrayList<InventoryGeneratedRecipe> result=new ArrayList<>();
+    static List<IRecipe> findUnusualRecipes(Container inventory, int firstInventorySlotNo) {
+        ArrayList<IRecipe> result=new ArrayList<>();
 
         // needed for various recipes; count the number of each dye type
         int     hasDye[]=new int[16];
@@ -46,6 +49,7 @@ public class InventoryRecipeScanner {
         boolean hasWritableBook=false;
         boolean hasFilledMap=false;
         boolean hasMap=false;
+        Map<Item, Integer> hasRepairable = new HashMap<>();
         
         for (int i=0; i<36; i++) {
             Slot invitem=inventory.getSlot(i+firstInventorySlotNo);
@@ -102,6 +106,10 @@ public class InventoryRecipeScanner {
             }
             else if (item == Items.MAP) {
                 hasMap=true;
+            }
+            else if (item.isRepairable() && stack.isItemDamaged()) {
+                Integer previous=hasRepairable.get(item);
+                hasRepairable.put(item, previous == null ? 1 : previous+1);
             }
         }
         
@@ -168,6 +176,12 @@ public class InventoryRecipeScanner {
                     result.add(new InventoryGeneratedRecipe(resultItem, paper, gunPowder));
                 }
             }
+        }
+        
+        for (Item item:hasRepairable.keySet()) {
+            System.out.println("repairable "+item.getUnlocalizedName() +": "+hasRepairable.get(item));
+            if (hasRepairable.get(item)>=2)
+                result.add(new RepairRecipe(item));
         }
 
         System.out.println("returning "+result.size()+" custom recipes");
