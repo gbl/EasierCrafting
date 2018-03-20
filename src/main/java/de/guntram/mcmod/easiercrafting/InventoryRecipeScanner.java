@@ -20,6 +20,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.PotionType;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.tileentity.TileEntityBanner;
@@ -108,8 +109,11 @@ public class InventoryRecipeScanner {
                 hasMap=true;
             }
             else if (item.isRepairable() && stack.isItemDamaged()) {
-                Integer previous=hasRepairable.get(item);
-                hasRepairable.put(item, previous == null ? 1 : previous+1);
+                NBTTagList enchantments = stack.getEnchantmentTagList();
+                if (enchantments.tagCount() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()) {
+                    Integer previous=hasRepairable.get(item);
+                    hasRepairable.put(item, previous == null ? 1 : previous+1);
+                }
             }
         }
         

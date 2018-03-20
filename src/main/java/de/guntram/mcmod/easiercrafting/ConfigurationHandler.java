@@ -17,12 +17,14 @@ public class ConfigurationHandler {
     private boolean allowRecipeBook;
     private boolean showGuiRight;
     private boolean allowGeneratedRecipes;
+    private int maxEnchantsAllowedForRepair;
 
     public static ConfigurationHandler getInstance() {
         if (instance==null)
             instance=new ConfigurationHandler();
         return instance;
     }
+    
 
     public void load(final File configFile) {
         if (config == null) {
@@ -44,7 +46,8 @@ public class ConfigurationHandler {
         autoFocusSearch=config.getBoolean("Auto focus search text", Configuration.CATEGORY_CLIENT, false, "Automatically focus the search box when opening craft GUI");
         allowRecipeBook=config.getBoolean("Allow MC internal recipe book", Configuration.CATEGORY_CLIENT, true, "Allow opening the MC internal recipe book (since 1.12)");
         showGuiRight=config.getBoolean("Show GUI right of inventory", Configuration.CATEGORY_CLIENT, true, "Show the GUI right of the inventory, when it could conflict with Just Enough Items, instead of left, where it conflicts with active buffs");
-        allowGeneratedRecipes=config.getBoolean("Allow EXPERIMENTAL special recipes", Configuration.CATEGORY_CLIENT, false, "Add Shulker box coloring, tipped arrows, and fireworks to the craftable list");
+        allowGeneratedRecipes=config.getBoolean("Allow EXPERIMENTAL special recipes", Configuration.CATEGORY_CLIENT, false, "Add Shulker box coloring, tipped arrows, fireworks, repairs to the craftable list");
+        maxEnchantsAllowedForRepair=config.getInt("Max. enchants", Configuration.CATEGORY_CLIENT, 0, 0, 10, "Don't consider items for workbench repair if they have more than this number of enchants");
         
         if (config.hasChanged())
             config.save();
@@ -76,5 +79,9 @@ public class ConfigurationHandler {
 
     public static boolean getAllowGeneratedRecipes() {
         return getInstance().allowGeneratedRecipes;
+    }
+    
+    public static int getMaxEnchantsAllowedForRepair() {
+        return getInstance().maxEnchantsAllowedForRepair;
     }
 }

@@ -560,7 +560,9 @@ public class RecipeBook {
             Slot invitem=container.inventorySlots.getSlot(slot+firstInventorySlotNo);
             ItemStack slotcontent=invitem.getStack();
             if (slotcontent.getItem() == repairRecipe.getItem()
-            &&  slotcontent.getItemDamage()>0) {
+            &&  slotcontent.getItemDamage()>0
+            &&  slotcontent.getEnchantmentTagList().tagCount() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()
+            ) {
                 if (firstSlot==-1)
                     firstSlot=slot;
                 else if (container.inventorySlots.getSlot(firstSlot+firstInventorySlotNo).getStack().getItemDamage() > slotcontent.getItemDamage())
@@ -582,7 +584,9 @@ public class RecipeBook {
             Slot invitem=container.inventorySlots.getSlot(slot+firstInventorySlotNo);
             ItemStack slotcontent=invitem.getStack();
             if (slotcontent.getItem() == repairRecipe.getItem()
-            &&  slotcontent.getItemDamage()>0) {
+            &&  slotcontent.getItemDamage()>0
+            &&  slotcontent.getEnchantmentTagList().tagCount() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()
+            ) {
                 if (secondSlot==-1)
                     secondSlot=slot;
                 else {
