@@ -7,10 +7,8 @@ package de.guntram.mcmod.easiercrafting;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockShulkerBox;
 import net.minecraft.inventory.Container;
@@ -57,7 +55,17 @@ public class InventoryRecipeScanner {
             ItemStack stack=invitem.getStack();
             Item item = stack.getItem();
 
-            if (item == Items.DYE) {
+            if (item.isRepairable() && stack.isItemDamaged()) {
+                NBTTagList enchantments = stack.getEnchantmentTagList();
+                if (enchantments.tagCount() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()) {
+                    Integer previous=hasRepairable.get(item);
+                    hasRepairable.put(item, previous == null ? 1 : previous+1);
+                }
+            }
+            else if (stack.hasTagCompound()) {
+                continue;
+            }
+            else if (item == Items.DYE) {
                 int dyeIndex=stack.getMetadata() & 15;
                 hasDye[dyeIndex]+=stack.getCount();
             }
@@ -107,13 +115,6 @@ public class InventoryRecipeScanner {
             }
             else if (item == Items.MAP) {
                 hasMap=true;
-            }
-            else if (item.isRepairable() && stack.isItemDamaged()) {
-                NBTTagList enchantments = stack.getEnchantmentTagList();
-                if (enchantments.tagCount() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()) {
-                    Integer previous=hasRepairable.get(item);
-                    hasRepairable.put(item, previous == null ? 1 : previous+1);
-                }
             }
         }
         
