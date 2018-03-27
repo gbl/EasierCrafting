@@ -62,6 +62,9 @@ public class InventoryRecipeScanner {
                     hasRepairable.put(item, previous == null ? 1 : previous+1);
                 }
             }
+            else if (item == Items.LINGERING_POTION) {
+                availablePotions.put(PotionUtils.getPotionFromItem(stack), i);
+            }
             else if (stack.hasTagCompound()) {
                 continue;
             }
@@ -94,9 +97,6 @@ public class InventoryRecipeScanner {
             }
             else if (item == Items.ARROW) {
                 availableArrows+=stack.getCount();
-            }
-            else if (item == Items.LINGERING_POTION) {
-                availablePotions.put(PotionUtils.getPotionFromItem(stack), i);
             }
             else if (item == Items.GUNPOWDER) {
                 availableGunPowder+=stack.getCount();
