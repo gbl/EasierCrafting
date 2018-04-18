@@ -118,12 +118,12 @@ public class InventoryRecipeScanner {
             }
         }
         
-        System.out.print("hasDye: ");
+        //System.out.print("hasDye: ");
         for (int i=0; i<hasDye.length; i++) {
-            System.out.print(hasDye[i]+",");
+            //System.out.print(hasDye[i]+",");
         }
-        System.out.println();
-        System.out.println("hasShulkerBox ="+hasShulkerBox);
+        //System.out.println();
+        //System.out.println("hasShulkerBox ="+hasShulkerBox);
         if (hasShulkerBox) {
             for (int i=0; i<hasDye.length; i++) {
                 if (hasDye[i]>0) {
@@ -140,10 +140,10 @@ public class InventoryRecipeScanner {
         // do not implement banners at the moment
         // do not implement colored leather at the moment
 
-        System.out.println("Arrows: "+availableArrows);
+        //System.out.println("Arrows: "+availableArrows);
         if (availableArrows >= 8) {
             for (PotionType type: availablePotions.keySet()) {
-                System.out.println("Potion "+type.getNamePrefixed("?")+" at "+availablePotions.get(type));
+                //System.out.println("Potion "+type.getNamePrefixed("?")+" at "+availablePotions.get(type));
                 ItemStack potion = inventory.getSlot(firstInventorySlotNo+availablePotions.get(type)).getStack();
                 ItemStack resultArrow = new ItemStack(Items.TIPPED_ARROW, 8);
                 PotionUtils.addPotionToItemStack(resultArrow, PotionUtils.getPotionFromItem(potion));
@@ -158,8 +158,8 @@ public class InventoryRecipeScanner {
             }
         }
 
-        System.out.println("Paper: "+hasPaper);
-        System.out.println("Gunpowder: "+availableGunPowder);
+        //System.out.println("Paper: "+hasPaper);
+        //System.out.println("Gunpowder: "+availableGunPowder);
 
         if (hasPaper && availableGunPowder > 0) {
             ItemStack paper=new ItemStack(Items.PAPER);
@@ -177,19 +177,19 @@ public class InventoryRecipeScanner {
                     ItemStack[] gunPowder = new ItemStack[power];
                     for (int k=0; k<power; k++)
                         gunPowder[k]=new ItemStack(Items.GUNPOWDER);
-                    System.out.println("adding fireworks with "+power+" powder");
+                    //System.out.println("adding fireworks with "+power+" powder");
                     result.add(new InventoryGeneratedRecipe(resultItem, paper, gunPowder));
                 }
             }
         }
         
         for (Item item:hasRepairable.keySet()) {
-            System.out.println("repairable "+item.getUnlocalizedName() +": "+hasRepairable.get(item));
+            //System.out.println("repairable "+item.getUnlocalizedName() +": "+hasRepairable.get(item));
             if (hasRepairable.get(item)>=2)
                 result.add(new RepairRecipe(item));
         }
 
-        System.out.println("returning "+result.size()+" custom recipes");
+        //System.out.println("returning "+result.size()+" custom recipes");
         return result;
     }
 }
