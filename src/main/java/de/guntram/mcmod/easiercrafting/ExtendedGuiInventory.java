@@ -1,9 +1,8 @@
 package de.guntram.mcmod.easiercrafting;
 
-import java.io.IOException;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.player.EntityPlayer;
-import org.lwjgl.input.Mouse;
+import org.lwjgl.glfw.GLFW;
 
 public class ExtendedGuiInventory extends GuiInventory {
     
@@ -17,11 +16,11 @@ public class ExtendedGuiInventory extends GuiInventory {
     public void initGui() {
         super.initGui();
         if (!ConfigurationHandler.getAllowMinecraftRecipeBook())
-            this.buttonList.clear();
+            this.buttons.clear();
         this.recipeBook.afterInitGui();
     }
 
-    void setRecipeBook(RecipeBook recipeBook) {
+    public void setRecipeBook(RecipeBook recipeBook) {
         this.recipeBook=recipeBook;
     }
     
@@ -32,24 +31,32 @@ public class ExtendedGuiInventory extends GuiInventory {
     }
     
     @Override
-    public void handleMouseInput() throws IOException {
-        recipeBook.scrollBy(Mouse.getDWheel());        
-        super.handleMouseInput();
-    }
+    public boolean mouseScrolled(double delta) {
+        recipeBook.scrollBy((int) delta);
+        return super.mouseScrolled(delta);
+    }    
     
     @Override
-    protected void mouseClicked(final int mouseX, final int mouseY, final int mouseButton) throws IOException {
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        recipeBook.mouseClicked(mouseX, mouseY, mouseButton, guiLeft, guiTop);
+        recipeBook.mouseClicked((int)mouseX, (int)mouseY, mouseButton, guiLeft, guiTop);
+        return true;
     }
 
     @Override
-    public void keyTyped(char c, int i) throws IOException {
-        if (c==27)
-            super.keyTyped(c, i);
-        else if (recipeBook.keyTyped(c, i))
-            ;
+    public boolean keyPressed(int c, int scancode, int modifiers) {
+        if (c==GLFW.GLFW_KEY_ESCAPE)
+            return super.keyPressed(c, scancode, modifiers);
+        else if (recipeBook.keyPressed(c, scancode, modifiers))
+            return true;
         else
-            super.keyTyped(c, i);
+            return super.keyPressed(c, scancode, modifiers);
+    }
+    
+    @Override
+    public boolean charTyped(char codepoint, int modifiers) {
+        if (!recipeBook.charTyped(codepoint, modifiers))
+            return super.charTyped(codepoint, modifiers);
+        return true;
     }
 }

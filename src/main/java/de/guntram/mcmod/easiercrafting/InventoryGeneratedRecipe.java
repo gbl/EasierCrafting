@@ -5,9 +5,11 @@
  */
 package de.guntram.mcmod.easiercrafting;
 
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
@@ -32,7 +34,12 @@ public class InventoryGeneratedRecipe implements IRecipe {
     }
 
     @Override
-    public ItemStack getCraftingResult(InventoryCrafting inv) {
+    public boolean matches(IInventory ii, World world) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public ItemStack getCraftingResult(IInventory inv) {
         return result;
     }
 
@@ -52,22 +59,12 @@ public class InventoryGeneratedRecipe implements IRecipe {
     }
 
     @Override
-    public boolean matches(InventoryCrafting inv, World worldIn) {
+    public ResourceLocation getId() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public IRecipe setRegistryName(ResourceLocation name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public ResourceLocation getRegistryName() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Class<IRecipe> getRegistryType() {
+    public IRecipeSerializer<?> getSerializer() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

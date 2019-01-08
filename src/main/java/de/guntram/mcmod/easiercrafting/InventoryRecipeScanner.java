@@ -15,6 +15,8 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.init.Items;
+import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
@@ -22,6 +24,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.PotionType;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.tileentity.TileEntityBanner;
+import net.minecraft.util.text.TextComponentString;
 
 /**
  *
@@ -33,7 +36,7 @@ public class InventoryRecipeScanner {
         ArrayList<IRecipe> result=new ArrayList<>();
 
         // needed for various recipes; count the number of each dye type
-        int     hasDye[]=new int[16];
+        Map<EnumDyeColor, Integer> hasDye = new HashMap<>();
         
         boolean hasShulkerBox=false;
         ItemStack shulkerBoxItemStack=null;
@@ -55,9 +58,9 @@ public class InventoryRecipeScanner {
             ItemStack stack=invitem.getStack();
             Item item = stack.getItem();
 
-            if (item.isRepairable() && stack.isItemDamaged()) {
+            if (item.isDamageable() && stack.isDamaged()) {
                 NBTTagList enchantments = stack.getEnchantmentTagList();
-                if (enchantments.tagCount() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()) {
+                if (enchantments.size() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()) {
                     Integer previous=hasRepairable.get(item);
                     hasRepairable.put(item, previous == null ? 1 : previous+1);
                 }
@@ -65,17 +68,22 @@ public class InventoryRecipeScanner {
             else if (item == Items.LINGERING_POTION) {
                 availablePotions.put(PotionUtils.getPotionFromItem(stack), i);
             }
-            else if (stack.hasTagCompound()) {
+            else if (stack.isEnchanted()) {
                 continue;
             }
-            else if (item == Items.DYE) {
-                int dyeIndex=stack.getMetadata() & 15;
-                hasDye[dyeIndex]+=stack.getCount();
+            else if (item instanceof ItemDye) {
+                EnumDyeColor color=((ItemDye)item).getDyeColor();
+                if (hasDye.containsKey(color)) {
+                    hasDye.put(color, hasDye.get(color)+stack.getCount());
+                } else {
+                    hasDye.put(color, stack.getCount());
+                }
             }
             else if (Block.getBlockFromItem(item) instanceof BlockShulkerBox) {
                 hasShulkerBox=true;
                 shulkerBoxItemStack=stack;
             }
+            /* TODO 
             else if (item == Items.BANNER) {
                 int patterns=TileEntityBanner.getPatterns(stack);
                 if (patterns<6)
@@ -83,6 +91,7 @@ public class InventoryRecipeScanner {
                 if (patterns>0)
                     hasCopyableBanner=true;
             }
+            */
             else if (item == Items.LEATHER_HELMET) {
                 hasHelmet=true;
             }
@@ -118,22 +127,14 @@ public class InventoryRecipeScanner {
             }
         }
         
-        //System.out.print("hasDye: ");
-        for (int i=0; i<hasDye.length; i++) {
-            //System.out.print(hasDye[i]+",");
-        }
-        //System.out.println();
-        //System.out.println("hasShulkerBox ="+hasShulkerBox);
         if (hasShulkerBox) {
-            for (int i=0; i<hasDye.length; i++) {
-                if (hasDye[i]>0) {
-                    Item resultingBox = Item.getItemById(234-i);    // shulker boxes are 219(white) to 234(black)
-                    result.add(new InventoryGeneratedRecipe(
-                            new ItemStack(resultingBox, 1),
-                            new ItemStack(Items.DYE, 1, i),
-                            shulkerBoxItemStack
-                    ));
-                }
+            for (EnumDyeColor dye: hasDye.keySet()) {
+                Block resultingBox=BlockShulkerBox.getBlockByColor(dye);
+                result.add(new InventoryGeneratedRecipe(
+                        new ItemStack(resultingBox, 1),
+                        new ItemStack(ItemDye.getItem(dye)),
+                        shulkerBoxItemStack
+                ));
             }
         }
 
@@ -166,13 +167,10 @@ public class InventoryRecipeScanner {
 
             for (int power=1; power<=3; power++) {
                 if (availableGunPowder>=power) {
-                    ItemStack resultItem = new ItemStack(Items.FIREWORKS, 3);
-                    NBTTagCompound nbttagcompound1 = new NBTTagCompound();      // copied from RecipeFireworks.java
-                    nbttagcompound1.setByte("Flight", (byte)power);
-                    NBTTagCompound nbttagcompound3 = new NBTTagCompound();
-                    nbttagcompound3.setTag("Fireworks", nbttagcompound1);
-                    resultItem.setTagCompound(nbttagcompound3);
-                    resultItem.setStackDisplayName("Strength "+power);
+                    ItemStack resultItem = new ItemStack(Items.FIREWORK_ROCKET, 3);
+                    NBTTagCompound nbttagcompound = resultItem.getOrCreateChildTag("Fireworks");
+                    nbttagcompound.putByte("Flight", (byte)power);
+                    resultItem.setDisplayName(new TextComponentString("Strength "+power));
 
                     ItemStack[] gunPowder = new ItemStack[power];
                     for (int k=0; k<power; k++)

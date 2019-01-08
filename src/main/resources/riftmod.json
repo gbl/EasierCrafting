@@ -1,0 +1,11 @@
+{
+    "id": "easiercrafting",
+    "name": "EasierCrafting",
+    "authors": [
+        "Giselbaer"
+    ],
+    "listeners": [
+        "de.guntram.mcmod.easiercrafting.EasierCrafting",
+        "de.guntram.mcmod.easiercrafting.ConfigurationHandler"
+    ]
+}

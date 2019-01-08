@@ -1,0 +1,5 @@
+# public field net/minecraft/client/gui/inventory/GuiContainer xSize, ySize, guiLeft, guiTop
+public field cky f I
+public field cky g I
+public field cky i I
+public field cky s I

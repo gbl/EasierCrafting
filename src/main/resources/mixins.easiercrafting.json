@@ -1,0 +1,13 @@
+{
+    "required": true,
+    "package": "de.guntram.mcmod.easiercrafting.mixins",
+    "refmap": "mixins.easiercrafting.refmap.json",
+    "minVersion": "0.6",
+    "client": [
+        "GuiCraftMixin",
+        "GuiInventoryMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}
