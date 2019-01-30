@@ -648,7 +648,7 @@ else */
 
     boolean charTyped(char codepoint, int modifiers) {
         // System.out.println("char code="+codepoint+", modifiers="+modifiers);
-        if (pattern.isFocused())
+        if (pattern!=null && pattern.isFocused())
             return pattern.charTyped(codepoint, modifiers);
         return false;
     }
