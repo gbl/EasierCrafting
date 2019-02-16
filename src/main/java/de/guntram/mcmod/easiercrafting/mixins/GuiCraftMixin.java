@@ -23,7 +23,6 @@ public class GuiCraftMixin extends AbstractClientPlayer {
     @Inject(method="displayGui", at=@At("HEAD"), cancellable = true)
     public void displayExtendedCraftGUI(IInteractionObject owner, CallbackInfo ci) {
         String s=owner.getGuiID();
-        System.out.println("EGC mixin with object "+s);
         if ("minecraft:crafting_table".equals(s)) {
             ExtendedGuiCrafting egc = new ExtendedGuiCrafting(this.inventory, this.world);
             egc.setRecipeBook(new RecipeBook(egc, 1, 3, 0, 10));

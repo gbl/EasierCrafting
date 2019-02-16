@@ -1,11 +1,15 @@
 package de.guntram.mcmod.easiercrafting;
 
+import de.guntram.mcmod.rifttools.ConfigChangedEvent;
+import de.guntram.mcmod.rifttools.Configuration;
+import de.guntram.mcmod.rifttools.ModConfigurationHandler;
 import java.io.File;
 
-public class ConfigurationHandler {
+public class ConfigurationHandler implements ModConfigurationHandler {
 
     private static ConfigurationHandler instance;
 
+    private Configuration config;
     private String configFileName;
     
     private boolean autoFocusSearch;
@@ -23,18 +27,37 @@ public class ConfigurationHandler {
     
 
     public void load(final File configFile) {
-        loadConfig();
+        if (config == null) {
+            config = new Configuration(configFile);
+            configFileName=configFile.getPath();
+            loadConfig();
+        }
     }
 
-    private void loadConfig() {
-        autoUpdateRecipeTimer=5;
-        autoFocusSearch=false;
-        allowRecipeBook=true;
-        showGuiRight=true;
-        allowGeneratedRecipes=true;
-        maxEnchantsAllowedForRepair=1;
+    @Override
+    public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+        if (event.getModID().equalsIgnoreCase(EasierCrafting.MODID)) {
+            loadConfig();
+        }
     }
     
+    private void loadConfig() {
+        autoUpdateRecipeTimer=config.getInt("Auto update recipe timer", Configuration.CATEGORY_CLIENT, 5, 0, 30, "Update recipe list after this many seconds after last click");
+        autoFocusSearch=config.getBoolean("Auto focus search text", Configuration.CATEGORY_CLIENT, false, "Automatically focus the search box when opening craft GUI");
+        allowRecipeBook=config.getBoolean("Allow MC internal recipe book", Configuration.CATEGORY_CLIENT, true, "Allow opening the MC internal recipe book (since 1.12)");
+        showGuiRight=config.getBoolean("Show GUI right of inventory", Configuration.CATEGORY_CLIENT, true, "Show the GUI right of the inventory, where it could conflict with Just Enough Items, instead of left, where it conflicts with active buffs");
+        allowGeneratedRecipes=config.getBoolean("Allow special recipes", Configuration.CATEGORY_CLIENT, true, "Add Shulker box coloring, tipped arrows, fireworks, repairs to the craftable list");
+        maxEnchantsAllowedForRepair=config.getInt("Max. enchants", Configuration.CATEGORY_CLIENT, 0, 0, 10, "Don't consider items for workbench repair if they have more than this number of enchants");
+        
+        if (config.hasChanged())
+            config.save();
+    }
+    
+    @Override
+    public Configuration getConfig() {
+        return config;
+    }
+
     public static String getConfigFileName() {
         return getInstance().configFileName;
     }

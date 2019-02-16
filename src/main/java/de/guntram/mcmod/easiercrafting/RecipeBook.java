@@ -582,11 +582,8 @@ else */
                 else if (container.inventorySlots.getSlot(firstSlot+firstInventorySlotNo).getStack().getDamage() > slotcontent.getDamage())
                     firstSlot=slot;
             }
-            System.out.println("ToRepair checked slot "+slot+", best first item is now in "+firstSlot+", damage value is "+
-                    (firstSlot==-1 ? "unknown" : container.inventorySlots.getSlot(firstSlot+firstInventorySlotNo).getStack().getDamage()));
         }
         if (firstSlot==-1) {
-            System.out.println("Wanted to repair a "+repairRecipe.getItem().getTranslationKey()+" but found none?");
             return;
         }
         int neededRepair=container.inventorySlots.getSlot(firstSlot+firstInventorySlotNo).getStack().getDamage();
@@ -619,14 +616,8 @@ else */
                     }
                 }
             }
-            System.out.println("RepairWith checked slot "+slot+", repair with "+secondSlot+", repairing by "+
-                (secondSlot==-1 ? "unknown" : 
-                (container.inventorySlots.getSlot(secondSlot+firstInventorySlotNo).getStack().getMaxDamage()-
-                 container.inventorySlots.getSlot(secondSlot+firstInventorySlotNo).getStack().getDamage()))
-            );
         }
         if (secondSlot==-1) {
-            System.out.println("Repair with a "+repairRecipe.getItem().getTranslationKey()+" but found none?");
             return;
         }
         transfer(secondSlot+firstInventorySlotNo, firstCraftSlot+1, 1);

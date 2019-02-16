@@ -22,7 +22,6 @@ public class GuiInventoryMixin {
             target="Lnet/minecraft/client/tutorial/Tutorial;openInventory()V"), cancellable = true)
 
     public void displayExtendedInventory(CallbackInfo ci) {
-        System.out.println("EGI mixin");
         ExtendedGuiInventory egi = new ExtendedGuiInventory(this.player);
         egi.setRecipeBook(new RecipeBook(egi, 1, 2, 0, 9));
         this.displayGuiScreen(egi);

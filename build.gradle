@@ -16,7 +16,7 @@ apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'java'
 
 group = "de.guntram.mcmod.easiercrafting"
-version = "1.13.2-rift1.0.4.77-1.3beta3"
+version = "1.13.2-rift1.0.4.77-1.3beta4"
 archivesBaseName = "easiercrafting"
 
 sourceCompatibility = '1.8'
