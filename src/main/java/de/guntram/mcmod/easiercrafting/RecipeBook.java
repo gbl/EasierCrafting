@@ -624,6 +624,8 @@ else */
     }
     
     public boolean keyPressed(int code, int scancode, int modifiers) {
+        if (pattern==null)
+            return false;
         // System.out.println("key code="+code+", scancode="+scancode+", modifiers="+modifiers);
         if (code==GLFW.GLFW_KEY_ENTER || code==GLFW.GLFW_KEY_KP_ENTER) {
             updatePatternMatch();
