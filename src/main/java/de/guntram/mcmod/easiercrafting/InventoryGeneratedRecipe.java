@@ -5,66 +5,71 @@
  */
 package de.guntram.mcmod.easiercrafting;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.recipe.RecipeType;
+import net.minecraft.util.DefaultedList;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 /**
  *
  * @author gbl
  */
-public class InventoryGeneratedRecipe implements IRecipe {
+public class InventoryGeneratedRecipe<C extends Inventory> implements Recipe<C> {
     
     ItemStack result;
-    NonNullList<Ingredient> ingredients;
+    DefaultedList<Ingredient> ingredients;
 
     public InventoryGeneratedRecipe(ItemStack result, ItemStack firstInput, ItemStack... inputs) {
         this.result=result;
 
-        ingredients=NonNullList.create();
-        ingredients.add(Ingredient.fromStacks(firstInput));
+        ingredients=DefaultedList.create();
+        ingredients.add(Ingredient.ofStacks(firstInput));
         for (ItemStack stack:inputs) 
-            ingredients.add(Ingredient.fromStacks(stack));
+            ingredients.add(Ingredient.ofStacks(stack));
     }
 
     @Override
-    public boolean matches(IInventory ii, World world) {
+    public boolean matches(C ii, World world) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public ItemStack getCraftingResult(IInventory inv) {
+    public ItemStack craft(C inv) {
         return result;
     }
 
     @Override
-    public boolean canFit(int width, int height) {
+    public boolean fits(int width, int height) {
         return width*height >= ingredients.size();
     }
 
     @Override
-    public ItemStack getRecipeOutput() {
+    public ItemStack getOutput() {
         return result;
     }
 
     @Override
-    public NonNullList<Ingredient> getIngredients() {
+    public DefaultedList<Ingredient> getPreviewInputs() {
         return ingredients;
     }
 
     @Override
-    public ResourceLocation getId() {
+    public Identifier getId() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public RecipeType<?> getType() {
+        return RecipeType.CRAFTING;
     }
 }

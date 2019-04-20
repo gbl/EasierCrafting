@@ -5,21 +5,22 @@
  */
 package de.guntram.mcmod.easiercrafting;
 
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.recipe.RecipeType;
+import net.minecraft.util.DefaultedList;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 /**
  *
  * @author gbl
  */
-public class RepairRecipe implements IRecipe {
+public class RepairRecipe<C  extends Inventory> implements Recipe<C> {
     
     private Item item;
 
@@ -32,40 +33,45 @@ public class RepairRecipe implements IRecipe {
     }
     
     @Override
-    public boolean matches(IInventory inv, World worldIn) {
+    public boolean matches(C inv, World worldIn) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public ItemStack getCraftingResult(IInventory inv) {
+    public ItemStack craft(C inv) {
         return new ItemStack(item);
     }
 
     @Override
-    public boolean canFit(int width, int height) {
+    public boolean fits(int width, int height) {
         return true;
     }
     
     @Override
-    public ItemStack getRecipeOutput() {
+    public ItemStack getOutput() {
         return new ItemStack(item);
     }
 
     @Override
-    public NonNullList<Ingredient> getIngredients() {
-        NonNullList<Ingredient> ingredients = NonNullList.create();
-        ingredients.add(Ingredient.fromStacks(new ItemStack(item)));
-        ingredients.add(Ingredient.fromStacks(new ItemStack(item)));
+    public DefaultedList<Ingredient> getPreviewInputs() {
+        DefaultedList<Ingredient> ingredients = DefaultedList.create();
+        ingredients.add(Ingredient.ofStacks(new ItemStack(item)));
+        ingredients.add(Ingredient.ofStacks(new ItemStack(item)));
         return ingredients;
     }
 
     @Override
-    public ResourceLocation getId() {
+    public Identifier getId() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public RecipeType<?> getType() {
+        return RecipeType.CRAFTING;
     }
 }

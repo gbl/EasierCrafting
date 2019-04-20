@@ -1,11 +1,10 @@
 package de.guntram.mcmod.easiercrafting;
 
-import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.gui.ContainerScreen;
 import org.lwjgl.glfw.GLFW;
 
-public class ExtendedGuiInventory extends GuiInventory {
-    
+public class ExtendedGuiInventory /* extends ContainerScreen  */ {
+/*
     private RecipeBook recipeBook;
 
     public ExtendedGuiInventory(EntityPlayer player) {
@@ -58,5 +57,5 @@ public class ExtendedGuiInventory extends GuiInventory {
         if (!recipeBook.charTyped(codepoint, modifiers))
             return super.charTyped(codepoint, modifiers);
         return true;
-    }
+    } */
 }

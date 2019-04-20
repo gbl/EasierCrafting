@@ -7,40 +7,39 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import static net.minecraft.client.gui.GuiScreen.isShiftKeyDown;
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.texture.SimpleTexture;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.render.GuiLighting;
+import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.item.Items;
+import net.minecraft.container.SlotActionType;
+import net.minecraft.container.Container;
+import net.minecraft.container.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.item.crafting.ShapelessRecipe;
-import net.minecraft.potion.PotionType;
-import net.minecraft.potion.PotionUtils;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionUtil;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.crafting.CraftingRecipe;
+import net.minecraft.util.Identifier;
+import net.minecraft.recipe.crafting.ShapedRecipe;
+import net.minecraft.recipe.crafting.ShapelessRecipe;
+import net.minecraft.util.DefaultedList;
 import org.lwjgl.glfw.GLFW;
 
 public class RecipeBook {
-    private final GuiContainer container;
+    private final ExtendedGuiCrafting screen;
     private final int firstCraftSlot;
     private final int gridSize;
     private final int resultSlotNo;
     private final int firstInventorySlotNo;
-    TreeMap<String, TreeSet<IRecipe>> craftableCategories;
-    private IRecipe underMouse;
+    TreeMap<String, TreeSet<CraftingRecipe>> craftableCategories;
+    private CraftingRecipe underMouse;
     
     private final int itemSize=20;
     private final int itemLift=5;         // how many pixels to display items above where they would be normally
@@ -54,15 +53,17 @@ public class RecipeBook {
     private int textBoxSize;
     private long recipeUpdateTime;
     
-    private GuiTextField pattern;
-    private TreeSet<IRecipe> patternMatchingRecipes;
+    private TextFieldWidget pattern;
+    private TreeSet<CraftingRecipe> patternMatchingRecipes;
     private int patternListSize;
     
-    static ResourceLocation arrows;
+    static Identifier arrows;
+    private int containerLeft;
+    private int containerTop;
     
 /**
  * 
- * @param craftinv          The container the recipe book is attached to - this
+ * @param craftScreen        The container the recipe book is attached to - this
  *      can be a GuiCrafting or a GuiInventory container
  * @param firstCraftSlot    The slot number of the first slot that is a craft
  *      slot in craftinv
@@ -71,8 +72,8 @@ public class RecipeBook {
  * @param firstInventorySlot
  *                          the slot number of the first inventory slot
  */    
-    public RecipeBook(GuiContainer craftinv, int firstCraftSlot, int gridsize, int resultSlot, int firstInventorySlot) {
-        this.container=craftinv;
+    public RecipeBook(ExtendedGuiCrafting craftScreen, int firstCraftSlot, int gridsize, int resultSlot, int firstInventorySlot) {
+        this.screen=craftScreen;
         this.firstCraftSlot=firstCraftSlot;
         this.gridSize=gridsize;
         this.resultSlotNo=resultSlot;
@@ -82,24 +83,30 @@ public class RecipeBook {
         this.pattern=null;
         this.underMouse=null;
         
+        
         if (arrows==null) {
-            arrows=new ResourceLocation(EasierCrafting.MODID, "textures/arrows.png");
+            arrows=new Identifier(EasierCrafting.MODID, "textures/arrows.png");
+            /* ??? 
             SimpleTexture x=new SimpleTexture(arrows);
-            boolean flag = Minecraft.getInstance().getTextureManager().loadTexture(arrows, x);
+            boolean flag = MinecraftClient.getInstance().getTextureManager().loadTexture(arrows, x);
             //System.out.println("loading "+arrows.toString()+": "+flag);
+            */
         }
     }
     
     void afterInitGui() {
+        this.containerLeft = (screen.width - 176 /* container.containerWidth */)/2;
+        this.containerTop  = (screen.height - 166 /* container.containerHeight */) /2;
+
         int tempItemsPerRow = 8;
         int tempXOffset=-itemSize*tempItemsPerRow -10;
-        if (tempXOffset+container.guiLeft < 0) {
-            tempItemsPerRow=(container.guiLeft-10)/itemSize;
+        if (tempXOffset+containerLeft < 0) {
+            tempItemsPerRow=(containerLeft-10)/itemSize;
             tempXOffset=-itemSize*tempItemsPerRow-10;
         }
         textBoxSize=-tempXOffset-15;
         if (ConfigurationHandler.getShowGuiRight())
-            tempXOffset=container.xSize+10;
+            tempXOffset=screen.width+10;
         if (tempItemsPerRow < 2) {
             System.out.println("forcing tempItemsPerRow to 2 when it's "+tempItemsPerRow);
             tempItemsPerRow = 2;
@@ -107,7 +114,7 @@ public class RecipeBook {
         this.itemsPerRow=tempItemsPerRow;
         this.xOffset=tempXOffset;
         this.mouseScroll=0;
-        //System.out.println("left="+container.guiLeft()+", items="+itemsPerRow+", offset="+tempXOffset+", textbox="+textBoxSize);
+        System.out.println("left="+containerLeft+", items="+itemsPerRow+", offset="+tempXOffset+", textbox="+textBoxSize);
         updatePatternMatch();
         updateRecipes();
     }
@@ -115,17 +122,18 @@ public class RecipeBook {
     // left is the X position we want to draw at, Y is (normally) 0.
     // However, if our height is larger than the GUI container height,
     // adjust our Y position accordingly.
-    void drawRecipeList(FontRenderer fontRenderer, ItemRenderer itemRenderer,
+    void drawRecipeList(TextRenderer fontRenderer, ItemRenderer itemRenderer,
             int left, int height, int mouseX, int mouseY) {
+        System.out.println("drawRecipeList: left="+left+", height="+height);
         // We can't do this in the constructor as we don't yet know sizes from initGui.
         // Also, not in afterInitGui() because we don't know fontRender there.
         if (pattern==null) {
             //System.out.println("drawRecipeList creating textbox");
-            //Collection<IRecipe> x = Minecraft.getInstance().player.world.getRecipeManager().getRecipes();
+            //Collection<CraftingRecipe> x = Minecraft.getInstance().player.world.getRecipeManager().getRecipes();
             //System.out.println("found "+x.size()+" recipes");
             
-            pattern=new GuiTextField(1, fontRenderer, xOffset, 0, textBoxSize, 20);
-            pattern.setFocused(ConfigurationHandler.getAutoFocusSearch());
+            pattern=new TextFieldWidget(fontRenderer, xOffset, 0, textBoxSize, 20, "");
+            pattern.changeFocus(ConfigurationHandler.getAutoFocusSearch());
         }
 
         boolean underMouseIsCraftable=true;
@@ -140,13 +148,13 @@ public class RecipeBook {
         if (neededHeight>height) {
             ypos-=(neededHeight-height)/2;
             //System.out.println("ypos is now "+ypos);
-            if (ypos < -container.guiTop) {
-                ypos = -container.guiTop;
+            if (ypos < -containerTop) {
+                ypos = -containerTop;
                 //System.out.println("mouse wheel text at"+ypos);
                 // fontRenderer.drawString(I18n.format("message.usemouse"), xOffset+itemSize, ypos, 0xff0000);
-                Minecraft.getInstance().getTextureManager().bindTexture(arrows);
-                container.drawTexturedModalRect(xOffset,                ypos,  0, 0, 20, 20);
-                container.drawTexturedModalRect(xOffset+textBoxSize-20, ypos, 20, 0, 20, 20);
+                MinecraftClient.getInstance().getTextureManager().bindTexture(arrows);
+                screen.blit(xOffset,                ypos,  0, 0, 20, 20);
+                screen.blit(xOffset+textBoxSize-20, ypos, 20, 0, 20, 20);
                 mouseScrollEnabled=true;
                 ypos+=itemSize;
             } else {
@@ -157,13 +165,13 @@ public class RecipeBook {
             mouseScrollEnabled=false;
             mouseScroll=0;
         }
-        RenderHelper.enableStandardItemLighting();
-        RenderHelper.enableGUIStandardItemLighting();
+        GuiLighting.enable();
+        GuiLighting.enableForItems();
 
         underMouse=null;
 
         pattern.y=ypos;
-        pattern.drawTextField(0, 0, 0f);    // <-- parameters neccessary but unused 
+        pattern.renderButton(0, 0, 0f);    // <-- parameters neccessary but unused 
         ypos+=itemSize*3/2;
         minYtoDraw=ypos;
         ypos-=mouseScroll*itemSize;
@@ -172,16 +180,17 @@ public class RecipeBook {
             underMouseIsCraftable=false;
         
         for (String category: craftableCategories.keySet()) {
+            System.out.println(category+" at "+xOffset+"/"+ypos);
             if (ypos>=minYtoDraw)
-                fontRenderer.drawString(category, xOffset, ypos, 0xffff00);
+                fontRenderer.draw(category, xOffset, ypos, 0xffff00);
             ypos+=itemSize;
             ypos=drawRecipeOutputs(craftableCategories.get(category), itemRenderer, fontRenderer, 0, ypos, mouseX, mouseY);
         }
         if (underMouse!=null) {
-            fontRenderer.drawString(underMouse.getRecipeOutput().getDisplayName().getFormattedText(), 0, height+3, 0xffff00);
+            fontRenderer.draw(underMouse.getOutput().getDisplayName().getFormattedText(), 0, height+3, 0xffff00);
             if (underMouse instanceof ShapedRecipe) {
-                NonNullList<Ingredient> ingredients = underMouse.getIngredients();
-                fontRenderer.drawString("sr", left-20, height, 0x202020);
+                DefaultedList<Ingredient> ingredients = underMouse.getPreviewInputs();
+                fontRenderer.draw("sr", left-20, height, 0x202020);
                 for (int x=0; x<((ShapedRecipe)underMouse).getWidth(); x++) {
                     for (int y=0; y<((ShapedRecipe)underMouse).getHeight(); y++) {
                         renderIngredient(itemRenderer, fontRenderer, 
@@ -189,47 +198,31 @@ public class RecipeBook {
                     }
                 }
             } else if (underMouse instanceof ShapelessRecipe) {
-                fontRenderer.drawString("slr", left-20, height, 0x202020);
+                fontRenderer.draw("slr", left-20, height, 0x202020);
                 xpos=0;
-                for (Ingredient ingredient: ((ShapelessRecipe)underMouse).getIngredients()) {
+                for (Ingredient ingredient: ((ShapelessRecipe)underMouse).getPreviewInputs()) {
                     renderIngredient(itemRenderer, fontRenderer, ingredient, itemSize*xpos, height+itemSize);
                     xpos++;
                 }
-/* Omit Forge extension that's probably not in forge for 1.13 anyway 
-            } else if (underMouse instanceof ShapedOreRecipe) {
-                fontRenderer.drawString("sor", left-20, height, 0x202020);
-                NonNullList<Ingredient> ingredients = underMouse.getIngredients();
-                for (int x=0; x<((ShapedOreRecipe)underMouse).getWidth(); x++) {
-                    for (int y=0; y<((ShapedOreRecipe)underMouse).getHeight(); y++) {
-                        renderIngredient(itemRenderer, fontRenderer, ingredients.get(x+y*((ShapedOreRecipe)underMouse).getWidth()), itemSize*x, height+itemSize+itemSize*y);
-                    }
-                }
-            } else if (underMouse instanceof ShapelessOreRecipe) {
-                fontRenderer.drawString("slor", left-20, height, 0x202020);
-                xpos=0;
-                for (Ingredient ingredient: ((ShapelessOreRecipe)underMouse).getIngredients()) {
-                    renderIngredient(itemRenderer, fontRenderer, ingredient, itemSize*xpos, height+itemSize);
-                    xpos++;
-                }
-*/
             }
         }
      
-        RenderHelper.disableStandardItemLighting();
+        GuiLighting.disable();
         if (!underMouseIsCraftable)
             underMouse=null;
     }
 
-    private int drawRecipeOutputs(Iterable<IRecipe>recipes, 
-            ItemRenderer itemRenderer, FontRenderer fontRenderer, 
+    private int drawRecipeOutputs(TreeSet<CraftingRecipe>recipes, 
+            ItemRenderer itemRenderer, TextRenderer fontRenderer, 
             int xpos, int ypos,
             int mouseX, int mouseY) {
 
-        for (IRecipe recipe: recipes) {
-            ItemStack items=recipe.getRecipeOutput();
+        System.out.println("drawing recipes at "+xpos+"/"+ypos);
+        for (CraftingRecipe recipe: recipes) {
+            ItemStack items=recipe.getOutput();
             if (ypos>=minYtoDraw) {
-                itemRenderer.renderItemAndEffectIntoGUI(items, xOffset+xpos, ypos-itemLift);
-                itemRenderer.renderItemOverlays(fontRenderer, items, xOffset+xpos, ypos-itemLift);
+                itemRenderer.renderGuiItemIcon(items, xOffset+xpos, ypos-itemLift);
+                itemRenderer.renderGuiItemOverlay(fontRenderer, items, xOffset+xpos, ypos-itemLift);
                 if (mouseX>=xpos+xOffset  && mouseX<=xpos+xOffset+itemSize-1
                 &&  mouseY>=ypos-itemLift && mouseY<=ypos-itemLift+itemSize-1) {
                     underMouse=recipe;
@@ -246,37 +239,37 @@ public class RecipeBook {
         return ypos;
     }
     
-    public void renderIngredient(ItemRenderer itemRenderer, FontRenderer fontRenderer, Ingredient ingredient, int x, int y) {
-        ItemStack[] stacks=ingredient.getMatchingStacks();
+    public void renderIngredient(ItemRenderer itemRenderer, TextRenderer fontRenderer, Ingredient ingredient, int x, int y) {
+        ItemStack[] stacks=ingredient.getStackArray();
         if (stacks.length==0)
             return;
         int toRender=0;
         if (stacks.length>1)
             toRender=(int) ((System.currentTimeMillis()/333)%stacks.length);
-        itemRenderer.renderItemAndEffectIntoGUI(stacks[toRender], x, y);
-        itemRenderer.renderItemOverlays(fontRenderer, stacks[toRender], x, y);
+        itemRenderer.renderGuiItem(stacks[toRender], x, y);
+        itemRenderer.renderGuiItemOverlay(fontRenderer, stacks[toRender], x, y);
     }
     
     public final void updateRecipes() {
-        Container inventory=container.inventorySlots;
-        List<IRecipe> recipes = new ArrayList<>();
-//        for (Iterator<IRecipe> i= CraftingManager.REGISTRY.iterator(); i.hasNext();)
-//            recipes.add(i.next());
-        recipes.addAll(Minecraft.getInstance().player.world.getRecipeManager().getRecipes());
+        Container inventory=screen.getContainer();
+        List<Recipe> recipes = new ArrayList<>();
+        recipes.addAll(MinecraftClient.getInstance().player.world.getRecipeManager().values());
         if (ConfigurationHandler.getAllowGeneratedRecipes()) {
             recipes.addAll(InventoryRecipeScanner.findUnusualRecipes(inventory, firstInventorySlotNo));
         }
 
-        craftableCategories=new TreeMap();
-        for (IRecipe recipe:recipes) {
-            if (!canCraftRecipe(recipe, inventory, gridSize))
+        craftableCategories=new TreeMap<>();
+        for (Recipe recipe:recipes) {
+            if (recipe.getType() != RecipeType.CRAFTING || !(recipe instanceof CraftingRecipe))
+                continue;
+            if (!canCraftRecipe((CraftingRecipe)recipe, inventory, gridSize))
                 continue;
             //System.out.println("grid size is "+gridSize+", recipe needs "+recipe.getRecipeSize());
-            ItemStack result=recipe.getRecipeOutput();
+            ItemStack result=recipe.getOutput();
             Item item = result.getItem();
             if (item==Items.AIR)
                 continue;
-            ItemGroup tab = item.getGroup();
+            ItemGroup tab = item.getItemGroup();
             String category;
             if (tab==null) {
 /*                if (item==Items.FIREWORKS)
@@ -285,24 +278,24 @@ else */
                     category="(none?)";
             }
             else
-                category=I18n.format(tab.getTabLabel(), new Object[0]);
-            TreeSet<IRecipe> catRecipes=craftableCategories.get(category);
+                category=I18n.translate(tab.getTranslationKey(), new Object[0]);
+            TreeSet<CraftingRecipe> catRecipes=craftableCategories.get(category);
             if (catRecipes==null) {
-                catRecipes=new TreeSet<>(new Comparator<IRecipe>() {
+                catRecipes=new TreeSet<>(new Comparator<CraftingRecipe>() {
                     @Override
-                    public int compare(IRecipe a, IRecipe b) {
-                        return a.getRecipeOutput().getDisplayName().getUnformattedComponentText().
-                            compareToIgnoreCase(b.getRecipeOutput().getDisplayName().getUnformattedComponentText());
+                    public int compare(CraftingRecipe a, CraftingRecipe b) {
+                        return a.getOutput().getDisplayName().getText().
+                            compareToIgnoreCase(b.getOutput().getDisplayName().getText());
                     }
                 }
                 );
                 craftableCategories.put(category, catRecipes);
             }
             //System.out.println("adding "+result.getDisplayName()+" in "+category);
-            catRecipes.add(recipe);
+            catRecipes.add((CraftingRecipe)recipe);
         }
         listSize=craftableCategories.size();
-        for (TreeSet<IRecipe> tree: craftableCategories.values())
+        for (TreeSet<CraftingRecipe> tree: craftableCategories.values())
             listSize+=((tree.size()+(itemsPerRow-1))/itemsPerRow);
         listSize*=itemSize;
         mouseScroll=0;
@@ -311,11 +304,11 @@ else */
     public final void updatePatternMatch() {
         
         patternListSize=0;
-        patternMatchingRecipes=new TreeSet<>(new Comparator<IRecipe>() {
+        patternMatchingRecipes=new TreeSet<>(new Comparator<CraftingRecipe>() {
             @Override
-            public int compare(IRecipe a, IRecipe b) {
-                return a.getRecipeOutput().getDisplayName().getUnformattedComponentText().
-                        compareToIgnoreCase(b.getRecipeOutput().getDisplayName().getUnformattedComponentText());
+            public int compare(CraftingRecipe a, CraftingRecipe b) {
+                return a.getOutput().getDisplayName().getText().
+                        compareToIgnoreCase(b.getOutput().getDisplayName().getText());
             }
         });
 
@@ -325,23 +318,25 @@ else */
         if (patternText.length()<2)
             return;
 
-        Container inventory=container.inventorySlots;
-        List<IRecipe> recipes = new ArrayList<>();
-        recipes.addAll(Minecraft.getInstance().player.world.getRecipeManager().getRecipes());
-//        for (Iterator<IRecipe> i= CraftingManager.REGISTRY.iterator(); i.hasNext();)
+        Container inventory=screen.getContainer();
+        List<Recipe> recipes = new ArrayList<>();
+        recipes.addAll(MinecraftClient.getInstance().player.world.getRecipeManager().values());
+//        for (Iterator<CraftingRecipe> i= CraftingManager.REGISTRY.iterator(); i.hasNext();)
 //            recipes.add(i.next());
         Pattern regex=Pattern.compile(patternText, Pattern.CASE_INSENSITIVE);
-        for (IRecipe recipe:recipes) {
-            ItemStack result=recipe.getRecipeOutput();
+        for (Recipe recipe:recipes) {
+            if (recipe.getType() != RecipeType.CRAFTING)
+                continue;
+            ItemStack result=recipe.getOutput();
             Item item = result.getItem();
             if (item==Items.AIR)
                 continue;
-            if (!regex.matcher(result.getDisplayName().getUnformattedComponentText()).find()) {
+            if (!regex.matcher(result.getDisplayName().getText()).find()) {
                 //System.out.println("not adding "+result.getDisplayName()+" because no match");
                 continue;
             }
             //System.out.println("adding "+result.getDisplayName()+" to pattern match "+patternText);
-            patternMatchingRecipes.add(recipe);
+            patternMatchingRecipes.add((CraftingRecipe) recipe);
         }
         patternListSize=((patternMatchingRecipes.size()+(itemsPerRow-1))/itemsPerRow)*itemSize;
         mouseScroll=0;
@@ -352,21 +347,15 @@ else */
         Takefrom(Slot i, int n) { invitem=i; amount=n; }
     };
 
-    private boolean canCraftRecipe(IRecipe recipe, Container inventory, int gridSize) {
+    private boolean canCraftRecipe(CraftingRecipe recipe, Container inventory, int gridSize) {
         if (recipe instanceof ShapelessRecipe) {
             return canCraftShapeless((ShapelessRecipe) recipe, inventory);
         } else if (recipe instanceof ShapedRecipe) {
             return canCraftShaped((ShapedRecipe) recipe, inventory, gridSize);
-/* forge <= 1.12 only ?
-        } else if (recipe instanceof ShapedOreRecipe) {
-            return canCraftShapedOre((ShapedOreRecipe) recipe, inventory, gridSize);
-        } else if (recipe instanceof ShapelessOreRecipe) {
-            return canCraftShapelessOre((ShapelessOreRecipe) recipe, inventory, gridSize);
-*/
         } else if (recipe instanceof InventoryGeneratedRecipe || recipe instanceof RepairRecipe) {
             // We just generated the recipe so we should be able to craft it,
             // but make sure the grid is big enough
-            return recipe.canFit(gridSize, gridSize);
+            return recipe.fits(gridSize, gridSize);
             // return canCraft(recipe, recipe.getIngredients(), inventory);
         } else {
             //System.out.println(recipe.getRecipeOutput().getDisplayName()+" is a "+recipe.getClass().getCanonicalName());
@@ -375,7 +364,7 @@ else */
     }
     
     private boolean canCraftShapeless(ShapelessRecipe recipe, Container inventory) {
-        NonNullList<Ingredient> neededList = recipe.getIngredients();
+        DefaultedList<Ingredient> neededList = recipe.getPreviewInputs();
         return canCraft(recipe, neededList, inventory);
     }
 
@@ -384,41 +373,27 @@ else */
             //System.out.println("Can't do "+recipe.getRecipeOutput().getDisplayName()+" as it needs "+recipe.recipeWidth+"/"+recipe.recipeHeight);
             return false;
         }
-        NonNullList<Ingredient> neededList = recipe.getIngredients();
+        DefaultedList<Ingredient> neededList = recipe.getPreviewInputs();
         return canCraft(recipe, neededList, inventory);
     }
 
-/* forge <= 1.12    
-    private boolean canCraftShapedOre(ShapedOreRecipe recipe, Container inventory, int gridSize) {
-        if (recipe.getWidth()>gridSize || recipe.getHeight()>gridSize) {
-            //System.out.println("Can't do "+recipe.getRecipeOutput().getDisplayName()+" as it needs "+recipe.getWidth()+"/"+recipe.getHeight());
-            return false;
-        }
-        return canCraftOre(recipe, recipe.getIngredients(), inventory);
-    }
-
-    private boolean canCraftShapelessOre(ShapelessOreRecipe recipe, Container inventory, int gridSize) {
-        return canCraftOre(recipe, recipe.getIngredients(), inventory);
-    }
-*/
-    
-    private boolean canCraftOre(IRecipe recipe, NonNullList<Ingredient>input, Container inventory) {
+    private boolean canCraftOre(CraftingRecipe recipe, DefaultedList<Ingredient>input, Container inventory) {
         return canCraft(recipe, input, inventory);
     }
 
-    private boolean canCraft(IRecipe recipe, List<Ingredient> neededList, Container inventory) {
+    private boolean canCraft(CraftingRecipe recipe, List<Ingredient> neededList, Container inventory) {
         ArrayList<Takefrom> source=new ArrayList<>(neededList.size());
         for (Ingredient neededItem: neededList) {                                // iterate over needed items
-            ItemStack[] stacks=neededItem.getMatchingStacks();
+            ItemStack[] stacks=neededItem.getStackArray();
             if (stacks.length==0)
                 continue;
-            int neededAmount=stacks[0].getCount();
+            int neededAmount=stacks[0].getAmount();
             // System.out.println("need "+neededAmount+" "+stacks[0].getDisplayName()+" for "+recipe.getRecipeOutput().getDisplayName());
             for (int i=0; i<36; i++) {
                 Slot invitem=inventory.getSlot(i+firstInventorySlotNo);
                 ItemStack slotcontent=invitem.getStack();
                 if (canActAsIngredient(neededItem, slotcontent)) {
-                    int providedAmount=slotcontent.getCount();                  // check how many items there are
+                    int providedAmount=slotcontent.getAmount();                 // check how many items there are
                     for (int j=0; j<source.size(); j++)                         // subtract how many have been used on other slots
                         if (source.get(j).invitem==invitem)
                             providedAmount-=source.get(j).amount;
@@ -459,10 +434,10 @@ else */
 
         // mouseXY are screen coords here!
         //System.out.println("mouseY="+mouseY+", guiTop="+guiTop+", mouseX="+mouseX+", xOffset+guiLeft="+(xOffset+container.guiLeft()));
-        if (mouseY>0 && mouseY<20 && mouseX>xOffset+container.guiLeft && mouseX<xOffset+container.guiLeft+textBoxSize) {
-            if (mouseX<xOffset+container.guiLeft+20)
+        if (mouseY>0 && mouseY<20 && mouseX>xOffset+containerLeft && mouseX<xOffset+containerLeft+textBoxSize) {
+            if (mouseX<xOffset+containerLeft+20)
                 scrollBy(-100);
-            else if (mouseX>xOffset+container.guiLeft+textBoxSize-20)
+            else if (mouseX>xOffset+containerLeft+textBoxSize-20)
                 scrollBy(100);
             return;
         }
@@ -473,29 +448,29 @@ else */
 
         // Do nothing if the grid isn't empty.
         for (int craftslot=0; craftslot<gridSize*gridSize; craftslot++) {
-            ItemStack stack = container.inventorySlots.getSlot(craftslot+firstCraftSlot).getStack();
+            ItemStack stack = screen.getContainer().getSlot(craftslot+firstCraftSlot).getStack();
             if (stack!=null && !stack.isEmpty())
                 return;
         }
         
         if (underMouse instanceof RepairRecipe) {
-            fillCraftSlotsWithBestRepair((RepairRecipe)underMouse);
+//            fillCraftSlotsWithBestRepair((RepairRecipe)underMouse);       not with 1.14
         } else {
             fillCraftSlotsWithAnyMaterials(underMouse);
         }
 
         
         if (mouseButton==0) {
-            slotClick(resultSlotNo, mouseButton, ClickType.QUICK_MOVE);     // which is really PICKUP ALL
+            slotClick(resultSlotNo, mouseButton, SlotActionType.QUICK_MOVE);     // which is really PICKUP ALL
             recipeUpdateTime=System.currentTimeMillis()+ConfigurationHandler.getAutoUpdateRecipeTimer()*1000;
         }
     }
     
-    private void fillCraftSlotsWithAnyMaterials(IRecipe underMouse) {
-        NonNullList<Ingredient> recipeInput=getIngredientsAsList(underMouse);
+    private void fillCraftSlotsWithAnyMaterials(CraftingRecipe underMouse) {
+        DefaultedList<Ingredient> recipeInput=getIngredientsAsList(underMouse);
         
         int maxCraftableStacks=64;
-        if (isShiftKeyDown()) {
+        if (screen.hasShiftDown()) {
             // Try to find out how much we can craft at once, maximally. This is limited by a) the number of
             // items per stack (for example, dispensers need bows that stack to 1, so we can't craft more than 1
             // dispenser at a time), and b) the number of items we have divided by the number of input slots that
@@ -505,11 +480,11 @@ else */
             // this assumes a recipe never needs more than one item in a single input slot (unless more than 1 output item)
             HashMap<String,InputCount> inputCount=new HashMap<>();
             for (Ingredient ingr:recipeInput) {
-                ItemStack[] stacks = ingr.getMatchingStacks();
+                ItemStack[] stacks = ingr.getStackArray();
                 if (stacks.length==0)
                     continue;
-                if (stacks[0].getMaxStackSize()<maxCraftableStacks)                 // limit type a
-                    maxCraftableStacks=stacks[0].getMaxStackSize();
+                if (stacks[0].getMaxAmount()<maxCraftableStacks)                 // limit type a
+                    maxCraftableStacks=stacks[0].getMaxAmount();
                 String descriptor=stacks[0].getDisplayName()+":"+stacks[0].getDamage();
                 if (inputCount.containsKey(descriptor)) {
                     InputCount previous = inputCount.get(descriptor);
@@ -517,10 +492,10 @@ else */
                 } else {
                     int totalInInv=0;
                     for (int slot=0; slot<36; slot++) {
-                        Slot invitem=container.inventorySlots.getSlot(slot+firstInventorySlotNo);
+                        Slot invitem=screen.getContainer().getSlot(slot+firstInventorySlotNo);
                         ItemStack slotcontent=invitem.getStack();
                         if (canActAsIngredient(ingr, slotcontent))
-                            totalInInv+=slotcontent.getCount();
+                            totalInInv+=slotcontent.getAmount();
                     }
                     InputCount current=new InputCount();
                     current.count=1;
@@ -549,13 +524,13 @@ else */
             int remaining=maxCraftableStacks;
             Ingredient ingr=recipeInput.get(craftslot);
             for (int slot=0; remaining>0 && slot<36; slot++) {
-                Slot invitem=container.inventorySlots.getSlot(slot+firstInventorySlotNo);
+                Slot invitem=screen.getContainer().getSlot(slot+firstInventorySlotNo);
                 ItemStack slotcontent=invitem.getStack();
                 if (canActAsIngredient(ingr, slotcontent)) {
                     // System.out.println("craftslot is "+craftslot+", first is "+firstCraftSlot+", rowadjust is "+rowadjust+", transferring "+remaining+" items");
                     // TODO: && (isempty(craftslot) || ismergeable(slot,craftslot))
                     transfer(slot+firstInventorySlotNo, craftslot+firstCraftSlot+rowadjust, remaining);
-                    remaining=maxCraftableStacks-container.inventorySlots.getSlot(craftslot+firstCraftSlot+rowadjust).getStack().getCount();
+                    remaining=maxCraftableStacks-screen.getContainer().getSlot(craftslot+firstCraftSlot+rowadjust).getStack().getAmount();
                 }
             }
             if (underMouse instanceof ShapedRecipe && ((craftslot+1)%((ShapedRecipe)underMouse).getWidth())==0) {
@@ -563,7 +538,8 @@ else */
             }
         }
     }
-    
+
+/* Not with 1.14 ...
     private void fillCraftSlotsWithBestRepair(RepairRecipe repairRecipe) {
         // Search for item that has least damage. Put in first slot.
         // Search for second item that
@@ -571,40 +547,40 @@ else */
         //   b) does not repair first item fully but adds as much as possible
         int firstSlot=-1, secondSlot=-1;
         for (int slot=0; slot<36; slot++) {
-            Slot invitem=container.inventorySlots.getSlot(slot+firstInventorySlotNo);
+            Slot invitem=screen.getContainer().getSlot(slot+firstInventorySlotNo);
             ItemStack slotcontent=invitem.getStack();
             if (slotcontent.getItem() == repairRecipe.getItem()
             &&  slotcontent.getDamage()>0
-            &&  slotcontent.getEnchantmentTagList().size() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()
+            &&  slotcontent.getEnchantmentList().size() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()
             ) {
                 if (firstSlot==-1)
                     firstSlot=slot;
-                else if (container.inventorySlots.getSlot(firstSlot+firstInventorySlotNo).getStack().getDamage() > slotcontent.getDamage())
+                else if (screen.getContainer().getSlot(firstSlot+firstInventorySlotNo).getStack().getDamage() > slotcontent.getDamage())
                     firstSlot=slot;
             }
         }
         if (firstSlot==-1) {
             return;
         }
-        int neededRepair=container.inventorySlots.getSlot(firstSlot+firstInventorySlotNo).getStack().getDamage();
+        int neededRepair=screen.getContainer().getSlot(firstSlot+firstInventorySlotNo).getStack().getDamage();
         transfer(firstSlot+firstInventorySlotNo, firstCraftSlot, 1);
 
         for (int slot=0; slot<36; slot++) {
             if (slot==firstSlot)
                 continue;
-            Slot invitem=container.inventorySlots.getSlot(slot+firstInventorySlotNo);
+            Slot invitem=screen.getContainer().getSlot(slot+firstInventorySlotNo);
             ItemStack slotcontent=invitem.getStack();
             if (slotcontent.getItem() == repairRecipe.getItem()
             &&  slotcontent.getDamage()>0
-            &&  slotcontent.getEnchantmentTagList().size() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()
+            &&  slotcontent.getEnchantmentList().size() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()
             ) {
                 if (secondSlot==-1)
                     secondSlot=slot;
                 else {
-                    ItemStack currentRepairStack = container.inventorySlots.getSlot(secondSlot+firstInventorySlotNo).getStack();
-                    int currentRepairValue=currentRepairStack.getMaxDamage()-currentRepairStack.getDamage();
-                    ItemStack testedRepairStack = container.inventorySlots.getSlot(slot+firstInventorySlotNo).getStack();
-                    int testedRepairValue=testedRepairStack.getMaxDamage()-testedRepairStack.getDamage();
+                    ItemStack currentRepairStack = screen.getContainer().getSlot(secondSlot+firstInventorySlotNo).getStack();
+                    int currentRepairValue=currentRepairStack.getDurability()-currentRepairStack.getDamage();
+                    ItemStack testedRepairStack = screen.getContainer().getSlot(slot+firstInventorySlotNo).getStack();
+                    int testedRepairValue=testedRepairStack.getDurability()-testedRepairStack.getDamage();
 
                     if (currentRepairValue > neededRepair           // Does the item we remember repair this
                     &&  testedRepairValue > neededRepair            // And does the current item repair as well
@@ -622,14 +598,15 @@ else */
         }
         transfer(secondSlot+firstInventorySlotNo, firstCraftSlot+1, 1);
     }
-    
+*/
+
     public boolean keyPressed(int code, int scancode, int modifiers) {
         if (pattern==null)
             return false;
         // System.out.println("key code="+code+", scancode="+scancode+", modifiers="+modifiers);
         if (code==GLFW.GLFW_KEY_ENTER || code==GLFW.GLFW_KEY_KP_ENTER) {
             updatePatternMatch();
-            pattern.setFocused(false);
+            pattern.changeFocus(false);
             return true;
         } else if (pattern.isFocused()) {
             // System.out.println("-> sending to pattern");
@@ -646,9 +623,9 @@ else */
         return false;
     }
     
-    private NonNullList<Ingredient> getIngredientsAsList(IRecipe recipe) {
+    private DefaultedList<Ingredient> getIngredientsAsList(CraftingRecipe recipe) {
         // Wow. This was so much harder before 1.12.
-        return recipe.getIngredients();
+        return recipe.getPreviewInputs();
     }
     
     private boolean canActAsIngredient(Ingredient recipeComponent, ItemStack inventoryItem) {
@@ -658,24 +635,24 @@ else */
         if (inventoryItem.getItem()!=Items.LINGERING_POTION)
             return false;
         
-        PotionType neededType = PotionUtils.getPotionFromItem(inventoryItem);
-        ItemStack[] possiblePotions = recipeComponent.getMatchingStacks();
+        Potion neededType = PotionUtil.getPotion(inventoryItem);
+        ItemStack[] possiblePotions = recipeComponent.getStackArray();
         for (ItemStack stack: possiblePotions) {
-            if (PotionUtils.getPotionFromItem(stack) == neededType)
+            if (PotionUtil.getPotion(stack) == neededType)
                 return true;
         }
         return false;
     }
     
     private void transfer(int from, int to, int amount) {
-        Slot fromSlot=container.inventorySlots.getSlot(from);
+        Slot fromSlot=screen.getContainer().getSlot(from);
         ItemStack fromContent=fromSlot.getStack();
         
         //System.out.println("Trying to transfer "+amount+" "+fromContent.getDisplayName()+" from slot "+from+" to "+to);
         // want as much as we have, or more? Transfer all there is
-        if (amount >= fromSlot.getStack().getCount()) {
-            slotClick(from, 0, ClickType.PICKUP);
-            slotClick(to, 0, ClickType.PICKUP);
+        if (amount >= fromSlot.getStack().getAmount()) {
+            slotClick(from, 0, SlotActionType.PICKUP);
+            slotClick(to, 0, SlotActionType.PICKUP);
             return;
         }
 
@@ -683,26 +660,24 @@ else */
         // of items in the source slot, right clicking will round the source slot
         // down, and the hand up, so we transfer (n+1)/2 items.
         int transfer;
-        while (amount>=(transfer=((fromSlot.getStack().getCount()+1)/2))) {
-            slotClick(from, 1, ClickType.PICKUP);       // right click to get half the source
-            slotClick(to, 0, ClickType.PICKUP);
+        while (amount>=(transfer=((fromSlot.getStack().getAmount()+1)/2))) {
+            slotClick(from, 1, SlotActionType.PICKUP);       // right click to get half the source
+            slotClick(to, 0, SlotActionType.PICKUP);
             amount-=transfer;
             //System.out.println("transferred "+transfer+", amount is now "+amount);
         }
         
         if (amount>0) {
-            int prevCount=fromContent.getCount();
-            slotClick(from, 0, ClickType.PICKUP);       // left click source
+            int prevCount=fromContent.getAmount();
+            slotClick(from, 0, SlotActionType.PICKUP);       // left click source
             for (int i=0; i<amount; i++)
-                slotClick(to, 1, ClickType.PICKUP);         // right click target to deposit 1 item
+                slotClick(to, 1, SlotActionType.PICKUP);         // right click target to deposit 1 item
             if (prevCount>amount)
-                slotClick(from, 0, ClickType.PICKUP);       // left click source again to put stuff back
+                slotClick(from, 0, SlotActionType.PICKUP);       // left click source again to put stuff back
         }
     }
     
-    private void slotClick(int slot, int mouseButton, ClickType clickType) {
-        Minecraft mc=Minecraft.getInstance();
-        // System.out.println("Clicking slot "+slot+" "+(mouseButton==0 ? "left" : "right")+" type:"+clickType.toString());
-        mc.playerController.windowClick(mc.player.openContainer.windowId, slot, mouseButton, clickType, mc.player);
+    private void slotClick(int slot, int mouseButton, SlotActionType clickType) {
+        screen.slotClick(slot, mouseButton, clickType);
     }
 }

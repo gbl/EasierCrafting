@@ -1,5 +1,6 @@
 package de.guntram.mcmod.easiercrafting.mixins;
 
+/*
 import de.guntram.mcmod.easiercrafting.ExtendedGuiInventory;
 import de.guntram.mcmod.easiercrafting.RecipeBook;
 import javax.annotation.Nullable;
@@ -28,3 +29,4 @@ public class GuiInventoryMixin {
         ci.cancel();
     }
 }
+*/

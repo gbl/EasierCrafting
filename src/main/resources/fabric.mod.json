@@ -1,0 +1,19 @@
+{
+    "id": "easiercrafting",
+    "name": "EasierCrafting",
+    "description": "One-click Crafting",
+    "version": "1.3.0",
+    "side": "client",
+    "authors": [
+        "Giselbaer"
+    ],
+    "initializers": [
+        "de.guntram.mcmod.easiercrafting.EasierCrafting"
+    ],
+    "requires": {
+      "fabric": "*"
+    },
+    "mixins": {
+      "client": [ "mixins.easiercrafting.json", "mixins.easiercrafting_fabrictools.json" ]
+    }
+}
