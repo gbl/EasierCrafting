@@ -1,19 +1,31 @@
 {
+    "schemaVersion": 1,
     "id": "easiercrafting",
-    "name": "EasierCrafting",
-    "description": "One-click Crafting",
-    "version": "1.3.0",
-    "side": "client",
-    "authors": [
-        "Giselbaer"
+    "version": "1.14-fabric0.2.7-1.3.0",
+    "environment": "client",
+    "entrypoints": {
+        "client": [ "de.guntram.mcmod.easiercrafting.EasierCrafting" ],
+        "NOTYETmodmenu": [ "de.guntram.mcmod.easiercrafting.MMConfigurationHandler" ]
+    },
+    "custom": {
+        "modmenu:clientsideOnly": true
+    },
+    "mixins": [
+      	"mixins.easiercrafting.json"
     ],
-    "initializers": [
-        "de.guntram.mcmod.easiercrafting.EasierCrafting"
-    ],
-    "requires": {
+    "depends": {
       "fabric": "*"
     },
-    "mixins": {
-      "client": [ "mixins.easiercrafting.json", "mixins.easiercrafting_fabrictools.json" ]
+    "recommends": {
+      "modmenu" : "*"
+    },
+    "name": "EasierCrafting",
+    "description": "One-click Crafting",
+    "icon": "pack.png",
+    "authors": [ "Giselbaer" ],
+    "contact": {
+        "homepage": "https://minecraft.curseforge.com/projects/easiercrafting",
+        "sources": "https://github.com/gbl/EasierCrafting",
+        "issues": "https://github.com/gbl/EasierCrafting/issues"
     }
 }

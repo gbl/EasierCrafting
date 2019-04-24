@@ -95,8 +95,8 @@ public class RecipeBook {
     }
     
     void afterInitGui() {
-        this.containerLeft = (screen.width - 176 /* container.containerWidth */)/2;
-        this.containerTop  = (screen.height - 166 /* container.containerHeight */) /2;
+        this.containerLeft = (screen.width - 176 /* screen.containerWidth */)/2;
+        this.containerTop  = (screen.height - 166 /* screen.containerHeight */) /2;
 
         int tempItemsPerRow = 8;
         int tempXOffset=-itemSize*tempItemsPerRow -10;
@@ -106,7 +106,7 @@ public class RecipeBook {
         }
         textBoxSize=-tempXOffset-15;
         if (ConfigurationHandler.getShowGuiRight())
-            tempXOffset=screen.width+10;
+            tempXOffset=176 /* screen.containerWidth */  + 10;
         if (tempItemsPerRow < 2) {
             System.out.println("forcing tempItemsPerRow to 2 when it's "+tempItemsPerRow);
             tempItemsPerRow = 2;
@@ -114,7 +114,7 @@ public class RecipeBook {
         this.itemsPerRow=tempItemsPerRow;
         this.xOffset=tempXOffset;
         this.mouseScroll=0;
-        System.out.println("left="+containerLeft+", items="+itemsPerRow+", offset="+tempXOffset+", textbox="+textBoxSize);
+//        System.out.println("left="+containerLeft+", items="+itemsPerRow+", offset="+tempXOffset+", textbox="+textBoxSize);
         updatePatternMatch();
         updateRecipes();
     }
@@ -124,7 +124,7 @@ public class RecipeBook {
     // adjust our Y position accordingly.
     void drawRecipeList(TextRenderer fontRenderer, ItemRenderer itemRenderer,
             int left, int height, int mouseX, int mouseY) {
-        System.out.println("drawRecipeList: left="+left+", height="+height);
+
         // We can't do this in the constructor as we don't yet know sizes from initGui.
         // Also, not in afterInitGui() because we don't know fontRender there.
         if (pattern==null) {
@@ -180,7 +180,7 @@ public class RecipeBook {
             underMouseIsCraftable=false;
         
         for (String category: craftableCategories.keySet()) {
-            System.out.println(category+" at "+xOffset+"/"+ypos);
+//            System.out.println(category+" at "+xOffset+"/"+ypos);
             if (ypos>=minYtoDraw)
                 fontRenderer.draw(category, xOffset, ypos, 0xffff00);
             ypos+=itemSize;
@@ -217,7 +217,7 @@ public class RecipeBook {
             int xpos, int ypos,
             int mouseX, int mouseY) {
 
-        System.out.println("drawing recipes at "+xpos+"/"+ypos);
+//        System.out.println("drawing recipes at "+xpos+"/"+ypos);
         for (CraftingRecipe recipe: recipes) {
             ItemStack items=recipe.getOutput();
             if (ypos>=minYtoDraw) {
