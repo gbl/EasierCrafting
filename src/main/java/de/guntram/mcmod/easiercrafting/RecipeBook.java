@@ -22,13 +22,13 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
+import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.crafting.CraftingRecipe;
+import net.minecraft.recipe.ShapedRecipe;
+import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.util.Identifier;
-import net.minecraft.recipe.crafting.ShapedRecipe;
-import net.minecraft.recipe.crafting.ShapelessRecipe;
 import net.minecraft.util.DefaultedList;
 import org.lwjgl.glfw.GLFW;
 
@@ -187,7 +187,7 @@ public class RecipeBook {
             ypos=drawRecipeOutputs(craftableCategories.get(category), itemRenderer, fontRenderer, 0, ypos, mouseX, mouseY);
         }
         if (underMouse!=null) {
-            fontRenderer.draw(underMouse.getOutput().getDisplayName().getFormattedText(), 0, height+3, 0xffff00);
+            fontRenderer.draw(underMouse.getOutput().getName().asFormattedString(), 0, height+3, 0xffff00);
             if (underMouse instanceof ShapedRecipe) {
                 DefaultedList<Ingredient> ingredients = underMouse.getPreviewInputs();
                 fontRenderer.draw("sr", left-20, height, 0x202020);
@@ -269,7 +269,7 @@ public class RecipeBook {
             Item item = result.getItem();
             if (item==Items.AIR)
                 continue;
-            ItemGroup tab = item.getItemGroup();
+            ItemGroup tab = item.getGroup();
             String category;
             if (tab==null) {
 /*                if (item==Items.FIREWORKS)
@@ -284,8 +284,8 @@ else */
                 catRecipes=new TreeSet<>(new Comparator<CraftingRecipe>() {
                     @Override
                     public int compare(CraftingRecipe a, CraftingRecipe b) {
-                        return a.getOutput().getDisplayName().getText().
-                            compareToIgnoreCase(b.getOutput().getDisplayName().getText());
+                        return a.getOutput().getName().asString().
+                            compareToIgnoreCase(b.getOutput().getName().asString());
                     }
                 }
                 );
@@ -307,8 +307,8 @@ else */
         patternMatchingRecipes=new TreeSet<>(new Comparator<CraftingRecipe>() {
             @Override
             public int compare(CraftingRecipe a, CraftingRecipe b) {
-                return a.getOutput().getDisplayName().getText().
-                        compareToIgnoreCase(b.getOutput().getDisplayName().getText());
+                return a.getOutput().getName().asString().
+                        compareToIgnoreCase(b.getOutput().getName().asString());
             }
         });
 
@@ -331,7 +331,7 @@ else */
             Item item = result.getItem();
             if (item==Items.AIR)
                 continue;
-            if (!regex.matcher(result.getDisplayName().getText()).find()) {
+            if (!regex.matcher(result.getName().asString()).find()) {
                 //System.out.println("not adding "+result.getDisplayName()+" because no match");
                 continue;
             }
@@ -387,13 +387,13 @@ else */
             ItemStack[] stacks=neededItem.getStackArray();
             if (stacks.length==0)
                 continue;
-            int neededAmount=stacks[0].getAmount();
+            int neededAmount=stacks[0].getCount();
             // System.out.println("need "+neededAmount+" "+stacks[0].getDisplayName()+" for "+recipe.getRecipeOutput().getDisplayName());
             for (int i=0; i<36; i++) {
                 Slot invitem=inventory.getSlot(i+firstInventorySlotNo);
                 ItemStack slotcontent=invitem.getStack();
                 if (canActAsIngredient(neededItem, slotcontent)) {
-                    int providedAmount=slotcontent.getAmount();                 // check how many items there are
+                    int providedAmount=slotcontent.getCount();                 // check how many items there are
                     for (int j=0; j<source.size(); j++)                         // subtract how many have been used on other slots
                         if (source.get(j).invitem==invitem)
                             providedAmount-=source.get(j).amount;
@@ -483,9 +483,9 @@ else */
                 ItemStack[] stacks = ingr.getStackArray();
                 if (stacks.length==0)
                     continue;
-                if (stacks[0].getMaxAmount()<maxCraftableStacks)                 // limit type a
-                    maxCraftableStacks=stacks[0].getMaxAmount();
-                String descriptor=stacks[0].getDisplayName()+":"+stacks[0].getDamage();
+                if (stacks[0].getMaxCount()<maxCraftableStacks)                 // limit type a
+                    maxCraftableStacks=stacks[0].getMaxCount();
+                String descriptor=stacks[0].getName()+":"+stacks[0].getDamage();
                 if (inputCount.containsKey(descriptor)) {
                     InputCount previous = inputCount.get(descriptor);
                     previous.count++;
@@ -495,7 +495,7 @@ else */
                         Slot invitem=screen.getContainer().getSlot(slot+firstInventorySlotNo);
                         ItemStack slotcontent=invitem.getStack();
                         if (canActAsIngredient(ingr, slotcontent))
-                            totalInInv+=slotcontent.getAmount();
+                            totalInInv+=slotcontent.getCount();
                     }
                     InputCount current=new InputCount();
                     current.count=1;
@@ -530,7 +530,7 @@ else */
                     // System.out.println("craftslot is "+craftslot+", first is "+firstCraftSlot+", rowadjust is "+rowadjust+", transferring "+remaining+" items");
                     // TODO: && (isempty(craftslot) || ismergeable(slot,craftslot))
                     transfer(slot+firstInventorySlotNo, craftslot+firstCraftSlot+rowadjust, remaining);
-                    remaining=maxCraftableStacks-screen.getContainer().getSlot(craftslot+firstCraftSlot+rowadjust).getStack().getAmount();
+                    remaining=maxCraftableStacks-screen.getContainer().getSlot(craftslot+firstCraftSlot+rowadjust).getStack().getCount();
                 }
             }
             if (underMouse instanceof ShapedRecipe && ((craftslot+1)%((ShapedRecipe)underMouse).getWidth())==0) {
@@ -610,7 +610,8 @@ else */
             return true;
         } else if (pattern.isFocused()) {
             // System.out.println("-> sending to pattern");
-            return pattern.keyPressed(code, scancode, modifiers);
+            pattern.keyPressed(code, scancode, modifiers);
+            return true;            // prevent 'e' from closing screen
         } else {
             return false;
         }
@@ -650,7 +651,7 @@ else */
         
         //System.out.println("Trying to transfer "+amount+" "+fromContent.getDisplayName()+" from slot "+from+" to "+to);
         // want as much as we have, or more? Transfer all there is
-        if (amount >= fromSlot.getStack().getAmount()) {
+        if (amount >= fromSlot.getStack().getCount()) {
             slotClick(from, 0, SlotActionType.PICKUP);
             slotClick(to, 0, SlotActionType.PICKUP);
             return;
@@ -660,7 +661,7 @@ else */
         // of items in the source slot, right clicking will round the source slot
         // down, and the hand up, so we transfer (n+1)/2 items.
         int transfer;
-        while (amount>=(transfer=((fromSlot.getStack().getAmount()+1)/2))) {
+        while (amount>=(transfer=((fromSlot.getStack().getCount()+1)/2))) {
             slotClick(from, 1, SlotActionType.PICKUP);       // right click to get half the source
             slotClick(to, 0, SlotActionType.PICKUP);
             amount-=transfer;
@@ -668,7 +669,7 @@ else */
         }
         
         if (amount>0) {
-            int prevCount=fromContent.getAmount();
+            int prevCount=fromContent.getCount();
             slotClick(from, 0, SlotActionType.PICKUP);       // left click source
             for (int i=0; i<amount; i++)
                 slotClick(to, 1, SlotActionType.PICKUP);         // right click target to deposit 1 item

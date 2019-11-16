@@ -1,17 +1,17 @@
 package de.guntram.mcmod.easiercrafting;
 
-import net.minecraft.client.gui.container.CraftingTableScreen;
+import net.minecraft.client.gui.screen.ingame.CraftingTableScreen;
 import net.minecraft.container.CraftingTableContainer;
 import net.minecraft.container.SlotActionType;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.TextComponent;
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 public class ExtendedGuiCrafting extends CraftingTableScreen {
 
     private RecipeBook recipeBook;
 
-    public ExtendedGuiCrafting(CraftingTableContainer container, PlayerInventory lowerInv, TextComponent title) {
+    public ExtendedGuiCrafting(CraftingTableContainer container, PlayerInventory lowerInv, Text title) {
         super(container, lowerInv, title);
     }
     

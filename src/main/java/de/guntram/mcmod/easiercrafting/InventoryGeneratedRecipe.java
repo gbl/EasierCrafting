@@ -27,7 +27,7 @@ public class InventoryGeneratedRecipe<C extends Inventory> implements Recipe<C> 
     public InventoryGeneratedRecipe(ItemStack result, ItemStack firstInput, ItemStack... inputs) {
         this.result=result;
 
-        ingredients=DefaultedList.create();
+        ingredients=DefaultedList.of();
         ingredients.add(Ingredient.ofStacks(firstInput));
         for (ItemStack stack:inputs) 
             ingredients.add(Ingredient.ofStacks(stack));

@@ -23,7 +23,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.recipe.Recipe;
-import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.LiteralText;
 
 /**
  *
@@ -57,8 +57,8 @@ public class InventoryRecipeScanner {
             ItemStack stack=invitem.getStack();
             Item item = stack.getItem();
 
-            if (item.canDamage()&& stack.isDamaged()) {
-                ListTag enchantments = stack.getEnchantmentList();
+            if (item.isDamageable()&& stack.isDamaged()) {
+                ListTag enchantments = stack.getEnchantments();
                 if (enchantments.size() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()) {
                     Integer previous=hasRepairable.get(item);
                     hasRepairable.put(item, previous == null ? 1 : previous+1);
@@ -73,9 +73,9 @@ public class InventoryRecipeScanner {
             else if (item instanceof DyeItem) {
                 DyeColor color=((DyeItem)item).getColor();
                 if (hasDye.containsKey(color)) {
-                    hasDye.put(color, hasDye.get(color)+stack.getAmount());
+                    hasDye.put(color, hasDye.get(color)+stack.getCount());
                 } else {
-                    hasDye.put(color, stack.getAmount());
+                    hasDye.put(color, stack.getCount());
                 }
             }
             else if (Block.getBlockFromItem(item) instanceof ShulkerBoxBlock) {
@@ -104,10 +104,10 @@ public class InventoryRecipeScanner {
                 hasBoots=true;
             }
             else if (item == Items.ARROW) {
-                availableArrows+=stack.getAmount();
+                availableArrows+=stack.getCount();
             }
             else if (item == Items.GUNPOWDER) {
-                availableGunPowder+=stack.getAmount();
+                availableGunPowder+=stack.getCount();
             }
             else if (item == Items.PAPER) {
                 hasPaper=true;
@@ -131,7 +131,7 @@ public class InventoryRecipeScanner {
                 Block resultingBox=ShulkerBoxBlock.get(dye);
                 result.add(new InventoryGeneratedRecipe(
                         new ItemStack(resultingBox, 1),
-                        new ItemStack(DyeItem.fromColor(dye)),
+                        new ItemStack(DyeItem.byColor(dye)),
                         shulkerBoxItemStack
                 ));
             }
@@ -167,9 +167,9 @@ public class InventoryRecipeScanner {
             for (int power=1; power<=3; power++) {
                 if (availableGunPowder>=power) {
                     ItemStack resultItem = new ItemStack(Items.FIREWORK_ROCKET, 3);
-                    CompoundTag nbttagcompound = resultItem.getOrCreateSubCompoundTag("Fireworks");
+                    CompoundTag nbttagcompound = resultItem.getOrCreateSubTag("Fireworks");
                     nbttagcompound.putByte("Flight", (byte)power);
-                    resultItem.setDisplayName(new StringTextComponent("Strength "+power));
+                    resultItem.setCustomName(new LiteralText("Strength "+power));
 
                     ItemStack[] gunPowder = new ItemStack[power];
                     for (int k=0; k<power; k++)

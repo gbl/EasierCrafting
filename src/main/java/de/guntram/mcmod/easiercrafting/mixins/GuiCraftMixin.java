@@ -3,21 +3,22 @@ package de.guntram.mcmod.easiercrafting.mixins;
 import de.guntram.mcmod.easiercrafting.ExtendedGuiCrafting;
 import de.guntram.mcmod.easiercrafting.RecipeBook;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.ContainerScreenRegistry;
+import net.minecraft.client.gui.screen.Screens;
 import net.minecraft.container.ContainerType;
 import net.minecraft.container.CraftingTableContainer;
-import net.minecraft.text.TextComponent;
+
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ContainerScreenRegistry.class)
+@Mixin(Screens.class)
 public class GuiCraftMixin {
     
-    @Inject(method="openScreen", at=@At("HEAD"), cancellable = true)
+    @Inject(method="open", at=@At("HEAD"), cancellable = true)
     private static void checkCraftScreen(ContainerType type, MinecraftClient client,
-            int any, TextComponent component, CallbackInfo ci) {
+            int any, Text component, CallbackInfo ci) {
         if (type == ContainerType.CRAFTING) {
             CraftingTableContainer container = ContainerType.CRAFTING.create(any, client.player.inventory);
             ExtendedGuiCrafting screen = new ExtendedGuiCrafting(container, client.player.inventory, component);

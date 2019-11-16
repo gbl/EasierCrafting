@@ -1,7 +1,5 @@
 package de.guntram.mcmod.easiercrafting;
 
-import net.minecraft.client.gui.ContainerScreen;
-import org.lwjgl.glfw.GLFW;
 
 public class ExtendedGuiInventory /* extends ContainerScreen  */ {
 /*
