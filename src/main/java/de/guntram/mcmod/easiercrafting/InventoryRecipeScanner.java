@@ -181,7 +181,7 @@ public class InventoryRecipeScanner {
         }
         
         for (Item item:hasRepairable.keySet()) {
-            //System.out.println("repairable "+item.getUnlocalizedName() +": "+hasRepairable.get(item));
+            System.out.println("repairable "+item.getTranslationKey()+": "+hasRepairable.get(item));
             if (hasRepairable.get(item)>=2)
                 result.add(new RepairRecipe(item));
         }

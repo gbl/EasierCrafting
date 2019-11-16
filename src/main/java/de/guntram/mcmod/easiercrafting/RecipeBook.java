@@ -22,7 +22,6 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
-import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
@@ -38,8 +37,8 @@ public class RecipeBook {
     private final int gridSize;
     private final int resultSlotNo;
     private final int firstInventorySlotNo;
-    TreeMap<String, TreeSet<CraftingRecipe>> craftableCategories;
-    private CraftingRecipe underMouse;
+    TreeMap<String, TreeSet<Recipe>> craftableCategories;
+    private Recipe underMouse;
     
     private final int itemSize=20;
     private final int itemLift=5;         // how many pixels to display items above where they would be normally
@@ -54,7 +53,7 @@ public class RecipeBook {
     private long recipeUpdateTime;
     
     private TextFieldWidget pattern;
-    private TreeSet<CraftingRecipe> patternMatchingRecipes;
+    private TreeSet<Recipe> patternMatchingRecipes;
     private int patternListSize;
     
     static Identifier arrows;
@@ -128,10 +127,6 @@ public class RecipeBook {
         // We can't do this in the constructor as we don't yet know sizes from initGui.
         // Also, not in afterInitGui() because we don't know fontRender there.
         if (pattern==null) {
-            //System.out.println("drawRecipeList creating textbox");
-            //Collection<CraftingRecipe> x = Minecraft.getInstance().player.world.getRecipeManager().getRecipes();
-            //System.out.println("found "+x.size()+" recipes");
-            
             pattern=new TextFieldWidget(fontRenderer, xOffset, 0, textBoxSize, 20, "");
             pattern.changeFocus(ConfigurationHandler.getAutoFocusSearch());
         }
@@ -212,13 +207,13 @@ public class RecipeBook {
             underMouse=null;
     }
 
-    private int drawRecipeOutputs(TreeSet<CraftingRecipe>recipes, 
+    private int drawRecipeOutputs(TreeSet<Recipe>recipes, 
             ItemRenderer itemRenderer, TextRenderer fontRenderer, 
             int xpos, int ypos,
             int mouseX, int mouseY) {
 
 //        System.out.println("drawing recipes at "+xpos+"/"+ypos);
-        for (CraftingRecipe recipe: recipes) {
+        for (Recipe recipe: recipes) {
             ItemStack items=recipe.getOutput();
             if (ypos>=minYtoDraw) {
                 itemRenderer.renderGuiItemIcon(items, xOffset+xpos, ypos-itemLift);
@@ -260,9 +255,9 @@ public class RecipeBook {
 
         craftableCategories=new TreeMap<>();
         for (Recipe recipe:recipes) {
-            if (recipe.getType() != RecipeType.CRAFTING || !(recipe instanceof CraftingRecipe))
+            if (recipe.getType() != RecipeType.CRAFTING)
                 continue;
-            if (!canCraftRecipe((CraftingRecipe)recipe, inventory, gridSize))
+            if (!canCraftRecipe((Recipe)recipe, inventory, gridSize))
                 continue;
             //System.out.println("grid size is "+gridSize+", recipe needs "+recipe.getRecipeSize());
             ItemStack result=recipe.getOutput();
@@ -279,11 +274,11 @@ else */
             }
             else
                 category=I18n.translate(tab.getTranslationKey(), new Object[0]);
-            TreeSet<CraftingRecipe> catRecipes=craftableCategories.get(category);
+            TreeSet<Recipe> catRecipes=craftableCategories.get(category);
             if (catRecipes==null) {
-                catRecipes=new TreeSet<>(new Comparator<CraftingRecipe>() {
+                catRecipes=new TreeSet<>(new Comparator<Recipe>() {
                     @Override
-                    public int compare(CraftingRecipe a, CraftingRecipe b) {
+                    public int compare(Recipe a, Recipe b) {
                         return a.getOutput().getName().asString().
                             compareToIgnoreCase(b.getOutput().getName().asString());
                     }
@@ -292,10 +287,10 @@ else */
                 craftableCategories.put(category, catRecipes);
             }
             //System.out.println("adding "+result.getDisplayName()+" in "+category);
-            catRecipes.add((CraftingRecipe)recipe);
+            catRecipes.add((Recipe)recipe);
         }
         listSize=craftableCategories.size();
-        for (TreeSet<CraftingRecipe> tree: craftableCategories.values())
+        for (TreeSet<Recipe> tree: craftableCategories.values())
             listSize+=((tree.size()+(itemsPerRow-1))/itemsPerRow);
         listSize*=itemSize;
         mouseScroll=0;
@@ -304,9 +299,9 @@ else */
     public final void updatePatternMatch() {
         
         patternListSize=0;
-        patternMatchingRecipes=new TreeSet<>(new Comparator<CraftingRecipe>() {
+        patternMatchingRecipes=new TreeSet<>(new Comparator<Recipe>() {
             @Override
-            public int compare(CraftingRecipe a, CraftingRecipe b) {
+            public int compare(Recipe a, Recipe b) {
                 return a.getOutput().getName().asString().
                         compareToIgnoreCase(b.getOutput().getName().asString());
             }
@@ -321,8 +316,6 @@ else */
         Container inventory=screen.getContainer();
         List<Recipe> recipes = new ArrayList<>();
         recipes.addAll(MinecraftClient.getInstance().player.world.getRecipeManager().values());
-//        for (Iterator<CraftingRecipe> i= CraftingManager.REGISTRY.iterator(); i.hasNext();)
-//            recipes.add(i.next());
         Pattern regex=Pattern.compile(patternText, Pattern.CASE_INSENSITIVE);
         for (Recipe recipe:recipes) {
             if (recipe.getType() != RecipeType.CRAFTING)
@@ -336,7 +329,7 @@ else */
                 continue;
             }
             //System.out.println("adding "+result.getDisplayName()+" to pattern match "+patternText);
-            patternMatchingRecipes.add((CraftingRecipe) recipe);
+            patternMatchingRecipes.add((Recipe) recipe);
         }
         patternListSize=((patternMatchingRecipes.size()+(itemsPerRow-1))/itemsPerRow)*itemSize;
         mouseScroll=0;
@@ -347,16 +340,13 @@ else */
         Takefrom(Slot i, int n) { invitem=i; amount=n; }
     };
 
-    private boolean canCraftRecipe(CraftingRecipe recipe, Container inventory, int gridSize) {
+    private boolean canCraftRecipe(Recipe recipe, Container inventory, int gridSize) {
         if (recipe instanceof ShapelessRecipe) {
             return canCraftShapeless((ShapelessRecipe) recipe, inventory);
         } else if (recipe instanceof ShapedRecipe) {
             return canCraftShaped((ShapedRecipe) recipe, inventory, gridSize);
         } else if (recipe instanceof InventoryGeneratedRecipe || recipe instanceof RepairRecipe) {
-            // We just generated the recipe so we should be able to craft it,
-            // but make sure the grid is big enough
             return recipe.fits(gridSize, gridSize);
-            // return canCraft(recipe, recipe.getIngredients(), inventory);
         } else {
             //System.out.println(recipe.getRecipeOutput().getDisplayName()+" is a "+recipe.getClass().getCanonicalName());
         }
@@ -377,11 +367,11 @@ else */
         return canCraft(recipe, neededList, inventory);
     }
 
-    private boolean canCraftOre(CraftingRecipe recipe, DefaultedList<Ingredient>input, Container inventory) {
+    private boolean canCraftOre(Recipe recipe, DefaultedList<Ingredient>input, Container inventory) {
         return canCraft(recipe, input, inventory);
     }
 
-    private boolean canCraft(CraftingRecipe recipe, List<Ingredient> neededList, Container inventory) {
+    private boolean canCraft(Recipe recipe, List<Ingredient> neededList, Container inventory) {
         ArrayList<Takefrom> source=new ArrayList<>(neededList.size());
         for (Ingredient neededItem: neededList) {                                // iterate over needed items
             ItemStack[] stacks=neededItem.getStackArray();
@@ -454,7 +444,7 @@ else */
         }
         
         if (underMouse instanceof RepairRecipe) {
-//            fillCraftSlotsWithBestRepair((RepairRecipe)underMouse);       not with 1.14
+            fillCraftSlotsWithBestRepair((RepairRecipe)underMouse);
         } else {
             fillCraftSlotsWithAnyMaterials(underMouse);
         }
@@ -466,7 +456,7 @@ else */
         }
     }
     
-    private void fillCraftSlotsWithAnyMaterials(CraftingRecipe underMouse) {
+    private void fillCraftSlotsWithAnyMaterials(Recipe underMouse) {
         DefaultedList<Ingredient> recipeInput=getIngredientsAsList(underMouse);
         
         int maxCraftableStacks=64;
@@ -539,66 +529,45 @@ else */
         }
     }
 
-/* Not with 1.14 ...
     private void fillCraftSlotsWithBestRepair(RepairRecipe repairRecipe) {
-        // Search for item that has least damage. Put in first slot.
-        // Search for second item that
-        //   a) repairs first item fully, taking the one that is damaged most
-        //   b) does not repair first item fully but adds as much as possible
-        int firstSlot=-1, secondSlot=-1;
+        
+        // New algorithm: acutally, combining the best item with the worst item
+        // is almost always right as it maximizes the 10% bonus from good items
+
+        int bestItemSlot=-1, worstItemSlot=-1;
         for (int slot=0; slot<36; slot++) {
             Slot invitem=screen.getContainer().getSlot(slot+firstInventorySlotNo);
             ItemStack slotcontent=invitem.getStack();
             if (slotcontent.getItem() == repairRecipe.getItem()
             &&  slotcontent.getDamage()>0
-            &&  slotcontent.getEnchantmentList().size() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()
+            &&  slotcontent.getEnchantments().size() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()
             ) {
-                if (firstSlot==-1)
-                    firstSlot=slot;
-                else if (screen.getContainer().getSlot(firstSlot+firstInventorySlotNo).getStack().getDamage() > slotcontent.getDamage())
-                    firstSlot=slot;
+                if (bestItemSlot==-1)
+                    bestItemSlot=worstItemSlot=slot;
+                else if (getDamage(bestItemSlot) > slotcontent.getDamage())
+                    bestItemSlot=slot;
+                else if (getDamage(worstItemSlot) < slotcontent.getDamage())
+                    worstItemSlot=slot;
             }
         }
-        if (firstSlot==-1) {
+        if (bestItemSlot==-1 || worstItemSlot == -1 || worstItemSlot == bestItemSlot) {
             return;
         }
-        int neededRepair=screen.getContainer().getSlot(firstSlot+firstInventorySlotNo).getStack().getDamage();
-        transfer(firstSlot+firstInventorySlotNo, firstCraftSlot, 1);
 
-        for (int slot=0; slot<36; slot++) {
-            if (slot==firstSlot)
-                continue;
-            Slot invitem=screen.getContainer().getSlot(slot+firstInventorySlotNo);
-            ItemStack slotcontent=invitem.getStack();
-            if (slotcontent.getItem() == repairRecipe.getItem()
-            &&  slotcontent.getDamage()>0
-            &&  slotcontent.getEnchantmentList().size() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()
-            ) {
-                if (secondSlot==-1)
-                    secondSlot=slot;
-                else {
-                    ItemStack currentRepairStack = screen.getContainer().getSlot(secondSlot+firstInventorySlotNo).getStack();
-                    int currentRepairValue=currentRepairStack.getDurability()-currentRepairStack.getDamage();
-                    ItemStack testedRepairStack = screen.getContainer().getSlot(slot+firstInventorySlotNo).getStack();
-                    int testedRepairValue=testedRepairStack.getDurability()-testedRepairStack.getDamage();
-
-                    if (currentRepairValue > neededRepair           // Does the item we remember repair this
-                    &&  testedRepairValue > neededRepair            // And does the current item repair as well
-                    &&  testedRepairValue < currentRepairValue) {   // but the current item is more damaged so we sacrifice less
-                        secondSlot=slot;
-                    }
-                    else if (testedRepairValue > currentRepairValue) {  // will this item repair more than the remembered one?
-                        secondSlot=slot;
-                    }
-                }
-            }
-        }
-        if (secondSlot==-1) {
-            return;
-        }
-        transfer(secondSlot+firstInventorySlotNo, firstCraftSlot+1, 1);
+        transfer(bestItemSlot+firstInventorySlotNo, firstCraftSlot, 1);
+        transfer(worstItemSlot+firstInventorySlotNo, firstCraftSlot+1, 1);
     }
-*/
+    
+    private int getDamage(int slot) {
+        ItemStack stack = screen.getContainer().getSlot(slot+firstInventorySlotNo).getStack();
+        return stack.getDamage();
+    }
+
+    private int getRemainingDurability(int slot) {
+        ItemStack stack = screen.getContainer().getSlot(slot+firstInventorySlotNo).getStack();
+        int remainingDurability = stack.getMaxDamage() - stack.getDamage();
+        return remainingDurability;
+    }
 
     public boolean keyPressed(int code, int scancode, int modifiers) {
         if (pattern==null)
@@ -624,8 +593,7 @@ else */
         return false;
     }
     
-    private DefaultedList<Ingredient> getIngredientsAsList(CraftingRecipe recipe) {
-        // Wow. This was so much harder before 1.12.
+    private DefaultedList<Ingredient> getIngredientsAsList(Recipe recipe) {
         return recipe.getPreviewInputs();
     }
     
