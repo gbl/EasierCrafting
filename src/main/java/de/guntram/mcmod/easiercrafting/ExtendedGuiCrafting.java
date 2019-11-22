@@ -7,7 +7,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
-public class ExtendedGuiCrafting extends CraftingTableScreen {
+public class ExtendedGuiCrafting extends CraftingTableScreen implements SlotClickAccepter {
 
     private RecipeBook recipeBook;
 
@@ -64,6 +64,7 @@ public class ExtendedGuiCrafting extends CraftingTableScreen {
         return true;
     }
 
+    @Override
     public void slotClick(int slot, int mouseButton, SlotActionType clickType) {
         // System.out.println("Clicking slot "+slot+" "+(mouseButton==0 ? "left" : "right")+" type:"+clickType.toString());
         this.onMouseClick(null, slot, mouseButton, clickType);

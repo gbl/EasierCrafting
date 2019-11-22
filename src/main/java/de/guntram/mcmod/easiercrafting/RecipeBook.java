@@ -9,6 +9,7 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.render.item.ItemRenderer;
@@ -32,7 +33,7 @@ import net.minecraft.util.DefaultedList;
 import org.lwjgl.glfw.GLFW;
 
 public class RecipeBook {
-    private final ExtendedGuiCrafting screen;
+    private final AbstractContainerScreen screen;
     private final int firstCraftSlot;
     private final int gridSize;
     private final int resultSlotNo;
@@ -71,7 +72,7 @@ public class RecipeBook {
  * @param firstInventorySlot
  *                          the slot number of the first inventory slot
  */    
-    public RecipeBook(ExtendedGuiCrafting craftScreen, int firstCraftSlot, int gridsize, int resultSlot, int firstInventorySlot) {
+    public RecipeBook(AbstractContainerScreen craftScreen, int firstCraftSlot, int gridsize, int resultSlot, int firstInventorySlot) {
         this.screen=craftScreen;
         this.firstCraftSlot=firstCraftSlot;
         this.gridSize=gridsize;
@@ -647,6 +648,6 @@ else */
     }
     
     private void slotClick(int slot, int mouseButton, SlotActionType clickType) {
-        screen.slotClick(slot, mouseButton, clickType);
+        ((SlotClickAccepter)screen).slotClick(slot, mouseButton, clickType);
     }
 }

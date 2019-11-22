@@ -1,17 +1,22 @@
 package de.guntram.mcmod.easiercrafting;
 
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.container.SlotActionType;
+import net.minecraft.entity.player.PlayerEntity;
+import org.lwjgl.glfw.GLFW;
 
-public class ExtendedGuiInventory /* extends ContainerScreen  */ {
-/*
+
+public class ExtendedGuiInventory extends InventoryScreen implements SlotClickAccepter {
+
     private RecipeBook recipeBook;
 
-    public ExtendedGuiInventory(EntityPlayer player) {
+    public ExtendedGuiInventory(PlayerEntity player) {
         super(player);
     }
     
     @Override
-    public void initGui() {
-        super.initGui();
+    public void init() {
+        super.init();
         if (!ConfigurationHandler.getAllowMinecraftRecipeBook())
             this.buttons.clear();
         this.recipeBook.afterInitGui();
@@ -22,21 +27,21 @@ public class ExtendedGuiInventory /* extends ContainerScreen  */ {
     }
     
     @Override
-    protected void drawGuiContainerForegroundLayer(final int mouseX, final int mouseY) {
-        super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-        recipeBook.drawRecipeList(fontRenderer, itemRender, xSize, ySize, mouseX-guiLeft, mouseY-guiTop);
+    protected void drawForeground(final int mouseX, final int mouseY) {
+        super.drawForeground(mouseX, mouseY);
+        recipeBook.drawRecipeList(font, itemRenderer, containerWidth, containerHeight, mouseX-left, mouseY-top);
     }
     
     @Override
-    public boolean mouseScrolled(double delta) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
         recipeBook.scrollBy((int) delta);
-        return super.mouseScrolled(delta);
+        return super.mouseScrolled(mouseX, mouseY, delta);
     }    
     
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        recipeBook.mouseClicked((int)mouseX, (int)mouseY, mouseButton, guiLeft, guiTop);
+        recipeBook.mouseClicked((int)mouseX, (int)mouseY, mouseButton, left, top);
         return true;
     }
 
@@ -55,5 +60,13 @@ public class ExtendedGuiInventory /* extends ContainerScreen  */ {
         if (!recipeBook.charTyped(codepoint, modifiers))
             return super.charTyped(codepoint, modifiers);
         return true;
-    } */
+    }
+
+    @Override
+    public void slotClick(int slot, int mouseButton, SlotActionType clickType) {
+        // System.out.println("Clicking slot "+slot+" "+(mouseButton==0 ? "left" : "right")+" type:"+clickType.toString());
+        this.onMouseClick(null, slot, mouseButton, clickType);
+        // mc.playerController.windowClick(mc.player.openContainer.windowId, slot, mouseButton, clickType, mc.player);
+    }
+
 }
