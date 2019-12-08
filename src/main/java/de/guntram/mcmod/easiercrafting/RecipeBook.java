@@ -128,7 +128,10 @@ public class RecipeBook {
         // Also, not in afterInitGui() because we don't know fontRender there.
         if (pattern==null) {
             pattern=new TextFieldWidget(fontRenderer, xOffset, 0, textBoxSize, 20, "");
-            pattern.changeFocus(ConfigurationHandler.getAutoFocusSearch());
+            if (ConfigurationHandler.getAutoFocusSearch()) {
+                // doh - in 1.15, changeFocus toggles the focus and ignores the parameter
+                pattern.changeFocus(true);
+            }
         }
 
         boolean underMouseIsCraftable=true;

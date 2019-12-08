@@ -24,12 +24,16 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.text.LiteralText;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author gbl
  */
 public class InventoryRecipeScanner {
+    
+    private static final Logger LOGGER = LogManager.getLogger();
     
     static List<Recipe> findUnusualRecipes(Container inventory, int firstInventorySlotNo) {
         ArrayList<Recipe> result=new ArrayList<>();
@@ -181,7 +185,7 @@ public class InventoryRecipeScanner {
         }
         
         for (Item item:hasRepairable.keySet()) {
-            System.out.println("repairable "+item.getTranslationKey()+": "+hasRepairable.get(item));
+            LOGGER.debug("repairable "+item.getTranslationKey()+": "+hasRepairable.get(item));
             if (hasRepairable.get(item)>=2)
                 result.add(new RepairRecipe(item));
         }

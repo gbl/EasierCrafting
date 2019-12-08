@@ -26,8 +26,8 @@ dependencies {
     modCompile "net.fabricmc:fabric-loader:0.7.2+build.174"
     modCompile "net.fabricmc.fabric-api:fabric-api:0.4.20+build.273-1.15"
     modCompile "io.github.prospector.modmenu:ModMenu:1.6.3-95"
-        // modCompile "de.guntram.mcmod:GBfabrictools:1.0.0"
-        // include    "de.guntram.mcmod:GBfabrictools:1.0.0"
+    modCompile "de.guntram.mcmod:GBfabrictools:1.1.0"
+    include    "de.guntram.mcmod:GBfabrictools:1.1.0"
 }
 
 // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task

@@ -1,15 +1,15 @@
 package de.guntram.mcmod.easiercrafting;
 
-/* import de.guntram.mcmod.fabrictools.ConfigChangedEvent;
+import de.guntram.mcmod.fabrictools.ConfigChangedEvent;
 import de.guntram.mcmod.fabrictools.Configuration;
-import de.guntram.mcmod.fabrictools.ModConfigurationHandler;  */
+import de.guntram.mcmod.fabrictools.ModConfigurationHandler;
 import java.io.File;
 
-public class ConfigurationHandler {
+public class ConfigurationHandler implements ModConfigurationHandler {
 
     private static ConfigurationHandler instance;
 
-//    private Configuration config;
+    private Configuration config;
     private String configFileName;
     
     private boolean autoFocusSearch;
@@ -26,27 +26,22 @@ public class ConfigurationHandler {
     }
     
 
-    public void load(final File configFile) { /*
+    public void load(final File configFile) {
         if (config == null) {
             config = new Configuration(configFile);
             configFileName=configFile.getPath();
             loadConfig();
-        } */
-        loadConfig();
+        }
     }
     
-    /*
-
     @Override
     public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
         if (event.getModID().equalsIgnoreCase(EasierCrafting.MODID)) {
             loadConfig();
         }
     }
-    */
     
     private void loadConfig() {
-        /* 
         autoUpdateRecipeTimer=config.getInt("Auto update recipe timer", Configuration.CATEGORY_CLIENT, 5, 0, 30, "Update recipe list after this many seconds after last click");
         autoFocusSearch=config.getBoolean("Auto focus search text", Configuration.CATEGORY_CLIENT, false, "Automatically focus the search box when opening craft GUI");
         allowRecipeBook=config.getBoolean("Allow MC internal recipe book", Configuration.CATEGORY_CLIENT, true, "Allow opening the MC internal recipe book (since 1.12)");
@@ -56,19 +51,12 @@ public class ConfigurationHandler {
         
         if (config.hasChanged())
             config.save();
-        */
-        autoUpdateRecipeTimer=5;
-        autoFocusSearch=false;
-        allowRecipeBook=true;
-        showGuiRight=true;
-        allowGeneratedRecipes=true;
-        maxEnchantsAllowedForRepair=2;
     }
     
-    /* @Override
+    @Override
     public Configuration getConfig() {
         return config;
-    }    */
+    }
 
     public static String getConfigFileName() {
         return getInstance().configFileName;
