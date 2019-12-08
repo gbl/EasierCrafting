@@ -11,7 +11,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.item.Items;
@@ -161,8 +160,8 @@ public class RecipeBook {
             mouseScrollEnabled=false;
             mouseScroll=0;
         }
-        GuiLighting.enable();
-        GuiLighting.enableForItems();
+//        GuiLighting.enable();
+//        GuiLighting.enableForItems();
 
         underMouse=null;
 
@@ -203,7 +202,7 @@ public class RecipeBook {
             }
         }
      
-        GuiLighting.disable();
+//        GuiLighting.disable();
         if (!underMouseIsCraftable)
             underMouse=null;
     }
@@ -236,7 +235,7 @@ public class RecipeBook {
     }
     
     public void renderIngredient(ItemRenderer itemRenderer, TextRenderer fontRenderer, Ingredient ingredient, int x, int y) {
-        ItemStack[] stacks=ingredient.getStackArray();
+        ItemStack[] stacks=ingredient.getMatchingStacksClient();
         if (stacks.length==0)
             return;
         int toRender=0;
@@ -375,7 +374,7 @@ else */
     private boolean canCraft(Recipe recipe, List<Ingredient> neededList, Container inventory) {
         ArrayList<Takefrom> source=new ArrayList<>(neededList.size());
         for (Ingredient neededItem: neededList) {                                // iterate over needed items
-            ItemStack[] stacks=neededItem.getStackArray();
+            ItemStack[] stacks=neededItem.getMatchingStacksClient();
             if (stacks.length==0)
                 continue;
             int neededAmount=stacks[0].getCount();
@@ -471,7 +470,7 @@ else */
             // this assumes a recipe never needs more than one item in a single input slot (unless more than 1 output item)
             HashMap<String,InputCount> inputCount=new HashMap<>();
             for (Ingredient ingr:recipeInput) {
-                ItemStack[] stacks = ingr.getStackArray();
+                ItemStack[] stacks = ingr.getMatchingStacksClient();
                 if (stacks.length==0)
                     continue;
                 if (stacks[0].getMaxCount()<maxCraftableStacks)                 // limit type a
@@ -606,7 +605,7 @@ else */
             return false;
         
         Potion neededType = PotionUtil.getPotion(inventoryItem);
-        ItemStack[] possiblePotions = recipeComponent.getStackArray();
+        ItemStack[] possiblePotions = recipeComponent.getMatchingStacksClient();
         for (ItemStack stack: possiblePotions) {
             if (PotionUtil.getPotion(stack) == neededType)
                 return true;

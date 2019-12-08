@@ -29,7 +29,7 @@ public class ExtendedGuiInventory extends InventoryScreen implements SlotClickAc
     @Override
     protected void drawForeground(final int mouseX, final int mouseY) {
         super.drawForeground(mouseX, mouseY);
-        recipeBook.drawRecipeList(font, itemRenderer, containerWidth, containerHeight, mouseX-left, mouseY-top);
+        recipeBook.drawRecipeList(font, itemRenderer, containerWidth, containerHeight, mouseX-x, mouseY-y);
     }
     
     @Override
@@ -41,7 +41,7 @@ public class ExtendedGuiInventory extends InventoryScreen implements SlotClickAc
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        recipeBook.mouseClicked((int)mouseX, (int)mouseY, mouseButton, left, top);
+        recipeBook.mouseClicked((int)mouseX, (int)mouseY, mouseButton, x, y);
         return true;
     }
 
