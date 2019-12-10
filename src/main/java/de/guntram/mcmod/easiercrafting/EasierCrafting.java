@@ -6,6 +6,7 @@ import net.fabricmc.api.ClientModInitializer;
 public class EasierCrafting implements ClientModInitializer 
 {
     static final String MODID="easiercrafting";
+    static final String MODNAME="EasierCrafting";
     static final String VERSION="@VERSION@";
 
     @Override

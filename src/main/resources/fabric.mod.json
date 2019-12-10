@@ -1,11 +1,11 @@
 {
     "schemaVersion": 1,
     "id": "easiercrafting",
-    "version": "1.14-fabric0.4.1-1.3.0",
+    "version": "1.15.pre6-fabric0.4.1-1.3.0",
     "environment": "client",
     "entrypoints": {
         "client": [ "de.guntram.mcmod.easiercrafting.EasierCrafting" ],
-        "NOTYETmodmenu": [ "de.guntram.mcmod.easiercrafting.MMConfigurationHandler" ]
+        "modmenu": [ "de.guntram.mcmod.easiercrafting.MMConfigurationHandler" ]
     },
     "custom": {
         "modmenu:clientsideOnly": true
