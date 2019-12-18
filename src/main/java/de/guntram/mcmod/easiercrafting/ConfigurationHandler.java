@@ -18,13 +18,13 @@ public class ConfigurationHandler implements ModConfigurationHandler {
     private boolean showGuiRight;
     private boolean allowGeneratedRecipes;
     private int maxEnchantsAllowedForRepair;
+    private boolean categorizeRecipes;
 
     public static ConfigurationHandler getInstance() {
         if (instance==null)
             instance=new ConfigurationHandler();
         return instance;
     }
-    
 
     public void load(final File configFile) {
         if (config == null) {
@@ -48,6 +48,7 @@ public class ConfigurationHandler implements ModConfigurationHandler {
         showGuiRight=config.getBoolean("Show GUI right of inventory", Configuration.CATEGORY_CLIENT, true, "Show the GUI right of the inventory, where it could conflict with Just Enough Items, instead of left, where it conflicts with active buffs");
         allowGeneratedRecipes=config.getBoolean("Allow special recipes", Configuration.CATEGORY_CLIENT, true, "Add Shulker box coloring, tipped arrows, fireworks, repairs to the craftable list");
         maxEnchantsAllowedForRepair=config.getInt("Max. enchants", Configuration.CATEGORY_CLIENT, 0, 0, 10, "Don't consider items for workbench repair if they have more than this number of enchants");
+        categorizeRecipes=config.getBoolean("Categorize recipes", Configuration.CATEGORY_CLIENT, true, "Categorize recipes by their creative mode tab");
         
         if (config.hasChanged())
             config.save();
@@ -84,5 +85,9 @@ public class ConfigurationHandler implements ModConfigurationHandler {
     
     public static int getMaxEnchantsAllowedForRepair() {
         return getInstance().maxEnchantsAllowedForRepair;
+    }
+    
+    public static boolean getCategorizeRecipes() {
+        return getInstance().categorizeRecipes;
     }
 }
