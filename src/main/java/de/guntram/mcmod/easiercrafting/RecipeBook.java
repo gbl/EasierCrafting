@@ -269,14 +269,13 @@ public class RecipeBook {
                 continue;
             ItemGroup tab = item.getGroup();
             String category;
-            if (tab==null) {
-/*                if (item==Items.FIREWORKS)
-                    category = "Fireworks";
-else */
+            if (!ConfigurationHandler.getCategorizeRecipes()) {
+                category="Possible Recipes";
+            } else if (tab==null) {
                     category="(none?)";
-            }
-            else
+            } else {
                 category=I18n.translate(tab.getTranslationKey(), new Object[0]);
+            }
             TreeSet<Recipe> catRecipes=craftableCategories.get(category);
             if (catRecipes==null) {
                 catRecipes=new TreeSet<>(new Comparator<Recipe>() {
