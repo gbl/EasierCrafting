@@ -1,5 +1,6 @@
 package de.guntram.mcmod.easiercrafting.mixins;
 
+import net.minecraft.container.SlotActionType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.packet.ClickWindowC2SPacket;
@@ -16,7 +17,7 @@ public class ServerPlayNetworkHandlerMixin {
     
     @Inject(method="onClickWindow", at=@At("RETURN"))
     private void clickWindowSendsCraftResult(ClickWindowC2SPacket packet, CallbackInfo ci) {
-        if (packet.getSlot() == 0) {
+        if (packet.getSlot() == 0 && packet.getActionType() == SlotActionType.QUICK_MOVE) {
             this.player.openContainer(this.player.container);
         }
     }

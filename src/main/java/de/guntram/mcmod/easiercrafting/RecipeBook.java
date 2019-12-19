@@ -508,7 +508,7 @@ public class RecipeBook {
             }
         }
         
-        LOGGER.info("Item in result slot is "+screen.getContainer().getSlot(resultSlotNo).getStack().getName());
+        LOGGER.debug("Item in result slot is "+screen.getContainer().getSlot(resultSlotNo).getStack().getItem().getName().asString());
 
         
         if (mouseButton==0) {
