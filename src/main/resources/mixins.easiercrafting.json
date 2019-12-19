@@ -6,9 +6,10 @@
     "client": [
         "GuiCraftMixin", "AbstractFurnaceScreenMixin", "AbstractFurnaceContainerMixin", "GuiInventoryMixin",
         "ServerPlayNetworkHandlerMixin"
+
     ],
     "client-disabled": [
-        "GuiActionConfirmDebug", "ClickWindowC2SPacketMixin"
+        "GuiActionConfirmDebug", "ClickWindowC2SPacketMixin"        
     ],
     "injectors": {
         "defaultRequire": 1
