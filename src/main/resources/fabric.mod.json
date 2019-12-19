@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "easiercrafting",
-    "version": "1.14.4-fabric0.4.2-1.4.0",
+    "version": "1.14.4-fabric0.4.2-1.5.0",
     "environment": "client",
     "entrypoints": {
         "client": [ "de.guntram.mcmod.easiercrafting.EasierCrafting" ],
