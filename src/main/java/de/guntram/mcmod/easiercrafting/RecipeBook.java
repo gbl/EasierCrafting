@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
+import net.minecraft.block.Block;
+import net.minecraft.block.SlabBlock;
+import net.minecraft.block.StairsBlock;
+import net.minecraft.block.WallBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
@@ -18,27 +22,35 @@ import net.minecraft.item.Items;
 import net.minecraft.container.SlotActionType;
 import net.minecraft.container.Container;
 import net.minecraft.container.Slot;
+import net.minecraft.container.StonecutterContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
+import net.minecraft.recipe.CuttingRecipe;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.ShapelessRecipe;
+import net.minecraft.recipe.StonecuttingRecipe;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.DefaultedList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 
 public class RecipeBook {
+    
+    private static final Logger LOGGER = LogManager.getLogger(RecipeBook.class);
+
     private final AbstractContainerScreen screen;
     private final int firstCraftSlot;
     private final int gridSize;
     private final int resultSlotNo;
     private final int firstInventorySlotNo;
-    TreeMap<String, TreeSet<Recipe>> craftableCategories;
+    TreeMap<String, RecipeTreeSet> craftableCategories;
     private Recipe underMouse;
     
     private final int itemSize=20;
@@ -48,13 +60,13 @@ public class RecipeBook {
     private int itemsPerRow;                // # of items per row. Normally 8.
     private int xOffset;                    // offset of list to standard gui. itemSize*itemsPerRow+10.
     private int mouseScroll;
-    private boolean mouseScrollEnabled;
     private int minYtoDraw=0;               // implements clipping top part of the item list
     private int textBoxSize;
     private long recipeUpdateTime;
+    private RecipeType wantedRecipeType;
     
     private TextFieldWidget pattern;
-    private TreeSet<Recipe> patternMatchingRecipes;
+    private RecipeTreeSet patternMatchingRecipes;
     private int patternListSize;
     
     static Identifier arrows;
@@ -77,20 +89,29 @@ public class RecipeBook {
         this.firstCraftSlot=firstCraftSlot;
         this.gridSize=gridsize;
         this.resultSlotNo=resultSlot;
-        // firstInventorySlot is not neccesarily number of slots minus 36 -- 
-        // player inventory has 9-44; 45 is offhand
         this.firstInventorySlotNo=firstInventorySlot;
         this.pattern=null;
         this.underMouse=null;
         
-        
+        if (screen instanceof ExtendedGuiStonecutter) {
+            wantedRecipeType = RecipeType.STONECUTTING;
+        } else if (screen instanceof ExtendedGuiCrafting || screen instanceof ExtendedGuiInventory) {
+            wantedRecipeType = RecipeType.CRAFTING;
+        } else {
+            wantedRecipeType = null;        // should not happen
+        }
+
         if (arrows==null) {
             arrows=new Identifier(EasierCrafting.MODID, "textures/arrows.png");
-            /* ??? 
-            SimpleTexture x=new SimpleTexture(arrows);
-            boolean flag = MinecraftClient.getInstance().getTextureManager().loadTexture(arrows, x);
-            //System.out.println("loading "+arrows.toString()+": "+flag);
-            */
+        }
+        
+        Container inventory=screen.getContainer();
+        LOGGER.debug("cutting: size= "+inventory.slotList.size());
+        for (int i=0; i<inventory.slotList.size(); i++) {
+            ItemStack stack=inventory.getSlot(i).getStack();
+            if(!stack.isEmpty()) {
+                LOGGER.debug("slot "+i+" has "+stack.getCount()+" of "+stack.getItem().getName().asString());
+            }
         }
     }
     
@@ -154,14 +175,11 @@ public class RecipeBook {
                 MinecraftClient.getInstance().getTextureManager().bindTexture(arrows);
                 screen.blit(xOffset,                ypos,  0, 0, 20, 20);
                 screen.blit(xOffset+textBoxSize-20, ypos, 20, 0, 20, 20);
-                mouseScrollEnabled=true;
                 ypos+=itemSize;
             } else {
-                mouseScrollEnabled=false;
                 mouseScroll=0;
             }
         } else {
-            mouseScrollEnabled=false;
             mouseScroll=0;
         }
         GuiLighting.enable();
@@ -203,15 +221,25 @@ public class RecipeBook {
                     renderIngredient(itemRenderer, fontRenderer, ingredient, itemSize*xpos, height+itemSize);
                     xpos++;
                 }
+            } else if (underMouse instanceof CuttingRecipe) {
+                fontRenderer.draw("from "+((Ingredient)(underMouse.getPreviewInputs().get(0))).getStackArray()[0].getName().asString(),
+                        0, height+itemSize, 0xffff00);
+                xpos=0;
+                for (Ingredient ingredient: ((CuttingRecipe)underMouse).getPreviewInputs()) {
+                    renderIngredient(itemRenderer, fontRenderer, ingredient, itemSize*xpos, height+2*itemSize);
+                    xpos++;
+                }
             }
         }
      
         GuiLighting.disable();
-        if (!underMouseIsCraftable)
+        if (!underMouseIsCraftable) {
+            // prevent action when clicking the output icon
             underMouse=null;
+        }
     }
 
-    private int drawRecipeOutputs(TreeSet<Recipe>recipes, 
+    private int drawRecipeOutputs(RecipeTreeSet recipes, 
             ItemRenderer itemRenderer, TextRenderer fontRenderer, 
             int xpos, int ypos,
             int mouseX, int mouseY) {
@@ -253,13 +281,13 @@ public class RecipeBook {
         Container inventory=screen.getContainer();
         List<Recipe> recipes = new ArrayList<>();
         recipes.addAll(MinecraftClient.getInstance().player.world.getRecipeManager().values());
-        if (ConfigurationHandler.getAllowGeneratedRecipes()) {
+        if (wantedRecipeType == RecipeType.CRAFTING && ConfigurationHandler.getAllowGeneratedRecipes()) {
             recipes.addAll(InventoryRecipeScanner.findUnusualRecipes(inventory, firstInventorySlotNo));
         }
 
         craftableCategories=new TreeMap<>();
         for (Recipe recipe:recipes) {
-            if (recipe.getType() != RecipeType.CRAFTING)
+            if (!recipeTypeMatchesWorkstation(recipe))
                 continue;
             if (!canCraftRecipe((Recipe)recipe, inventory, gridSize))
                 continue;
@@ -275,25 +303,31 @@ public class RecipeBook {
             } else if (tab==null) {
                     category="(none?)";
             } else {
-                category=I18n.translate(tab.getTranslationKey(), new Object[0]);
-            }
-            TreeSet<Recipe> catRecipes=craftableCategories.get(category);
-            if (catRecipes==null) {
-                catRecipes=new TreeSet<>(new Comparator<Recipe>() {
-                    @Override
-                    public int compare(Recipe a, Recipe b) {
-                        return a.getOutput().getName().asString().
-                            compareToIgnoreCase(b.getOutput().getName().asString());
+                if (wantedRecipeType == RecipeType.STONECUTTING) {
+                    Block block=Block.getBlockFromItem(item);
+                    if (block instanceof StairsBlock) {
+                        category = "Stairs";
+                    } else if (block instanceof SlabBlock) {
+                        category = "Slabs";
+                    } else if (block instanceof WallBlock) {
+                        category = "Walls";
+                    } else {
+                        category = "Blocks";
                     }
+                } else {
+                    category=I18n.translate(tab.getTranslationKey(), new Object[0]);
                 }
-                );
+            }
+            RecipeTreeSet catRecipes=craftableCategories.get(category);
+            if (catRecipes==null) {
+                catRecipes=new RecipeTreeSet();
                 craftableCategories.put(category, catRecipes);
             }
             //System.out.println("adding "+result.getDisplayName()+" in "+category);
             catRecipes.add((Recipe)recipe);
         }
         listSize=craftableCategories.size();
-        for (TreeSet<Recipe> tree: craftableCategories.values())
+        for (RecipeTreeSet tree: craftableCategories.values())
             listSize+=((tree.size()+(itemsPerRow-1))/itemsPerRow);
         listSize*=itemSize;
         mouseScroll=0;
@@ -302,13 +336,7 @@ public class RecipeBook {
     public final void updatePatternMatch() {
         
         patternListSize=0;
-        patternMatchingRecipes=new TreeSet<>(new Comparator<Recipe>() {
-            @Override
-            public int compare(Recipe a, Recipe b) {
-                return a.getOutput().getName().asString().
-                        compareToIgnoreCase(b.getOutput().getName().asString());
-            }
-        });
+        patternMatchingRecipes=new RecipeTreeSet();
 
         if (pattern==null)          // constructor run but no gui opened yet
             return;
@@ -321,7 +349,7 @@ public class RecipeBook {
         recipes.addAll(MinecraftClient.getInstance().player.world.getRecipeManager().values());
         Pattern regex=Pattern.compile(patternText, Pattern.CASE_INSENSITIVE);
         for (Recipe recipe:recipes) {
-            if (recipe.getType() != RecipeType.CRAFTING)
+            if (!recipeTypeMatchesWorkstation(recipe))
                 continue;
             ItemStack result=recipe.getOutput();
             Item item = result.getItem();
@@ -337,6 +365,10 @@ public class RecipeBook {
         patternListSize=((patternMatchingRecipes.size()+(itemsPerRow-1))/itemsPerRow)*itemSize;
         mouseScroll=0;
     }
+    
+    private boolean recipeTypeMatchesWorkstation(Recipe recipe) {
+        return wantedRecipeType == recipe.getType();
+    }
 
     class Takefrom { 
         Slot invitem; int amount; 
@@ -350,6 +382,19 @@ public class RecipeBook {
             return canCraftShaped((ShapedRecipe) recipe, inventory, gridSize);
         } else if (recipe instanceof InventoryGeneratedRecipe || recipe instanceof RepairRecipe) {
             return recipe.fits(gridSize, gridSize);
+        } else if (recipe instanceof CuttingRecipe) {
+            ItemStack stack = recipe.getOutput();
+            LOGGER.debug("output: "+stack.getItem().getName().asString());
+            for (Ingredient ing: (List<Ingredient>)recipe.getPreviewInputs()) {
+                ItemStack[] stacks=ing.getStackArray();
+                if (stacks.length > 1) {
+                    LOGGER.info(stacks.length+" possible inputs for "+stack.getItem().getName().asString());
+                    for (ItemStack stack2: stacks) {
+                        LOGGER.info("    "+stack2.getItem().getName().asString());
+                    }
+                }
+            }
+            return canCraftCutting((CuttingRecipe)recipe, inventory);
         } else {
             //System.out.println(recipe.getRecipeOutput().getDisplayName()+" is a "+recipe.getClass().getCanonicalName());
         }
@@ -362,10 +407,14 @@ public class RecipeBook {
     }
 
     private boolean canCraftShaped(ShapedRecipe recipe, Container inventory, int gridSize) {
-        if (recipe.getWidth()>gridSize || recipe.getHeight()>gridSize) {
-            //System.out.println("Can't do "+recipe.getRecipeOutput().getDisplayName()+" as it needs "+recipe.recipeWidth+"/"+recipe.recipeHeight);
+        if (!recipe.fits(gridSize, gridSize)) {
             return false;
         }
+        DefaultedList<Ingredient> neededList = recipe.getPreviewInputs();
+        return canCraft(recipe, neededList, inventory);
+    }
+    
+    private boolean canCraftCutting(CuttingRecipe recipe, Container inventory) {
         DefaultedList<Ingredient> neededList = recipe.getPreviewInputs();
         return canCraft(recipe, neededList, inventory);
     }
@@ -416,8 +465,6 @@ public class RecipeBook {
         int old=mouseScroll;
         if (ticks<=-100 && mouseScroll*itemSize < listSize+patternListSize)      mouseScroll++;
         if (ticks>= 100 && mouseScroll>0)                                        mouseScroll--;
-//        if (mouseScroll!=old)
-//            System.out.println("mouseScroll is now "+mouseScroll+" vs height "+(listSize+patternListSize));
     }
 
     public void mouseClicked(int mouseX, int mouseY, int mouseButton, int guiLeft, int guiTop) {
@@ -451,6 +498,17 @@ public class RecipeBook {
         } else {
             fillCraftSlotsWithAnyMaterials(underMouse);
         }
+        if (underMouse.getType() == RecipeType.STONECUTTING) {
+            StonecutterContainer container = (StonecutterContainer) screen.getContainer();
+            List<StonecuttingRecipe> recipes = container.getAvailableRecipes();
+            int index = recipes.indexOf(underMouse);
+            if (index >= 0) {
+                container.onButtonClick(null, index);
+                MinecraftClient.getInstance().interactionManager.clickButton(container.syncId, index);
+            }
+        }
+        
+        LOGGER.info("Item in result slot is "+screen.getContainer().getSlot(resultSlotNo).getStack().getName());
 
         
         if (mouseButton==0) {
@@ -651,5 +709,28 @@ public class RecipeBook {
     
     private void slotClick(int slot, int mouseButton, SlotActionType clickType) {
         ((SlotClickAccepter)screen).slotClick(slot, mouseButton, clickType);
+    }
+    
+    private class RecipeTreeSet extends TreeSet<Recipe> {
+        RecipeTreeSet() {
+            super(new Comparator<Recipe>() {
+                @Override
+                public int compare(Recipe a, Recipe b) {
+                    int sameName = a.getOutput().getName().asString().compareToIgnoreCase(b.getOutput().getName().asString());
+                    if (a.getType() == RecipeType.STONECUTTING && b.getType() == RecipeType.STONECUTTING) {
+                        if (sameName != 0) {
+                            return sameName;
+                        } else {
+                            return ((Ingredient)(a.getPreviewInputs().get(0))).getStackArray()[0].getItem().getName().asString()
+                            .compareToIgnoreCase(
+                                   ((Ingredient)(b.getPreviewInputs().get(0))).getStackArray()[0].getItem().getName().asString()
+                            );
+                        }
+                    } else {
+                        return sameName;
+                    }
+                }
+            });
+        }
     }
 }

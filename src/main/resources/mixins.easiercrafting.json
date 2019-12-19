@@ -4,10 +4,11 @@
     "refmap": "EasierCrafting-refmap.json",
     "minVersion": "0.6",
     "client": [
-        "GuiCraftMixin", "AbstractFurnaceScreenMixin", "AbstractFurnaceContainerMixin", "GuiInventoryMixin"
+        "GuiCraftMixin", "AbstractFurnaceScreenMixin", "AbstractFurnaceContainerMixin", "GuiInventoryMixin",
+        "ServerPlayNetworkHandlerMixin"
     ],
     "client-disabled": [
-        
+        "GuiActionConfirmDebug", "ClickWindowC2SPacketMixin"
     ],
     "injectors": {
         "defaultRequire": 1
