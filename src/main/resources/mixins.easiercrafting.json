@@ -5,7 +5,7 @@
     "minVersion": "0.6",
     "client": [
         "GuiCraftMixin", "AbstractFurnaceScreenMixin", "AbstractFurnaceContainerMixin", "GuiInventoryMixin",
-        "ServerPlayNetworkHandlerMixin"
+        "ServerPlayNetworkHandlerMixin", "BrewingRecipeRegistryExporter"
 
     ],
     "client-disabled": [
