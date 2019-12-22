@@ -5,7 +5,7 @@
  */
 package de.guntram.mcmod.easiercrafting.mixins;
 
-import de.guntram.mcmod.easiercrafting.PropertyDelegateProvider;
+import de.guntram.mcmod.easiercrafting.accessorInterfaces.PropertyDelegateProvider;
 import net.minecraft.container.AbstractFurnaceContainer;
 import net.minecraft.container.ContainerType;
 import net.minecraft.container.CraftingContainer;
