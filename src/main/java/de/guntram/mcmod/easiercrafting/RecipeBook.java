@@ -37,6 +37,7 @@ import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.recipe.StonecuttingRecipe;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.DefaultedList;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -97,8 +98,10 @@ public class RecipeBook {
             wantedRecipeType = RecipeType.STONECUTTING;
         } else if (screen instanceof ExtendedGuiCrafting || screen instanceof ExtendedGuiInventory) {
             wantedRecipeType = RecipeType.CRAFTING;
+        } else if (screen instanceof ExtendedGuiBrewingStand) {
+            wantedRecipeType = BrewingRecipe.recipeType;
         } else {
-            wantedRecipeType = null;        // should not happen
+            wantedRecipeType = null;        // for example with brewing stand
         }
 
         if (arrows==null) {
@@ -106,11 +109,15 @@ public class RecipeBook {
         }
         
         Container inventory=screen.getContainer();
-        LOGGER.debug("cutting: size= "+inventory.slotList.size());
+        Level level = Level.DEBUG;
+        if (screen instanceof ExtendedGuiBrewingStand) {
+            level=Level.INFO;
+        }
+        LOGGER.log(level, "recipebook: size= "+inventory.slotList.size());
         for (int i=0; i<inventory.slotList.size(); i++) {
             ItemStack stack=inventory.getSlot(i).getStack();
             if(!stack.isEmpty()) {
-                LOGGER.debug("slot "+i+" has "+stack.getCount()+" of "+stack.getItem().getName().asString());
+                LOGGER.log(level, "slot "+i+" has "+stack.getCount()+" of "+stack.getItem().getName().asString());
             }
         }
     }
@@ -284,6 +291,9 @@ public class RecipeBook {
         if (wantedRecipeType == RecipeType.CRAFTING && ConfigurationHandler.getAllowGeneratedRecipes()) {
             recipes.addAll(InventoryRecipeScanner.findUnusualRecipes(inventory, firstInventorySlotNo));
         }
+        if (wantedRecipeType == BrewingRecipe.recipeType) {
+            recipes.addAll(BrewingRecipeRegistryCache.findBrewingRecipesFromRegistry());
+        }
 
         craftableCategories=new TreeMap<>();
         for (Recipe recipe:recipes) {
@@ -384,17 +394,19 @@ public class RecipeBook {
             return recipe.fits(gridSize, gridSize);
         } else if (recipe instanceof CuttingRecipe) {
             ItemStack stack = recipe.getOutput();
-            LOGGER.debug("output: "+stack.getItem().getName().asString());
-            for (Ingredient ing: (List<Ingredient>)recipe.getPreviewInputs()) {
-                ItemStack[] stacks=ing.getStackArray();
+            LOGGER.debug("output: " + stack.getItem().getName().asString());
+            for (Ingredient ing : (List<Ingredient>) recipe.getPreviewInputs()) {
+                ItemStack[] stacks = ing.getStackArray();
                 if (stacks.length > 1) {
-                    LOGGER.info(stacks.length+" possible inputs for "+stack.getItem().getName().asString());
-                    for (ItemStack stack2: stacks) {
-                        LOGGER.info("    "+stack2.getItem().getName().asString());
+                    LOGGER.info(stacks.length + " possible inputs for " + stack.getItem().getName().asString());
+                    for (ItemStack stack2 : stacks) {
+                        LOGGER.info("    " + stack2.getItem().getName().asString());
                     }
                 }
             }
-            return canCraftCutting((CuttingRecipe)recipe, inventory);
+            return canCraftCutting((CuttingRecipe) recipe, inventory);
+        } else if (recipe instanceof BrewingRecipe) {
+            return true;
         } else {
             //System.out.println(recipe.getRecipeOutput().getDisplayName()+" is a "+recipe.getClass().getCanonicalName());
         }
