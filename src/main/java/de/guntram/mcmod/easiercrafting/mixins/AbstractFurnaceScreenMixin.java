@@ -5,7 +5,7 @@
  */
 package de.guntram.mcmod.easiercrafting.mixins;
 
-import de.guntram.mcmod.easiercrafting.PropertyDelegateProvider;
+import de.guntram.mcmod.easiercrafting.accessorInterfaces.PropertyDelegateProvider;
 import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 import net.minecraft.client.gui.screen.ingame.AbstractFurnaceScreen;
 import net.minecraft.container.Container;
