@@ -233,7 +233,7 @@ public class RecipeBook {
                 for (Object i: ((BrewingRecipe)underMouse).getPreviewInputs()) {
                     Ingredient ingredient = (Ingredient) i;
                     renderIngredient(itemRenderer, fontRenderer, ingredient, 0, height+ypos*itemSize);
-                    fontRenderer.draw(ingredient.getMatchingStacksClient()[0].getName().asFormattedString(), itemSize, height+5+ypos*itemSize, 0xffff00);
+                    fontRenderer.draw(ingredient.getStackArray()[0].getName().asFormattedString(), itemSize, height+5+ypos*itemSize, 0xffff00);
                     ypos++;
                 }
             }
@@ -494,9 +494,9 @@ public class RecipeBook {
 
     private boolean canBrew(BrewingRecipe recipe, Container inventory) {
         List<Ingredient> inputs=recipe.getPreviewInputs();
-        Item ingredient = inputs.get(1).getMatchingStacksClient()[0].getItem();
-        ItemStack inputPotionStack = inputs.get(0).getMatchingStacksClient()[0];
-        Potion inputPotion = PotionUtil.getPotion(inputs.get(0).getMatchingStacksClient()[0]);
+        Item ingredient = inputs.get(1).getStackArray()[0].getItem();
+        ItemStack inputPotionStack = inputs.get(0).getStackArray()[0];
+        Potion inputPotion = PotionUtil.getPotion(inputs.get(0).getStackArray()[0]);
         boolean haveIngredient = false;
         boolean haveInputPotion = false;
 
@@ -730,9 +730,9 @@ public class RecipeBook {
         Container container = screen.getContainer();
         ItemStack ingredientStack = container.getSlot(3+firstCraftSlot).getStack();
         List<Ingredient> inputs=recipe.getPreviewInputs();
-        ItemStack inputPotionStack = inputs.get(0).getMatchingStacksClient()[0];
+        ItemStack inputPotionStack = inputs.get(0).getStackArray()[0];
         if (ingredientStack.isEmpty()) {
-            Item neededItem = ((Ingredient)(recipe.getPreviewInputs().get(1))).getMatchingStacksClient()[0].getItem();
+            Item neededItem = ((Ingredient)(recipe.getPreviewInputs().get(1))).getStackArray()[0].getItem();
             for (int slot=0; slot<36; slot++) {
                 if (container.getSlot(slot+firstInventorySlotNo).getStack().getItem() == neededItem) {
                     LOGGER.info("transfer from inv slot "+slot+" to ingred. slot "+3);
