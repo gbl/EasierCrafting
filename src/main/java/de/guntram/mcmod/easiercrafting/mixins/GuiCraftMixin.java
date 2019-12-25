@@ -34,7 +34,7 @@ public class GuiCraftMixin {
         } else if (type == ContainerType.BREWING_STAND) {
             container=ContainerType.BREWING_STAND.create(any, client.player.inventory);
             screen = new ExtendedGuiBrewingStand((BrewingStandContainer) container, client.player.inventory, component);
-            ((ExtendedGuiBrewingStand)screen).setRecipeBook(new RecipeBook(screen, 3, 1, 0, 5));
+            ((ExtendedGuiBrewingStand)screen).setRecipeBook(new RecipeBook(screen, 0, 0, 0, 5));
         } else {
             return;
         }

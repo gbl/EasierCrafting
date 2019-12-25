@@ -1,5 +1,6 @@
 package de.guntram.mcmod.easiercrafting;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -7,6 +8,8 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
+
+import de.guntram.mcmod.easiercrafting.mixins.BrewingRecipeRegistryExporter;
 import net.minecraft.block.Block;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.StairsBlock;
@@ -27,6 +30,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
+import net.minecraft.potion.Potions;
 import net.minecraft.recipe.CuttingRecipe;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
@@ -64,7 +68,7 @@ public class RecipeBook {
     private int textBoxSize;
     private long recipeUpdateTime;
     private RecipeType wantedRecipeType;
-    
+
     private TextFieldWidget pattern;
     private RecipeTreeSet patternMatchingRecipes;
     private int patternListSize;
@@ -99,25 +103,13 @@ public class RecipeBook {
             wantedRecipeType = RecipeType.CRAFTING;
         } else if (screen instanceof ExtendedGuiBrewingStand) {
             wantedRecipeType = BrewingRecipe.recipeType;
+            recipeUpdateTime = System.currentTimeMillis() + 2000; // TODO: update when we get the server inventory packet instead of some fixed time
         } else {
             wantedRecipeType = null;        // for example with brewing stand
         }
 
         if (arrows==null) {
             arrows=new Identifier(EasierCrafting.MODID, "textures/arrows.png");
-        }
-        
-        Container inventory=screen.getContainer();
-        Level level = Level.DEBUG;
-        if (screen instanceof ExtendedGuiBrewingStand) {
-            level=Level.INFO;
-        }
-        LOGGER.log(level, "recipebook: size= "+inventory.slotList.size());
-        for (int i=0; i<inventory.slotList.size(); i++) {
-            ItemStack stack=inventory.getSlot(i).getStack();
-            if(!stack.isEmpty()) {
-                LOGGER.log(level, "slot "+i+" has "+stack.getCount()+" of "+stack.getItem().getName().asString());
-            }
         }
     }
     
@@ -235,6 +227,14 @@ public class RecipeBook {
                     renderIngredient(itemRenderer, fontRenderer, ingredient, itemSize*xpos, height+2*itemSize);
                     xpos++;
                 }
+            } else if (underMouse instanceof BrewingRecipe) {
+                ypos=1;
+                for (Object i: ((BrewingRecipe)underMouse).getPreviewInputs()) {
+                    Ingredient ingredient = (Ingredient) i;
+                    renderIngredient(itemRenderer, fontRenderer, ingredient, 0, height+ypos*itemSize);
+                    fontRenderer.draw(ingredient.getMatchingStacksClient()[0].getName().asFormattedString(), itemSize, height+5+ypos*itemSize, 0xffff00);
+                    ypos++;
+                }
             }
         }
      
@@ -286,12 +286,21 @@ public class RecipeBook {
     public final void updateRecipes() {
         Container inventory=screen.getContainer();
         List<Recipe> recipes = new ArrayList<>();
-        recipes.addAll(MinecraftClient.getInstance().player.world.getRecipeManager().values());
-        if (wantedRecipeType == RecipeType.CRAFTING && ConfigurationHandler.getAllowGeneratedRecipes()) {
-            recipes.addAll(InventoryRecipeScanner.findUnusualRecipes(inventory, firstInventorySlotNo));
-        }
         if (wantedRecipeType == BrewingRecipe.recipeType) {
             recipes.addAll(BrewingRecipeRegistryCache.findBrewingRecipesFromRegistry());
+            Level level = Level.DEBUG;
+            LOGGER.log(level, "recipebook: size= "+inventory.slotList.size());
+            for (int i=0; i<inventory.slotList.size(); i++) {
+                ItemStack stack=inventory.getSlot(i).getStack();
+                if(!stack.isEmpty()) {
+                    LOGGER.log(level, "slot "+i+" has "+stack.getCount()+" of "+stack.getItem().getName().asString());
+                }
+            }
+        } else {
+            recipes.addAll(MinecraftClient.getInstance().player.world.getRecipeManager().values());
+            if (wantedRecipeType == RecipeType.CRAFTING && ConfigurationHandler.getAllowGeneratedRecipes()) {
+                recipes.addAll(InventoryRecipeScanner.findUnusualRecipes(inventory, firstInventorySlotNo));
+            }
         }
 
         craftableCategories=new TreeMap<>();
@@ -313,7 +322,7 @@ public class RecipeBook {
                     category="(none?)";
             } else {
                 if (wantedRecipeType == RecipeType.STONECUTTING) {
-                    Block block=Block.getBlockFromItem(item);
+                    Block block = Block.getBlockFromItem(item);
                     if (block instanceof StairsBlock) {
                         category = "Stairs";
                     } else if (block instanceof SlabBlock) {
@@ -323,6 +332,8 @@ public class RecipeBook {
                     } else {
                         category = "Blocks";
                     }
+                } else if (wantedRecipeType == BrewingRecipe.recipeType) {
+                    category=((BrewingRecipe)recipe).getCategory();
                 } else {
                     category=I18n.translate(tab.getTranslationKey(), new Object[0]);
                 }
@@ -355,7 +366,11 @@ public class RecipeBook {
 
         Container inventory=screen.getContainer();
         List<Recipe> recipes = new ArrayList<>();
-        recipes.addAll(MinecraftClient.getInstance().player.world.getRecipeManager().values());
+        if (wantedRecipeType == BrewingRecipe.recipeType) {
+            recipes.addAll(BrewingRecipeRegistryCache.findBrewingRecipesFromRegistry());
+        } else {
+            recipes.addAll(MinecraftClient.getInstance().player.world.getRecipeManager().values());
+        }
         Pattern regex=Pattern.compile(patternText, Pattern.CASE_INSENSITIVE);
         for (Recipe recipe:recipes) {
             if (!recipeTypeMatchesWorkstation(recipe))
@@ -405,7 +420,7 @@ public class RecipeBook {
             }
             return canCraftCutting((CuttingRecipe) recipe, inventory);
         } else if (recipe instanceof BrewingRecipe) {
-            return true;
+            return canBrew((BrewingRecipe)recipe, inventory);
         } else {
             //System.out.println(recipe.getRecipeOutput().getDisplayName()+" is a "+recipe.getClass().getCanonicalName());
         }
@@ -466,6 +481,80 @@ public class RecipeBook {
         //System.out.println("enough stuff for "+recipe.getRecipeOutput().getDisplayName());
         return true;
     }
+
+    // This is a bit more complicated, because we have to handle item recipes (potion -> splash -> lingering)
+    // as well as potion recipes (Item stays the same, but the Potion NBT tag changes).
+    // In both cases, we need the ingredient, which can be in the player inventory or the brewing stand.
+    // In case of Potion recipes, we need the input potion type in either inventory or brewing stand. Brewing
+    // stand is fine, we know exactly what's going to be crafted in this case. But if all inputs are in the
+    // player inventory, and there's more than one usable item (for example, Potion water -> weakness, and the player
+    // has water and splash water in his inventory; or potion -> splash, and the player has weakness and night vision
+    // in his inventory), we might want to act somehow to prevent crafting the wrong input ...
+
+    private boolean canBrew(BrewingRecipe recipe, Container inventory) {
+        List<Ingredient> inputs=recipe.getPreviewInputs();
+        Item ingredient = inputs.get(1).getMatchingStacksClient()[0].getItem();
+        ItemStack inputPotionStack = inputs.get(0).getMatchingStacksClient()[0];
+        Potion inputPotion = PotionUtil.getPotion(inputs.get(0).getMatchingStacksClient()[0]);
+        boolean haveIngredient = false;
+        boolean haveInputPotion = false;
+
+        Level level=Level.DEBUG;
+        if (ingredient == Items.GUNPOWDER || ingredient == Items.NETHER_WART) {
+            level = Level.INFO;
+        }
+
+        LOGGER.log(level, "Check for "+(recipe.isItemRecipe() ? "Item recipe " : "Potion recipe ")+
+                PotionUtil.getPotion(recipe.getOutput()).getName(recipe.getOutput().getItem().getName().asString()+" ")+
+                " from "+
+                PotionUtil.getPotion(inputPotionStack).getName(inputPotionStack.getItem().getName().asString()+" ")+
+                " and "+
+                ingredient.getName().asString());
+        // check if the brewing stand has a usable input potion
+        for (int i=0; i<3; i++) {
+            ItemStack inventoryItemStack = inventory.getSlot(i+firstCraftSlot).getStack();
+            if (recipe.isItemRecipe()) {
+                haveInputPotion |= (inventoryItemStack.getItem() == inputPotionStack.getItem());
+            } else {
+                haveInputPotion |= PotionUtil.getPotion(inventoryItemStack) == PotionUtil.getPotion(inputPotionStack);
+            }
+            if (haveInputPotion) {
+                break;
+            }
+        }
+        LOGGER.log(level, "  haveInputPotion in Brewing Stand is "+haveInputPotion);
+
+        // check if the brewing stand already has the ingredient
+        LOGGER.log(level, "  ing slot item is "+inventory.getSlot(3+firstCraftSlot).getStack().getItem());
+        LOGGER.log(level, "  ingredient is "+ingredient);
+        if (inventory.getSlot(3+firstCraftSlot).getStack().getItem() == ingredient) {
+            haveIngredient = true;
+        }
+        LOGGER.log(level, "  haveIngredient in Brewing Stand is "+haveIngredient);
+
+        // check the player inventory
+        for (int i=0; i<36; i++) {
+            if (haveInputPotion && haveIngredient) {
+                break;
+            }
+            ItemStack inventoryItemStack = inventory.getSlot(i+firstInventorySlotNo).getStack();
+            if (inventoryItemStack.isEmpty())
+                continue;
+
+            if (recipe.isItemRecipe()) {
+                LOGGER.log(Level.TRACE, "item recipe compare "+inventoryItemStack.getItem()+" to "+inputPotionStack.getItem());
+                haveInputPotion |= (inventoryItemStack.getItem() == inputPotionStack.getItem());
+            } else {
+                LOGGER.log(Level.TRACE, "potion recipe compare "+PotionUtil.getPotion(inventoryItemStack).getName("")+" to "+PotionUtil.getPotion(inputPotionStack).getName(""));
+                haveInputPotion |= (PotionUtil.getPotion(inventoryItemStack) == PotionUtil.getPotion(inputPotionStack));
+            }
+            if (inventoryItemStack.getItem() == ingredient) {
+                haveIngredient = true;
+            }
+        }
+        LOGGER.log(level, MessageFormat.format("  after player inv; haveInputPotion = {0}, haveIngredient ={1}", haveInputPotion, haveIngredient));
+        return haveInputPotion && haveIngredient;
+    }
     
     class InputCount {
         int count;
@@ -497,6 +586,12 @@ public class RecipeBook {
         if (underMouse==null)
             return;
 
+        if (underMouse.getType() == BrewingRecipe.recipeType) {
+            // this is so different from other containers, we handle it now and return
+            fillBrewingStandSlots((BrewingRecipe)underMouse);
+            return;
+        }
+
         // Do nothing if the grid isn't empty.
         for (int craftslot=0; craftslot<gridSize*gridSize; craftslot++) {
             ItemStack stack = screen.getContainer().getSlot(craftslot+firstCraftSlot).getStack();
@@ -505,7 +600,7 @@ public class RecipeBook {
         }
         
         if (underMouse instanceof RepairRecipe) {
-            fillCraftSlotsWithBestRepair((RepairRecipe)underMouse);
+            fillCraftSlotsWithBestRepair((RepairRecipe) underMouse);
         } else {
             fillCraftSlotsWithAnyMaterials(underMouse);
         }
@@ -629,6 +724,44 @@ public class RecipeBook {
         transfer(bestItemSlot+firstInventorySlotNo, firstCraftSlot, 1);
         transfer(worstItemSlot+firstInventorySlotNo, firstCraftSlot+1, 1);
     }
+
+    private void fillBrewingStandSlots(BrewingRecipe recipe) {
+        Container container = screen.getContainer();
+        ItemStack ingredientStack = container.getSlot(3+firstCraftSlot).getStack();
+        List<Ingredient> inputs=recipe.getPreviewInputs();
+        ItemStack inputPotionStack = inputs.get(0).getMatchingStacksClient()[0];
+        if (ingredientStack.isEmpty()) {
+            Item neededItem = ((Ingredient)(recipe.getPreviewInputs().get(1))).getMatchingStacksClient()[0].getItem();
+            for (int slot=0; slot<36; slot++) {
+                if (container.getSlot(slot+firstInventorySlotNo).getStack().getItem() == neededItem) {
+                    LOGGER.info("transfer from inv slot "+slot+" to ingred. slot "+3);
+                    transfer(slot+firstInventorySlotNo, 3+firstCraftSlot, 1);
+                    break;
+                }
+            }
+        }
+        for (int potionSlot=0; potionSlot<3; potionSlot++) {
+            if (!container.getSlot(potionSlot+firstCraftSlot).getStack().isEmpty()) {
+                continue;
+            }
+            for (int slot=0; slot<36; slot++) {
+                ItemStack inventoryItemStack = container.getSlot(slot+firstInventorySlotNo).getStack();
+                if (inventoryItemStack.isEmpty())
+                    continue;
+                boolean matches = false;
+                if (recipe.isItemRecipe()) {
+                    matches = (inventoryItemStack.getItem() == inputPotionStack.getItem());
+                } else {
+                    matches = (PotionUtil.getPotion(inventoryItemStack) == PotionUtil.getPotion(inputPotionStack));
+                }
+                if (matches) {
+                    LOGGER.info("transfer from inv slot "+slot+" to potion slot "+potionSlot);
+                    transfer(slot+firstInventorySlotNo, potionSlot+firstCraftSlot, 1);
+                    break;
+                }
+            }
+        }
+    }
     
     private int getDamage(int slot) {
         ItemStack stack = screen.getContainer().getSlot(slot+firstInventorySlotNo).getStack();
@@ -728,7 +861,8 @@ public class RecipeBook {
                 @Override
                 public int compare(Recipe a, Recipe b) {
                     int sameName = a.getOutput().getName().asString().compareToIgnoreCase(b.getOutput().getName().asString());
-                    if (a.getType() == RecipeType.STONECUTTING && b.getType() == RecipeType.STONECUTTING) {
+                    if (a.getType() == RecipeType.STONECUTTING && b.getType() == RecipeType.STONECUTTING)
+                    {
                         if (sameName != 0) {
                             return sameName;
                         } else {
@@ -737,7 +871,25 @@ public class RecipeBook {
                                    ((Ingredient)(b.getPreviewInputs().get(0))).getMatchingStacksClient()[0].getItem().getName().asString()
                             );
                         }
-                    } else {
+                    } else if (a.getType() == BrewingRecipe.recipeType || b.getType() == BrewingRecipe.recipeType) {
+                        if (sameName != 0) {
+                            return sameName;
+                        }
+                        if (PotionUtil.getPotion(a.getOutput()) == PotionUtil.getPotion(b.getOutput())
+                        ||  PotionUtil.getPotionEffects(a.getOutput()).size() == 0
+                        ||  PotionUtil.getPotionEffects(b.getOutput()).size() == 0
+                        ) {
+                            return 0;
+                        }
+                        //LOGGER.info("comparing potions seems equal, name="+a.getOutput().getName().asString());
+                        //LOGGER.info("first potion is "+PotionUtil.getPotion(a.getOutput()).getName(""));
+                        //try { LOGGER.info("First dur. "+PotionUtil.getPotionEffects(a.getOutput()).get(0).getDuration()); } catch (Exception ex) {}
+                        //LOGGER.info("secnd potion is "+PotionUtil.getPotion(b.getOutput()).getName(""));
+                        //try { LOGGER.info("Secnd dur. "+PotionUtil.getPotionEffects(b.getOutput()).get(0).getDuration()); } catch (Exception ex) {}
+
+                        return PotionUtil.getPotionEffects(a.getOutput()).get(0).getDuration() - PotionUtil.getPotionEffects(b.getOutput()).get(0).getDuration();
+                    }
+                    else {
                         return sameName;
                     }
                 }
