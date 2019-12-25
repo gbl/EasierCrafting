@@ -1,7 +1,6 @@
 package de.guntram.mcmod.easiercrafting;
 
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
@@ -13,10 +12,12 @@ import net.minecraft.world.World;
 
 public class BrewingRecipe<C extends Inventory> implements Recipe<C> {
 
-    private ItemStack inputPotion, ingredient, outputPotion;
+    private final ItemStack inputPotion, ingredient, outputPotion;
+    private final boolean isPotionRecipe;
     public final static RecipeType recipeType = RecipeType.register("easiercrafting:brewing_recipe");
 
-    public BrewingRecipe(ItemStack inputPotion, ItemStack ingredient, ItemStack outputPotion) {
+    public BrewingRecipe(boolean isPotionRecipe, ItemStack inputPotion, ItemStack ingredient, ItemStack outputPotion) {
+        this.isPotionRecipe = isPotionRecipe;
         this.inputPotion = inputPotion;
         this.ingredient = ingredient;
         this.outputPotion = outputPotion;
@@ -63,5 +64,17 @@ public class BrewingRecipe<C extends Inventory> implements Recipe<C> {
     @Override
     public RecipeType<?> getType() {
         return recipeType;
+    }
+
+    public String getCategory() {
+        return isPotionRecipe ? "Effect" : "Improvement";
+    }
+
+    public boolean isPotionRecipe() {
+        return isPotionRecipe;
+    }
+
+    public boolean isItemRecipe() {
+        return !isPotionRecipe;
     }
 }

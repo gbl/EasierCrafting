@@ -18,14 +18,14 @@ import java.util.ArrayList;
 @Mixin(BrewingRecipeRegistry.class)
 public class BrewingRecipeRegistryExporter {
 
-    @Inject(method = "registerItemRecipe", at = @At("HEAD"))
+    @Inject(method = "registerItemRecipe", at = @At("RETURN"))
     private static void addItemRecipe(Item input, Item ingredient, Item output, CallbackInfo ci) {
-        BrewingRecipeRegistryCache.add(new BrewingRecipe(new ItemStack(input), new ItemStack(ingredient), new ItemStack(output)));
+        BrewingRecipeRegistryCache.add(new BrewingRecipe(false, new ItemStack(input), new ItemStack(ingredient), new ItemStack(output)));
     }
 
-    @Inject(method = "registerPotionRecipe", at=@At("HEAD"))
+    @Inject(method = "registerPotionRecipe", at=@At("RETURN"))
     private static void addPotionRecipe(Potion input, Item ingredient, Potion output, CallbackInfo ci) {
-        BrewingRecipeRegistryCache.add(new BrewingRecipe(PotionUtil.setPotion(new ItemStack(Items.POTION), input),
+        BrewingRecipeRegistryCache.add(new BrewingRecipe(true, PotionUtil.setPotion(new ItemStack(Items.POTION), input),
                                                 new ItemStack(ingredient),
                                                 PotionUtil.setPotion(new ItemStack(Items.POTION), output)));
     }
