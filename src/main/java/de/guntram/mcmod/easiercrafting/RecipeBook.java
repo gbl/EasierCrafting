@@ -1,5 +1,6 @@
 package de.guntram.mcmod.easiercrafting;
 
+import de.guntram.mcmod.debug.TagDump;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -28,6 +29,7 @@ import net.minecraft.container.StonecutterContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
@@ -457,10 +459,16 @@ public class RecipeBook {
                 continue;
             int neededAmount=stacks[0].getCount();
             // System.out.println("need "+neededAmount+" "+stacks[0].getDisplayName()+" for "+recipe.getRecipeOutput().getDisplayName());
+            if (recipe.getOutput().getItem() == Items.DISPENSER) {
+                LOGGER.debug("look for dispenser item "+I18n.translate(stacks[0].getItem().getTranslationKey()));
+            }
             for (int i=0; i<36; i++) {
                 Slot invitem=inventory.getSlot(i+firstInventorySlotNo);
                 ItemStack slotcontent=invitem.getStack();
                 if (canActAsIngredient(neededItem, slotcontent)) {
+                    if (recipe.getOutput().getItem() == Items.DISPENSER) {
+                        LOGGER.debug("Item in inv slot " +i + ":" +I18n.translate(slotcontent.getItem().getTranslationKey()) + " works");
+                    }
                     int providedAmount=slotcontent.getCount();                 // check how many items there are
                     for (int j=0; j<source.size(); j++)                         // subtract how many have been used on other slots
                         if (source.get(j).invitem==invitem)
@@ -470,6 +478,11 @@ public class RecipeBook {
                     if (providedAmount>0) {
                         source.add(new Takefrom(invitem, providedAmount));      // and remember how much we can take from here
                         neededAmount-=providedAmount;
+                    }
+                }
+                else {
+                    if (recipe.getOutput().getItem() == Items.DISPENSER) {
+                        LOGGER.debug("Item in inv slot " +i + ":" +I18n.translate(stacks[0].getItem().getTranslationKey()) + "doesn't work");
                     }
                 }
             }
@@ -803,9 +816,23 @@ public class RecipeBook {
     }
     
     private boolean canActAsIngredient(Ingredient recipeComponent, ItemStack inventoryItem) {
-        if (!inventoryItem.hasTag() && recipeComponent.test(inventoryItem))
-            return true;
         
+        boolean tagForbidsItem = false;
+        
+        if (inventoryItem.hasTag()) {
+            CompoundTag tag = inventoryItem.getTag();
+            for (String tagName: tag.getKeys()) {
+                if (!(tagName.equals("Damage")) || tag.getInt(tagName) != 0) {
+                    tagForbidsItem = true;
+                }
+            }
+        }
+        
+        if (!tagForbidsItem && recipeComponent.test(inventoryItem))
+            return true;
+
+        // TagDump.dump(inventoryItem.getTag(), 0);
+
         if (inventoryItem.getItem()!=Items.LINGERING_POTION)
             return false;
         
