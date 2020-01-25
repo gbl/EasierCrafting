@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BrewingRecipeRegistryCache {
 
@@ -15,7 +16,15 @@ public class BrewingRecipeRegistryCache {
         recipes.add(recipe);
     }
 
-    static List<BrewingRecipe> findBrewingRecipesFromRegistry() {
+    static List<BrewingRecipe> registeredBrewingRecipes() {
         return recipes;
+    }
+    
+    static List<BrewingRecipe> registeredPotionRecipes() {
+        return recipes.stream().filter(r -> r.isPotionRecipe()).collect(Collectors.toList());
+    }
+
+    static List<BrewingRecipe> registeredItemRecipes() {
+        return recipes.stream().filter(r -> r.isItemRecipe()).collect(Collectors.toList());
     }
 }

@@ -1,10 +1,8 @@
 package de.guntram.mcmod.easiercrafting;
 
 import net.minecraft.client.gui.screen.ingame.BrewingStandScreen;
-import net.minecraft.client.gui.screen.ingame.StonecutterScreen;
 import net.minecraft.container.BrewingStandContainer;
 import net.minecraft.container.SlotActionType;
-import net.minecraft.container.StonecutterContainer;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
