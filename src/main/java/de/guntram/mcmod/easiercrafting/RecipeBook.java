@@ -851,9 +851,9 @@ public class RecipeBook {
     }
     
     private boolean canActAsIngredient(Ingredient recipeComponent, ItemStack inventoryItem) {
-        
+
         boolean tagForbidsItem = false;
-        
+
         if (inventoryItem.hasTag()) {
             CompoundTag tag = inventoryItem.getTag();
             for (String tagName: tag.getKeys()) {
@@ -862,7 +862,7 @@ public class RecipeBook {
                 }
             }
         }
-        
+
         if (!tagForbidsItem && recipeComponent.test(inventoryItem))
             return true;
 
@@ -870,12 +870,14 @@ public class RecipeBook {
 
         if (inventoryItem.getItem()!=Items.LINGERING_POTION)
             return false;
-        
+
         Potion neededType = PotionUtil.getPotion(inventoryItem);
         ItemStack[] possiblePotions = recipeComponent.getMatchingStacksClient();
         for (ItemStack stack: possiblePotions) {
-            if (PotionUtil.getPotion(stack) == neededType)
+            // LOGGER.info("in lingering potion check, component = "+recipeComponent.getMatchingStacksClient()[0].getTranslationKey()+", invItem = "+inventoryItem.getTranslationKey());
+            if (PotionUtil.getPotion(stack) == neededType && recipeComponent.test(inventoryItem)) {
                 return true;
+            }
         }
         return false;
     }

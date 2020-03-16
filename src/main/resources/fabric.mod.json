@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "easiercrafting",
-    "version": "1.15-fabric0.4.23-1.6.0.beta2",
+    "version": "${version}",
     "environment": "client",
     "entrypoints": {
         "client": [ "de.guntram.mcmod.easiercrafting.EasierCrafting" ],
@@ -24,7 +24,7 @@
     "icon": "pack.png",
     "authors": [ "Giselbaer" ],
     "contact": {
-        "homepage": "https://minecraft.curseforge.com/projects/easiercrafting",
+        "homepage": "https://www.curseforge.com/minecraft/mc-mods/easiercrafting",
         "sources": "https://github.com/gbl/EasierCrafting",
         "issues": "https://github.com/gbl/EasierCrafting/issues"
     }
