@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.StairsBlock;
@@ -22,14 +21,14 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.item.Items;
-import net.minecraft.container.SlotActionType;
 import net.minecraft.container.Container;
 import net.minecraft.container.Slot;
+import net.minecraft.container.SlotActionType;
 import net.minecraft.container.StonecutterContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
@@ -41,8 +40,8 @@ import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.recipe.StonecuttingRecipe;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.DefaultedList;
+import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -210,7 +209,8 @@ public class RecipeBook {
             ypos=drawRecipeOutputs(craftableCategories.get(category), itemRenderer, fontRenderer, 0, ypos, mouseX, mouseY);
         }
         if (underMouse!=null) {
-            fontRenderer.draw(underMouse.getOutput().getName().asFormattedString(), 0, height+3, 0xffff00);
+            String displayName = EasierCrafting.recipeDisplayName(underMouse);
+            fontRenderer.draw(displayName, 0, height+3, 0xffff00);
             if (underMouse instanceof ShapedRecipe) {
                 DefaultedList<Ingredient> ingredients = underMouse.getPreviewInputs();
                 fontRenderer.draw("sr", left-20, height, 0x202020);
@@ -295,7 +295,7 @@ public class RecipeBook {
         Container inventory=screen.getContainer();
         List<Recipe> recipes = new ArrayList<>();
         if (wantedRecipeType == BrewingRecipe.recipeType) {
-            Level level = Level.INFO;
+            Level level = Level.DEBUG;
             LOGGER.log(level, "recipebook: size= "+inventory.slotList.size());
 
             List<BrewingRecipe> potionRecipes = BrewingRecipeRegistryCache.registeredPotionRecipes();
@@ -335,6 +335,7 @@ public class RecipeBook {
             recipes.addAll(possiblePotionRecipes);
         } else {
             recipes.addAll(player.world.getRecipeManager().values());
+            recipes.addAll(LocalRecipeManager.getInstance().values());
             if (wantedRecipeType == RecipeType.CRAFTING && ConfigurationHandler.getAllowGeneratedRecipes()) {
                 recipes.addAll(InventoryRecipeScanner.findUnusualRecipes(inventory, firstInventorySlotNo));
             }
@@ -355,8 +356,10 @@ public class RecipeBook {
             String category;
             if (!ConfigurationHandler.getCategorizeRecipes()) {
                 category="Possible Recipes";
+            } else if (recipe.getGroup().startsWith(EasierCrafting.MODID+":")) {
+                category = "Special Recipes";
             } else if (tab==null) {
-                    category="(none?)";
+                    category=recipe.getGroup();
             } else {
                 if (wantedRecipeType == RecipeType.STONECUTTING) {
                     Block block = Block.getBlockFromItem(item);
@@ -406,16 +409,17 @@ public class RecipeBook {
             recipes.addAll(BrewingRecipeRegistryCache.registeredBrewingRecipes());
         } else {
             recipes.addAll(player.world.getRecipeManager().values());
+            recipes.addAll(LocalRecipeManager.getInstance().values());
         }
         Pattern regex=Pattern.compile(patternText, Pattern.CASE_INSENSITIVE);
         for (Recipe recipe:recipes) {
             if (!recipeTypeMatchesWorkstation(recipe))
                 continue;
             ItemStack result=recipe.getOutput();
-            Item item = result.getItem();
-            if (item==Items.AIR)
+            if (result.getItem() == Items.AIR) {
                 continue;
-            if (!regex.matcher(result.getName().asString()).find()) {
+            }
+            if (!regex.matcher(EasierCrafting.recipeDisplayName(recipe)).find()) {
                 //System.out.println("not adding "+result.getDisplayName()+" because no match");
                 continue;
             }
@@ -448,9 +452,9 @@ public class RecipeBook {
             for (Ingredient ing : (List<Ingredient>) recipe.getPreviewInputs()) {
                 ItemStack[] stacks = ing.getMatchingStacksClient();
                 if (stacks.length > 1) {
-                    LOGGER.info(stacks.length + " possible inputs for " + stack.getItem().getName().asString());
+                    LOGGER.debug(stacks.length + " possible inputs for " + stack.getItem().getName().asString());
                     for (ItemStack stack2 : stacks) {
-                        LOGGER.info("    " + stack2.getItem().getName().asString());
+                        LOGGER.debug("    " + stack2.getItem().getName().asString());
                     }
                 }
             }
@@ -924,9 +928,8 @@ public class RecipeBook {
             super(new Comparator<Recipe>() {
                 @Override
                 public int compare(Recipe a, Recipe b) {
-                    int sameName = a.getOutput().getName().asString().compareToIgnoreCase(b.getOutput().getName().asString());
-                    if (a.getType() == RecipeType.STONECUTTING && b.getType() == RecipeType.STONECUTTING)
-                    {
+                    int sameName = EasierCrafting.recipeDisplayName(a).compareToIgnoreCase(EasierCrafting.recipeDisplayName(b));
+                    if (a.getType() == RecipeType.STONECUTTING && b.getType() == RecipeType.STONECUTTING) {
                         if (sameName != 0) {
                             return sameName;
                         } else {
@@ -952,8 +955,7 @@ public class RecipeBook {
                         //try { LOGGER.info("Secnd dur. "+PotionUtil.getPotionEffects(b.getOutput()).get(0).getDuration()); } catch (Exception ex) {}
 
                         return PotionUtil.getPotionEffects(a.getOutput()).get(0).getDuration() - PotionUtil.getPotionEffects(b.getOutput()).get(0).getDuration();
-                    }
-                    else {
+                    } else {
                         return sameName;
                     }
                 }
