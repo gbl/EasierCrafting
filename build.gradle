@@ -15,7 +15,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 archivesBaseName = "easiercrafting"
-version = "1.14.4-fabric0.4.2-1.6.0.beta2"
+version = "1.14.4-fabric0.4.2-1.6.0.beta3"
 
 minecraft {
         refmapName = "EasierCrafting-refmap.json";

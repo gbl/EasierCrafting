@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.StairsBlock;
@@ -19,18 +18,18 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.item.Items;
-import net.minecraft.container.SlotActionType;
 import net.minecraft.container.Container;
 import net.minecraft.container.Slot;
+import net.minecraft.container.SlotActionType;
 import net.minecraft.container.StonecutterContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
@@ -41,8 +40,8 @@ import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.recipe.StonecuttingRecipe;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.DefaultedList;
+import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -849,7 +848,7 @@ public class RecipeBook {
         Potion neededType = PotionUtil.getPotion(inventoryItem);
         ItemStack[] possiblePotions = recipeComponent.getStackArray();
         for (ItemStack stack: possiblePotions) {
-            if (PotionUtil.getPotion(stack) == neededType)
+            if (PotionUtil.getPotion(stack) == neededType && recipeComponent.test(inventoryItem))
                 return true;
         }
         return false;
