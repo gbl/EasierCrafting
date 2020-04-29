@@ -102,7 +102,7 @@ public class LocalRecipeManager extends RecipeManager implements ResourceManager
                 while (entries.hasMoreElements()) {
                     ZipEntry entry = entries.nextElement();
                     if (pathPredicate.test(entry.getName())) {
-                        result.add(new Identifier(EasierCrafting.MODID, filename + SEPARATOR + entry.getName()));
+                        result.add(new Identifier(EasierCrafting.MODID, filename.replace('\\', '/') + SEPARATOR + entry.getName()));
                     }
                 }
             } catch (IOException ex) {
@@ -123,7 +123,7 @@ class LocalRecipeResource implements Resource {
     
     @Override
     public Identifier getId() {
-        return new Identifier(EasierCrafting.MODID, zipName+LocalRecipeManager.SEPARATOR+entryName);
+        return new Identifier(EasierCrafting.MODID, zipName.replace('\\', '/')+LocalRecipeManager.SEPARATOR+entryName);
     }
 
     @Override
