@@ -2,6 +2,7 @@ package de.guntram.mcmod.easiercrafting.mixins;
 
 import de.guntram.mcmod.easiercrafting.ExtendedGuiBrewingStand;
 import de.guntram.mcmod.easiercrafting.ExtendedGuiCrafting;
+import de.guntram.mcmod.easiercrafting.ExtendedGuiLoom;
 import de.guntram.mcmod.easiercrafting.ExtendedGuiStonecutter;
 import de.guntram.mcmod.easiercrafting.RecipeBook;
 import net.minecraft.client.MinecraftClient;
@@ -35,6 +36,9 @@ public class GuiCraftMixin {
             container=ContainerType.BREWING_STAND.create(any, client.player.inventory);
             screen = new ExtendedGuiBrewingStand((BrewingStandContainer) container, client.player.inventory, component);
             ((ExtendedGuiBrewingStand)screen).setRecipeBook(new RecipeBook(screen, 0, 0, 0, 5));
+        } else if (type == ContainerType.LOOM) {
+            container=ContainerType.LOOM.create(any, client.player.inventory);
+            screen = new ExtendedGuiLoom((LoomContainer) container, client.player.inventory, component);
         } else {
             return;
         }
