@@ -16,6 +16,7 @@ import net.minecraft.block.StairsBlock;
 import net.minecraft.block.WallBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -643,42 +644,53 @@ public class RecipeBook {
             return;
         }
 
-        // Do nothing if the grid isn't empty.
-        for (int craftslot=0; craftslot<gridSize*gridSize; craftslot++) {
-            ItemStack stack = screen.getContainer().getSlot(craftslot+firstCraftSlot).getStack();
-            if (stack!=null && !stack.isEmpty())
-                return;
-        }
-        
-        if (underMouse instanceof RepairRecipe) {
-            fillCraftSlotsWithBestRepair((RepairRecipe) underMouse);
-        } else {
-            fillCraftSlotsWithAnyMaterials(underMouse);
-        }
-        if (underMouse.getType() == RecipeType.STONECUTTING) {
-            StonecutterContainer container = (StonecutterContainer) screen.getContainer();
-            List<StonecuttingRecipe> recipes = container.getAvailableRecipes();
-            int index = recipes.indexOf(underMouse);
-            if (index >= 0) {
-                container.onButtonClick(null, index);
-                MinecraftClient.getInstance().interactionManager.clickButton(container.syncId, index);
+//        do {
+            // Do nothing if the grid isn't empty.
+//            boolean empty = true;
+            for (int craftslot=0; craftslot<gridSize*gridSize; craftslot++) {
+                ItemStack stack = screen.getContainer().getSlot(craftslot+firstCraftSlot).getStack();
+                if (stack!=null && !stack.isEmpty()) {
+                    return;
+//                    LOGGER.info("returning as slot "+craftslot+" has "+stack.getCount()+" of "+stack.getTranslationKey());
+//                    empty = false;
+                }
             }
-        }
-        
-        LOGGER.debug("Item in result slot is "+screen.getContainer().getSlot(resultSlotNo).getStack().getItem().getName().asString());
+//            if (!empty) return;
 
-        
-        if (mouseButton==0) {
-            slotClick(resultSlotNo, mouseButton, SlotActionType.QUICK_MOVE);     // which is really PICKUP ALL
-            recipeUpdateTime=System.currentTimeMillis()+ConfigurationHandler.getAutoUpdateRecipeTimer()*1000;
-        }
+            if (underMouse instanceof RepairRecipe) {
+                fillCraftSlotsWithBestRepair((RepairRecipe) underMouse);
+            } else {
+                fillCraftSlotsWithAnyMaterials(underMouse);
+            }
+            if (underMouse.getType() == RecipeType.STONECUTTING) {
+                StonecutterContainer container = (StonecutterContainer) screen.getContainer();
+                List<StonecuttingRecipe> recipes = container.getAvailableRecipes();
+                int index = recipes.indexOf(underMouse);
+                if (index >= 0) {
+                    container.onButtonClick(null, index);
+                    MinecraftClient.getInstance().interactionManager.clickButton(container.syncId, index);
+                }
+            }
+
+//            LOGGER.info("Item in result slot is "+screen.getContainer().getSlot(resultSlotNo).getStack().getItem().getName().asString());
+
+
+            if (mouseButton==0) {
+                slotClick(resultSlotNo, mouseButton, SlotActionType.QUICK_MOVE);     // which is really PICKUP ALL
+                recipeUpdateTime=System.currentTimeMillis()+ConfigurationHandler.getAutoUpdateRecipeTimer()*1000;
+            }
+//            LOGGER.info("mousebutton = "+mouseButton);
+//            LOGGER.info("hasControl = "+Screen.hasControlDown());
+//            LOGGER.info("hasShift = "+Screen.hasShiftDown());
+//            LOGGER.info("canCraft = "+canCraftRecipe(underMouse, screen.getContainer(), gridSize));
+//        } while (mouseButton==0 && Screen.hasControlDown() && Screen.hasShiftDown() && canCraftRecipe(underMouse, screen.getContainer(), gridSize));
     }
     
     private void fillCraftSlotsWithAnyMaterials(Recipe underMouse) {
         DefaultedList<Ingredient> recipeInput=getIngredientsAsList(underMouse);
         
         int maxCraftableStacks=64;
-        if (screen.hasShiftDown()) {
+        if (Screen.hasShiftDown()) {
             // Try to find out how much we can craft at once, maximally. This is limited by a) the number of
             // items per stack (for example, dispensers need bows that stack to 1, so we can't craft more than 1
             // dispenser at a time), and b) the number of items we have divided by the number of input slots that
