@@ -1,6 +1,5 @@
 package de.guntram.mcmod.easiercrafting;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -109,7 +108,6 @@ public class RecipeBook {
             wantedRecipeType = RecipeType.CRAFTING;
         } else if (screen instanceof ExtendedGuiBrewingStand) {
             wantedRecipeType = BrewingRecipe.recipeType;
-            recipeUpdateTime = System.currentTimeMillis() + 2000; // TODO: update when we get the server inventory packet instead of some fixed time
         } else {
             wantedRecipeType = null;        // for example with brewing stand
         }
@@ -556,12 +554,12 @@ public class RecipeBook {
             level = Level.INFO;
         }
 
-        LOGGER.log(level, "Check for "+(recipe.isItemRecipe() ? "Item recipe " : "Potion recipe ")+
+/*        LOGGER.log(level, "Check for "+(recipe.isItemRecipe() ? "Item recipe " : "Potion recipe ")+
                 PotionUtil.getPotion(recipe.getOutput()).getName(recipe.getOutput().getItem().getName().asString()+" ")+
                 " from "+
                 PotionUtil.getPotion(inputPotionStack).getName(inputPotionStack.getItem().getName().asString()+" ")+
                 " and "+
-                ingredient.getName().asString());
+                ingredient.getName().asString()); */
         // check if the brewing stand has a usable input potion
         for (int i=0; i<3; i++) {
             ItemStack inventoryItemStack = inventory.getSlot(i+firstCraftSlot).getStack();
@@ -574,15 +572,15 @@ public class RecipeBook {
                 break;
             }
         }
-        LOGGER.log(level, "  haveInputPotion in Brewing Stand is "+haveInputPotion);
+//        LOGGER.log(level, "  haveInputPotion in Brewing Stand is "+haveInputPotion);
 
         // check if the brewing stand already has the ingredient
-        LOGGER.log(level, "  ing slot item is "+inventory.getSlot(3+firstCraftSlot).getStack().getItem());
-        LOGGER.log(level, "  ingredient is "+ingredient);
+//        LOGGER.log(level, "  ing slot item is "+inventory.getSlot(3+firstCraftSlot).getStack().getItem());
+//        LOGGER.log(level, "  ingredient is "+ingredient);
         if (inventory.getSlot(3+firstCraftSlot).getStack().getItem() == ingredient) {
             haveIngredient = true;
         }
-        LOGGER.log(level, "  haveIngredient in Brewing Stand is "+haveIngredient);
+//        LOGGER.log(level, "  haveIngredient in Brewing Stand is "+haveIngredient);
 
         // check the player inventory
         for (int i=0; i<36; i++) {
@@ -594,17 +592,17 @@ public class RecipeBook {
                 continue;
 
             if (recipe.isItemRecipe()) {
-                LOGGER.log(Level.TRACE, "item recipe compare "+inventoryItemStack.getItem()+" to "+inputPotionStack.getItem());
+//                LOGGER.log(Level.TRACE, "item recipe compare "+inventoryItemStack.getItem()+" to "+inputPotionStack.getItem());
                 haveInputPotion |= (inventoryItemStack.getItem() == inputPotionStack.getItem());
             } else {
-                LOGGER.log(Level.TRACE, "potion recipe compare "+PotionUtil.getPotion(inventoryItemStack).getName("")+" to "+PotionUtil.getPotion(inputPotionStack).getName(""));
+//                LOGGER.log(Level.TRACE, "potion recipe compare "+PotionUtil.getPotion(inventoryItemStack).getName("")+" to "+PotionUtil.getPotion(inputPotionStack).getName(""));
                 haveInputPotion |= (PotionUtil.getPotion(inventoryItemStack) == PotionUtil.getPotion(inputPotionStack));
             }
             if (inventoryItemStack.getItem() == ingredient) {
                 haveIngredient = true;
             }
         }
-        LOGGER.log(level, MessageFormat.format("  after player inv; haveInputPotion = {0}, haveIngredient ={1}", haveInputPotion, haveIngredient));
+//         LOGGER.log(level, MessageFormat.format("  after player inv; haveInputPotion = {0}, haveIngredient ={1}", haveInputPotion, haveIngredient));
         return haveInputPotion && haveIngredient;
     }
     
