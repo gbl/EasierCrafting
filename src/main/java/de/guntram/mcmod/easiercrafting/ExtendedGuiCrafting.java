@@ -27,7 +27,7 @@ public class ExtendedGuiCrafting extends CraftingTableScreen implements SlotClic
     public void setRecipeBook(RecipeBook recipeBook) {
         this.recipeBook=recipeBook;
     }
-    
+
     @Override
     protected void drawForeground(final int mouseX, final int mouseY) {
         super.drawForeground(mouseX, mouseY);

@@ -1,13 +1,11 @@
 package de.guntram.mcmod.easiercrafting;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.regex.Pattern;
 import net.minecraft.block.Block;
 import net.minecraft.block.SlabBlock;
@@ -49,15 +47,15 @@ import org.lwjgl.glfw.GLFW;
 
 public class RecipeBook {
     
-    private static final Logger LOGGER = LogManager.getLogger(RecipeBook.class);
+    public static final Logger LOGGER = LogManager.getLogger(RecipeBook.class);
 
-    private final AbstractContainerScreen screen;
+    public final AbstractContainerScreen screen;
     private final int firstCraftSlot;
     private final int gridSize;
     private final int resultSlotNo;
-    private final int firstInventorySlotNo;
-    TreeMap<String, RecipeTreeSet> craftableCategories;
-    private Recipe underMouse;
+    public final int firstInventorySlotNo;
+    public TreeMap<String, RecipeTreeSet> craftableCategories;
+    public Recipe underMouse;
     
     private final int itemSize=20;
     private final int itemLift=5;         // how many pixels to display items above where they would be normally
@@ -71,9 +69,9 @@ public class RecipeBook {
     private long recipeUpdateTime;
     private RecipeType wantedRecipeType;
 
-    private TextFieldWidget pattern;
-    private RecipeTreeSet patternMatchingRecipes;
-    private int patternListSize;
+    public TextFieldWidget pattern;
+    public RecipeTreeSet patternMatchingRecipes;
+    public int patternListSize;
     
     static Identifier arrows;
     private int containerLeft;
@@ -117,7 +115,7 @@ public class RecipeBook {
         }
     }
     
-    void afterInitGui() {
+    public void afterInitGui() {
         final int distanceFromGui = 25;
         
         this.containerLeft = (screen.width - 176 /*screen.containerWidth */)/2;
@@ -147,7 +145,7 @@ public class RecipeBook {
     // left is the X position we want to draw at, Y is (normally) 0.
     // However, if our height is larger than the GUI container height,
     // adjust our Y position accordingly.
-    void drawRecipeList(TextRenderer fontRenderer, ItemRenderer itemRenderer,
+    public void drawRecipeList(TextRenderer fontRenderer, ItemRenderer itemRenderer,
             int left, int height, int mouseX, int mouseY) {
 
         // We can't do this in the constructor as we don't yet know sizes from initGui.
@@ -252,7 +250,7 @@ public class RecipeBook {
         }
     }
 
-    private int drawRecipeOutputs(RecipeTreeSet recipes, 
+    public int drawRecipeOutputs(RecipeTreeSet recipes, 
             ItemRenderer itemRenderer, TextRenderer fontRenderer, 
             int xpos, int ypos,
             int mouseX, int mouseY) {
@@ -261,8 +259,7 @@ public class RecipeBook {
         for (Recipe recipe: recipes) {
             ItemStack items=recipe.getOutput();
             if (ypos>=minYtoDraw) {
-                itemRenderer.renderGuiItemIcon(items, xOffset+xpos, ypos-itemLift);
-                itemRenderer.renderGuiItemOverlay(fontRenderer, items, xOffset+xpos, ypos-itemLift);
+                renderSingleRecipeOutput(itemRenderer, fontRenderer, items, xOffset+xpos, ypos-itemLift);
                 if (mouseX>=xpos+xOffset  && mouseX<=xpos+xOffset+itemSize-1
                 &&  mouseY>=ypos-itemLift && mouseY<=ypos-itemLift+itemSize-1) {
                     underMouse=recipe;
@@ -279,6 +276,12 @@ public class RecipeBook {
         return ypos;
     }
     
+    public void renderSingleRecipeOutput(ItemRenderer itemRenderer, TextRenderer fontRenderer,
+            ItemStack items, int x, int y) {
+        itemRenderer.renderGuiItemIcon(items, x, y);
+        itemRenderer.renderGuiItemOverlay(fontRenderer, items, x, y);
+    }
+    
     public void renderIngredient(ItemRenderer itemRenderer, TextRenderer fontRenderer, Ingredient ingredient, int x, int y) {
         ItemStack[] stacks=ingredient.getMatchingStacksClient();
         if (stacks.length==0)
@@ -290,7 +293,7 @@ public class RecipeBook {
         itemRenderer.renderGuiItemOverlay(fontRenderer, stacks[toRender], x, y);
     }
     
-    public final void updateRecipes() {
+    public void updateRecipes() {
         Container inventory=screen.getContainer();
         List<Recipe> recipes = new ArrayList<>();
         if (wantedRecipeType == BrewingRecipe.recipeType) {
@@ -385,6 +388,10 @@ public class RecipeBook {
             //System.out.println("adding "+result.getDisplayName()+" in "+category);
             catRecipes.add((Recipe)recipe);
         }
+        recalcListSize();
+    }
+    
+    public void recalcListSize() {
         listSize=craftableCategories.size();
         for (RecipeTreeSet tree: craftableCategories.values())
             listSize+=((tree.size()+(itemsPerRow-1))/itemsPerRow);
@@ -392,13 +399,17 @@ public class RecipeBook {
         mouseScroll=0;
     }
     
-    public final void updatePatternMatch() {
+    public String getPatternText() {
+        if (pattern == null)
+            return "";
+        return pattern.getText();
+    }
+    
+    public void updatePatternMatch() {
         patternListSize=0;
         patternMatchingRecipes=new RecipeTreeSet();
 
-        if (pattern==null)          // constructor run but no gui opened yet
-            return;
-        String patternText=pattern.getText();
+        String patternText=getPatternText();
         if (patternText.length()<2)
             return;
 
@@ -423,8 +434,12 @@ public class RecipeBook {
                 continue;
             }
             //System.out.println("adding "+result.getDisplayName()+" to pattern match "+patternText);
-            patternMatchingRecipes.add((Recipe) recipe);
+            patternMatchingRecipes.add(recipe);
         }
+        recalcPatternMatchSize();
+    }
+    
+    public void recalcPatternMatchSize() {
         patternListSize=((patternMatchingRecipes.size()+(itemsPerRow-1))/itemsPerRow)*itemSize;
         mouseScroll=0;
     }
@@ -853,7 +868,7 @@ public class RecipeBook {
         }
     }
 
-    boolean charTyped(char codepoint, int modifiers) {
+    public boolean charTyped(char codepoint, int modifiers) {
         // System.out.println("char code="+codepoint+", modifiers="+modifiers);
         if (pattern!=null && pattern.isFocused())
             return pattern.charTyped(codepoint, modifiers);
@@ -896,7 +911,7 @@ public class RecipeBook {
         return false;
     }
     
-    private void transfer(int from, int to, int amount) {
+    public void transfer(int from, int to, int amount) {
         Slot fromSlot=screen.getContainer().getSlot(from);
         ItemStack fromContent=fromSlot.getStack();
         
@@ -929,47 +944,7 @@ public class RecipeBook {
         }
     }
     
-    private void slotClick(int slot, int mouseButton, SlotActionType clickType) {
+    public void slotClick(int slot, int mouseButton, SlotActionType clickType) {
         ((SlotClickAccepter)screen).slotClick(slot, mouseButton, clickType);
-    }
-    
-    private class RecipeTreeSet extends TreeSet<Recipe> {
-        RecipeTreeSet() {
-            super(new Comparator<Recipe>() {
-                @Override
-                public int compare(Recipe a, Recipe b) {
-                    int sameName = EasierCrafting.recipeDisplayName(a).compareToIgnoreCase(EasierCrafting.recipeDisplayName(b));
-                    if (a.getType() == RecipeType.STONECUTTING && b.getType() == RecipeType.STONECUTTING) {
-                        if (sameName != 0) {
-                            return sameName;
-                        } else {
-                            return ((Ingredient)(a.getPreviewInputs().get(0))).getMatchingStacksClient()[0].getItem().getName().asString()
-                            .compareToIgnoreCase(
-                                   ((Ingredient)(b.getPreviewInputs().get(0))).getMatchingStacksClient()[0].getItem().getName().asString()
-                            );
-                        }
-                    } else if (a.getType() == BrewingRecipe.recipeType || b.getType() == BrewingRecipe.recipeType) {
-                        if (sameName != 0) {
-                            return sameName;
-                        }
-                        if (PotionUtil.getPotion(a.getOutput()) == PotionUtil.getPotion(b.getOutput())
-                        ||  PotionUtil.getPotionEffects(a.getOutput()).size() == 0
-                        ||  PotionUtil.getPotionEffects(b.getOutput()).size() == 0
-                        ) {
-                            return 0;
-                        }
-                        //LOGGER.info("comparing potions seems equal, name="+a.getOutput().getName().asString());
-                        //LOGGER.info("first potion is "+PotionUtil.getPotion(a.getOutput()).getName(""));
-                        //try { LOGGER.info("First dur. "+PotionUtil.getPotionEffects(a.getOutput()).get(0).getDuration()); } catch (Exception ex) {}
-                        //LOGGER.info("secnd potion is "+PotionUtil.getPotion(b.getOutput()).getName(""));
-                        //try { LOGGER.info("Secnd dur. "+PotionUtil.getPotionEffects(b.getOutput()).get(0).getDuration()); } catch (Exception ex) {}
-
-                        return PotionUtil.getPotionEffects(a.getOutput()).get(0).getDuration() - PotionUtil.getPotionEffects(b.getOutput()).get(0).getDuration();
-                    } else {
-                        return sameName;
-                    }
-                }
-            });
-        }
     }
 }

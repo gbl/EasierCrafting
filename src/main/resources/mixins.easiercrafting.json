@@ -4,13 +4,14 @@
     "refmap": "EasierCrafting-refmap.json",
     "minVersion": "0.6",
     "client": [
+        "GuiActionConfirmDebug", 
+        "ClickWindowC2SPacketMixin"        
+,       
         "BrewingstandRefreshMixin",
         "GuiCraftMixin", "AbstractFurnaceScreenMixin", "AbstractFurnaceContainerMixin", "GuiInventoryMixin",
         "ServerPlayNetworkHandlerMixin", "BrewingRecipeRegistryExporter"
     ],
     "client-disabled": [
-        "GuiActionConfirmDebug", 
-        "ClickWindowC2SPacketMixin"        
     ],
     "injectors": {
         "defaultRequire": 1

@@ -1,5 +1,6 @@
 package de.guntram.mcmod.easiercrafting;
 
+import de.guntram.mcmod.easiercrafting.Loom.LoomRecipeRegistry;
 import de.guntram.mcmod.fabrictools.ConfigurationProvider;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,9 +16,9 @@ import net.minecraft.recipe.Recipe;
 
 public class EasierCrafting implements ClientModInitializer 
 {
-    static final String MODID="easiercrafting";
-    static final String MODNAME="EasierCrafting";
-    static final String VERSION="@VERSION@";
+    static public final String MODID="easiercrafting";
+    static public final String MODNAME="EasierCrafting";
+    static public final String VERSION="@VERSION@";
 
     @Override
     public void onInitializeClient() {
@@ -32,6 +33,8 @@ public class EasierCrafting implements ClientModInitializer
 
         LocalRecipeManager.addZipfile(localRecipes.getPath());
         LocalRecipeManager.load();
+        
+        LoomRecipeRegistry.loadRecipeCollection(LoomRecipeRegistry.getRecipeCollectionPath());
     }
     
     public static String recipeDisplayName(Recipe recipe) {

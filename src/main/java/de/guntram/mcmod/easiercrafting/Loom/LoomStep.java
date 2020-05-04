@@ -1,4 +1,4 @@
-package de.guntram.mcmod.easiercrafting;
+package de.guntram.mcmod.easiercrafting.Loom;
 
 public class LoomStep {
     String pattern;
