@@ -73,6 +73,15 @@ public class DelayedSlotClickQueue {
         getInstance().internalExecute(false);
     }
     
+    public static void clearGenerators() {
+        getInstance().pendingGenerators.clear();
+    }
+    
+    public static void clear() {
+        getInstance().pendingGenerators.clear();
+        getInstance().pendingClicks.clear();
+    }
+    
     private void internalExecute(boolean runGenerators) {
         while (runGenerators && pendingClicks.isEmpty() && !pendingGenerators.isEmpty()) {
             Runnable generator = pendingGenerators.pollFirst();

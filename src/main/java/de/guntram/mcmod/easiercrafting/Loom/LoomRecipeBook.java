@@ -24,6 +24,7 @@ import net.minecraft.container.SlotActionType;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.DyeColor;
 
@@ -131,27 +132,37 @@ public class LoomRecipeBook extends RecipeBook {
                     BannerPattern pattern = BannerPattern.byId(step.pattern);
                     if (pattern == null) {
                         LOGGER.warn("no BannerPattern found for "+step.pattern);
+                        DelayedSlotClickQueue.clear();
                         return;
                     }
                     DyeColor dye = DyeColor.byId(((ExtendedGuiLoom)screen).getColor(step.colorCode-'A'));
                     int dyeSlotIndex = findItemSlot(DyeItem.byColor(dye));
                     if (dyeSlotIndex == -1) {
                         LOGGER.warn("no dye found");
+                        DelayedSlotClickQueue.clear();
                         return;
                     }
                     LOGGER.info("transfer dye from "+dyeSlotIndex+" to 1");
                     transfer(dyeSlotIndex, 1, 1);
+                    
+                    int patternSlot = -1;
                     if (pattern.ordinal() <= BannerPattern.LOOM_APPLICABLE_COUNT) {
                         LOGGER.info("click container button "+pattern.ordinal());
                         MinecraftClient.getInstance().interactionManager
                                 .clickButton((screen.getContainer()).syncId, pattern.ordinal());// click loom button
                     } else {
-                        LOGGER.warn("item patterns not implemented yet");
-                        return;
-                        // ItemStack stack = pattern.baseStack;
-                        // find item stack in inventory
-                        // transfer to slot 2
-
+                        Item item = bannerPatternItemFromId(pattern.getId());
+                        if (item == null) {
+                            LOGGER.warn("Don't know which pattern to use for "+pattern.getId());
+                            DelayedSlotClickQueue.clear();
+                            return;
+                        }
+                        if ((patternSlot = findItemSlot(item))==-1) {
+                            LOGGER.warn("Did not find "+item.getTranslationKey()+" in inventory");
+                            DelayedSlotClickQueue.clear();
+                            return;
+                        }
+                        transfer(patternSlot, 2, 1);
                     }
 
                     // LOGGER.info("returning before first step");
@@ -164,12 +175,34 @@ public class LoomRecipeBook extends RecipeBook {
                         LOGGER.info("transfer banner to input");
                         transfer(3, 0, 1);
                     }
+                    
+                    if (patternSlot != -1) {
+                        slotClick(2, 0, SlotActionType.QUICK_MOVE);
+                    }
                 }
             });
         }
         // DelayedSlotClickQueue.execute(); Or don't as we expect to get a confirm 
         // for the THROW action that's generated for clicking outside the
         // GUI
+    }
+    
+    private Item bannerPatternItemFromId(String id) {
+        Item item;
+        if (id.equals("glb")) {
+            item = Items.GLOBE_BANNER_PATTERN;
+        } else if (id.equals("cre")) {
+            item = Items.CREEPER_BANNER_PATTERN;
+        } else if (id.equals("sku")) {
+            item = Items.SKULL_BANNER_PATTERN;
+        } else if (id.equals("flo")) {
+            item = Items.FLOWER_BANNER_PATTERN;
+        } else if (id.equals("moj")) {
+            item = Items.MOJANG_BANNER_PATTERN;
+        } else {
+            item = null;
+        }
+        return item;
     }
     
     @Override
