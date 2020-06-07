@@ -7,7 +7,7 @@ package de.guntram.mcmod.easiercrafting.delayedslotclicks;
 
 import de.guntram.mcmod.easiercrafting.SlotClickAccepter;
 import java.util.LinkedList;
-import net.minecraft.container.SlotActionType;
+import net.minecraft.screen.slot.SlotActionType;
 
 /**
  *

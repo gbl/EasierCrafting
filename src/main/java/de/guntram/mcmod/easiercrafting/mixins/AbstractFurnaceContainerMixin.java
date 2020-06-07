@@ -6,10 +6,10 @@
 package de.guntram.mcmod.easiercrafting.mixins;
 
 import de.guntram.mcmod.easiercrafting.accessorInterfaces.PropertyDelegateProvider;
-import net.minecraft.container.AbstractFurnaceContainer;
-import net.minecraft.container.ContainerType;
-import net.minecraft.container.CraftingContainer;
-import net.minecraft.container.PropertyDelegate;
+import net.minecraft.screen.AbstractFurnaceScreenHandler;
+import net.minecraft.screen.AbstractRecipeScreenHandler;
+import net.minecraft.screen.PropertyDelegate;
+import net.minecraft.screen.ScreenHandlerType;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,12 +18,12 @@ import org.spongepowered.asm.mixin.Shadow;
  *
  * @author gbl
  */
-@Mixin(AbstractFurnaceContainer.class)
-public abstract class AbstractFurnaceContainerMixin extends CraftingContainer implements PropertyDelegateProvider {
+@Mixin(AbstractFurnaceScreenHandler.class)
+public abstract class AbstractFurnaceContainerMixin extends AbstractRecipeScreenHandler implements PropertyDelegateProvider {
     
     @Shadow @Final private PropertyDelegate propertyDelegate;
     
-    public AbstractFurnaceContainerMixin(ContainerType containerType_1, int int_1) {
+    public AbstractFurnaceContainerMixin(ScreenHandlerType containerType_1, int int_1) {
         super(containerType_1, int_1);
     }
     

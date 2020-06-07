@@ -5,7 +5,8 @@
  */
 package de.guntram.mcmod.easiercrafting;
 
-import net.minecraft.container.SlotActionType;
+import net.minecraft.screen.slot.SlotActionType;
+
 
 /**
  *

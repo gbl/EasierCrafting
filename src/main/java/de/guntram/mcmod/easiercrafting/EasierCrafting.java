@@ -32,7 +32,7 @@ public class EasierCrafting implements ClientModInitializer
         }
 
         LocalRecipeManager.addZipfile(localRecipes.getPath());
-        LocalRecipeManager.load();
+// TODO  this has changed wildly in 1.16        LocalRecipeManager.load();
         
         LoomRecipeRegistry.loadRecipeCollection(LoomRecipeRegistry.getRecipeCollectionPath());
     }

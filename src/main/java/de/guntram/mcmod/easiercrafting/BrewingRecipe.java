@@ -7,8 +7,8 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.util.DefaultedList;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
 public class BrewingRecipe<C extends Inventory> implements Recipe<C> {
@@ -92,13 +92,13 @@ public class BrewingRecipe<C extends Inventory> implements Recipe<C> {
         StringBuilder result=new StringBuilder();
         result.append(getCategory())
                 .append(": input ")
-                .append(inputPotion.getItem().getName().asFormattedString()) . append("/")
-                .append(PotionUtil.getPotion(inputPotion).getName(""))
+                .append(inputPotion.getItem().getName().getString()) . append("/")
+                .append(PotionUtil.getPotion(inputPotion).finishTranslationKey(""))
                 .append(" with ingredient ")
-                .append(ingredient.getItem().getName().asFormattedString())
+                .append(ingredient.getItem().getName().getString())
                 .append(" yields ")
-                .append(outputPotion.getItem().getName().asFormattedString()) . append("/")
-                .append(PotionUtil.getPotion(outputPotion).getName(""))
+                .append(outputPotion.getItem().getName().getString()) . append("/")
+                .append(PotionUtil.getPotion(outputPotion).finishTranslationKey(""))
                 ;
         return result.toString();
     }

@@ -5,9 +5,6 @@
  */
 package de.guntram.mcmod.easiercrafting;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,15 +14,16 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.metadata.ResourceMetadataReader;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
@@ -46,12 +44,19 @@ public class LocalRecipeManager extends RecipeManager implements ResourceManager
     public static void addZipfile(String name) {
         forcedZips.add(name);
     }
-    
+
+/* 1.15.2 code 
     public static void load() {
         Map<Identifier, JsonObject> map = instance.prepare(instance, null);
         instance.apply(map, instance, null);
     }
+*/
     
+    @Override
+    public Stream<ResourcePack> method_29213() {
+        return Stream.of();
+    }
+
     public static void dumpAll() {
         for (Recipe r: instance.values()) {
             LOGGER.info(r.getId());
@@ -88,11 +93,14 @@ public class LocalRecipeManager extends RecipeManager implements ResourceManager
         result.add(getResource(id));
         return result;
     }
+    
+    @Override
+    public Collection<Identifier> findResources(Identifier resourceType, Predicate<String> pathPredicate) {
+        return findResources("", pathPredicate);
+    }
 
     @Override
     public Collection<Identifier> findResources(String resourceType, Predicate<String> pathPredicate) {
-        
-        final Gson gson = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
         final Set<Identifier> result = new HashSet<>();
         
         for (String filename: forcedZips) {

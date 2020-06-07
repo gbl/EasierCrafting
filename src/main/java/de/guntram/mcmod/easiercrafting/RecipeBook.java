@@ -15,15 +15,12 @@ import net.minecraft.block.WallBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.container.Container;
-import net.minecraft.container.Slot;
-import net.minecraft.container.SlotActionType;
-import net.minecraft.container.StonecutterContainer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -39,8 +36,13 @@ import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.recipe.StonecuttingRecipe;
-import net.minecraft.util.DefaultedList;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.StonecutterScreenHandler;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.DefaultedList;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,7 +52,7 @@ public class RecipeBook {
     
     public static final Logger LOGGER = LogManager.getLogger(RecipeBook.class);
 
-    public final AbstractContainerScreen screen;
+    public final HandledScreen screen;
     private final int firstCraftSlot;
     private final int gridSize;
     private final int resultSlotNo;
@@ -91,7 +93,7 @@ public class RecipeBook {
  * @param firstInventorySlot
  *                          the slot number of the first inventory slot
  */    
-    public RecipeBook(AbstractContainerScreen craftScreen, int firstCraftSlot, int gridsize, int resultSlot, int firstInventorySlot) {
+    public RecipeBook(HandledScreen craftScreen, int firstCraftSlot, int gridsize, int resultSlot, int firstInventorySlot) {
         this.screen=craftScreen;
         this.firstCraftSlot=firstCraftSlot;
         this.gridSize=gridsize;
@@ -146,13 +148,13 @@ public class RecipeBook {
     // left is the X position we want to draw at, Y is (normally) 0.
     // However, if our height is larger than the GUI container height,
     // adjust our Y position accordingly.
-    public void drawRecipeList(TextRenderer fontRenderer, ItemRenderer itemRenderer,
+    public void drawRecipeList(MatrixStack stack, TextRenderer fontRenderer, ItemRenderer itemRenderer,
             int left, int height, int mouseX, int mouseY) {
 
         // We can't do this in the constructor as we don't yet know sizes from initGui.
         // Also, not in afterInitGui() because we don't know fontRender there.
         if (pattern==null) {
-            pattern=new TextFieldWidget(fontRenderer, xOffset, 0, textBoxSize, 20, "");
+            pattern=new TextFieldWidget(fontRenderer, xOffset, 0, textBoxSize, 20, new LiteralText(""));
             if (ConfigurationHandler.getAutoFocusSearch()) {
                 // doh - in 1.15, changeFocus toggles the focus and ignores the parameter
                 pattern.changeFocus(true);
@@ -184,8 +186,8 @@ public class RecipeBook {
                 //System.out.println("mouse wheel text at"+ypos);
                 // fontRenderer.drawString(I18n.format("message.usemouse"), xOffset+itemSize, ypos, 0xff0000);
                 MinecraftClient.getInstance().getTextureManager().bindTexture(arrows);
-                screen.blit(xOffset,                ypos,  0, 0, 20, 20);
-                screen.blit(xOffset+textBoxSize-20, ypos, 20, 0, 20, 20);
+                screen.drawTexture(stack, xOffset,                ypos,  0, 0, 20, 20);
+                screen.drawTexture(stack, xOffset+textBoxSize-20, ypos, 20, 0, 20, 20);
                 ypos+=itemSize;
             } else {
                 mouseScroll=0;
@@ -199,7 +201,7 @@ public class RecipeBook {
         underMouse=null;
 
         pattern.y=ypos;
-        pattern.renderButton(0, 0, 0f);    // <-- parameters neccessary but unused 
+        pattern.renderButton(stack, 0, 0, 0f);    // <-- parameters neccessary but unused 
         ypos+=itemSize*3/2;
         minYtoDraw=ypos;
         ypos-=mouseScroll*itemSize;
@@ -210,16 +212,16 @@ public class RecipeBook {
         for (String category: craftableCategories.keySet()) {
 //            System.out.println(category+" at "+xOffset+"/"+ypos);
             if (ypos>=minYtoDraw)
-                fontRenderer.draw(category, xOffset, ypos, 0xffff00);
+                fontRenderer.draw(stack, category, xOffset, ypos, 0xffff00);
             ypos+=itemSize;
             ypos=drawRecipeOutputs(craftableCategories.get(category), itemRenderer, fontRenderer, 0, ypos, mouseX, mouseY);
         }
         if (underMouse!=null) {
             String displayName = EasierCrafting.recipeDisplayName(underMouse);
-            fontRenderer.draw(displayName, 0, height+3, 0xffff00);
+            fontRenderer.draw(stack, displayName, 0, height+3, 0xffff00);
             if (underMouse instanceof ShapedRecipe) {
                 DefaultedList<Ingredient> ingredients = underMouse.getPreviewInputs();
-                fontRenderer.draw("sr", left-20, height, 0x202020);
+                fontRenderer.draw(stack, "sr", left-20, height, 0x202020);
                 for (int x=0; x<((ShapedRecipe)underMouse).getWidth(); x++) {
                     for (int y=0; y<((ShapedRecipe)underMouse).getHeight(); y++) {
                         renderIngredient(itemRenderer, fontRenderer, 
@@ -227,14 +229,14 @@ public class RecipeBook {
                     }
                 }
             } else if (underMouse instanceof ShapelessRecipe) {
-                fontRenderer.draw("slr", left-20, height, 0x202020);
+                fontRenderer.draw(stack, "slr", left-20, height, 0x202020);
                 xpos=0;
                 for (Ingredient ingredient: ((ShapelessRecipe)underMouse).getPreviewInputs()) {
                     renderIngredient(itemRenderer, fontRenderer, ingredient, itemSize*xpos, height+itemSize);
                     xpos++;
                 }
             } else if (underMouse instanceof CuttingRecipe) {
-                fontRenderer.draw("from "+((Ingredient)(underMouse.getPreviewInputs().get(0))).getMatchingStacksClient()[0].getName().asString(),
+                fontRenderer.draw(stack, "from "+((Ingredient)(underMouse.getPreviewInputs().get(0))).getMatchingStacksClient()[0].getName().asString(),
                         0, height+itemSize, 0xffff00);
                 xpos=0;
                 for (Ingredient ingredient: ((CuttingRecipe)underMouse).getPreviewInputs()) {
@@ -246,7 +248,7 @@ public class RecipeBook {
                 for (Object i: ((BrewingRecipe)underMouse).getPreviewInputs()) {
                     Ingredient ingredient = (Ingredient) i;
                     renderIngredient(itemRenderer, fontRenderer, ingredient, 0, height+ypos*itemSize);
-                    fontRenderer.draw(ingredient.getMatchingStacksClient()[0].getName().asFormattedString(), itemSize, height+5+ypos*itemSize, 0xffff00);
+                    fontRenderer.draw(stack, ingredient.getMatchingStacksClient()[0].getName(), itemSize, height+5+ypos*itemSize, 0xffff00);
                     ypos++;
                 }
             }
@@ -303,23 +305,23 @@ public class RecipeBook {
     }
     
     public void updateRecipes() {
-        Container inventory=screen.getContainer();
+        ScreenHandler inventory = screen.getScreenHandler();
         List<Recipe> recipes = new ArrayList<>();
         if (wantedRecipeType == BrewingRecipe.recipeType) {
             Level level = Level.DEBUG;
-            LOGGER.log(level, "recipebook: size= "+inventory.slotList.size());
+            LOGGER.log(level, "recipebook: size= "+inventory.slots.size());
 
             List<BrewingRecipe> potionRecipes = BrewingRecipeRegistryCache.registeredPotionRecipes();
             Set<BrewingRecipe> possiblePotionRecipes = new HashSet<>();
             List<BrewingRecipe> itemRecipes = BrewingRecipeRegistryCache.registeredItemRecipes();
             Set<BrewingRecipe> possibleItemRecipes = new HashSet<>();
-            for (int i=0; i<inventory.slotList.size(); i++) {
+            for (int i=0; i<inventory.slots.size(); i++) {
                 // This loop also looks at the items in the brewing stand, which is fine!
                 ItemStack stack=inventory.getSlot(i).getStack();
                 Potion potionType = PotionUtil.getPotion(stack);
                 if (!stack.isEmpty() && potionType != Potions.EMPTY) {
                     BrewingRecipe newRecipe;
-                    LOGGER.log(level, "slot "+i+" has "+stack.getCount()+" of "+stack.getItem().getName().asString() + " potion type "+potionType.getName(""));
+                    LOGGER.log(level, "slot "+i+" has "+stack.getCount()+" of "+stack.getItem().getName().asString() + " potion type "+potionType.finishTranslationKey(""));
                     for (BrewingRecipe br: itemRecipes) {
                         if (br.getInputPotion().getItem() == stack.getItem()) {
                             // This potion item can be converted to a different item.
@@ -422,7 +424,6 @@ public class RecipeBook {
         if (patternText.length()<2)
             return;
 
-        Container inventory=screen.getContainer();
         List<Recipe> recipes = new ArrayList<>();
         if (wantedRecipeType == BrewingRecipe.recipeType) {
             recipes.addAll(BrewingRecipeRegistryCache.registeredBrewingRecipes());
@@ -462,7 +463,7 @@ public class RecipeBook {
         Takefrom(Slot i, int n) { invitem=i; amount=n; }
     };
 
-    private boolean canCraftRecipe(Recipe recipe, Container inventory, int gridSize) {
+    private boolean canCraftRecipe(Recipe recipe, ScreenHandler inventory, int gridSize) {
         if (recipe instanceof ShapelessRecipe) {
             return canCraftShapeless((ShapelessRecipe) recipe, inventory);
         } else if (recipe instanceof ShapedRecipe) {
@@ -490,12 +491,12 @@ public class RecipeBook {
         return false;
     }
     
-    private boolean canCraftShapeless(ShapelessRecipe recipe, Container inventory) {
+    private boolean canCraftShapeless(ShapelessRecipe recipe, ScreenHandler inventory) {
         DefaultedList<Ingredient> neededList = recipe.getPreviewInputs();
         return canCraft(recipe, neededList, inventory);
     }
 
-    private boolean canCraftShaped(ShapedRecipe recipe, Container inventory, int gridSize) {
+    private boolean canCraftShaped(ShapedRecipe recipe, ScreenHandler inventory, int gridSize) {
         if (!recipe.fits(gridSize, gridSize)) {
             return false;
         }
@@ -503,16 +504,16 @@ public class RecipeBook {
         return canCraft(recipe, neededList, inventory);
     }
     
-    private boolean canCraftCutting(CuttingRecipe recipe, Container inventory) {
+    private boolean canCraftCutting(CuttingRecipe recipe, ScreenHandler inventory) {
         DefaultedList<Ingredient> neededList = recipe.getPreviewInputs();
         return canCraft(recipe, neededList, inventory);
     }
 
-    private boolean canCraftOre(Recipe recipe, DefaultedList<Ingredient>input, Container inventory) {
+    private boolean canCraftOre(Recipe recipe, DefaultedList<Ingredient>input, ScreenHandler inventory) {
         return canCraft(recipe, input, inventory);
     }
 
-    private boolean canCraft(Recipe recipe, List<Ingredient> neededList, Container inventory) {
+    private boolean canCraft(Recipe recipe, List<Ingredient> neededList, ScreenHandler inventory) {
         ArrayList<Takefrom> source=new ArrayList<>(neededList.size());
         for (Ingredient neededItem: neededList) {                                // iterate over needed items
             ItemStack[] stacks=neededItem.getMatchingStacksClient();
@@ -565,7 +566,7 @@ public class RecipeBook {
     // has water and splash water in his inventory; or potion -> splash, and the player has weakness and night vision
     // in his inventory), we might want to act somehow to prevent crafting the wrong input ...
 
-    private boolean canBrew(BrewingRecipe recipe, Container inventory) {
+    private boolean canBrew(BrewingRecipe recipe, ScreenHandler inventory) {
         List<Ingredient> inputs=recipe.getPreviewInputs();
         Item ingredient = inputs.get(1).getMatchingStacksClient()[0].getItem();
         ItemStack inputPotionStack = inputs.get(0).getMatchingStacksClient()[0];
@@ -670,7 +671,7 @@ public class RecipeBook {
             // Do nothing if the grid isn't empty.
 //            boolean empty = true;
             for (int craftslot=0; craftslot<gridSize*gridSize; craftslot++) {
-                ItemStack stack = screen.getContainer().getSlot(craftslot+firstCraftSlot).getStack();
+                ItemStack stack = screen.getScreenHandler().getSlot(craftslot+firstCraftSlot).getStack();
                 if (stack!=null && !stack.isEmpty()) {
                     return;
 //                    LOGGER.info("returning as slot "+craftslot+" has "+stack.getCount()+" of "+stack.getTranslationKey());
@@ -685,7 +686,7 @@ public class RecipeBook {
                 fillCraftSlotsWithAnyMaterials(underMouse);
             }
             if (underMouse.getType() == RecipeType.STONECUTTING) {
-                StonecutterContainer container = (StonecutterContainer) screen.getContainer();
+                StonecutterScreenHandler container = (StonecutterScreenHandler) screen.getScreenHandler();
                 List<StonecuttingRecipe> recipes = container.getAvailableRecipes();
                 int index = recipes.indexOf(underMouse);
                 if (index >= 0) {
@@ -734,7 +735,7 @@ public class RecipeBook {
                 } else {
                     int totalInInv=0;
                     for (int slot=0; slot<36; slot++) {
-                        Slot invitem=screen.getContainer().getSlot(slot+firstInventorySlotNo);
+                        Slot invitem=screen.getScreenHandler().getSlot(slot+firstInventorySlotNo);
                         ItemStack slotcontent=invitem.getStack();
                         if (canActAsIngredient(ingr, slotcontent))
                             totalInInv+=slotcontent.getCount();
@@ -766,13 +767,13 @@ public class RecipeBook {
             int remaining=maxCraftableStacks;
             Ingredient ingr=recipeInput.get(craftslot);
             for (int slot=0; remaining>0 && slot<36; slot++) {
-                Slot invitem=screen.getContainer().getSlot(slot+firstInventorySlotNo);
+                Slot invitem=screen.getScreenHandler().getSlot(slot+firstInventorySlotNo);
                 ItemStack slotcontent=invitem.getStack();
                 if (canActAsIngredient(ingr, slotcontent)) {
                     // System.out.println("craftslot is "+craftslot+", first is "+firstCraftSlot+", rowadjust is "+rowadjust+", transferring "+remaining+" items");
                     // TODO: && (isempty(craftslot) || ismergeable(slot,craftslot))
                     transfer(slot+firstInventorySlotNo, craftslot+firstCraftSlot+rowadjust, remaining);
-                    remaining=maxCraftableStacks-screen.getContainer().getSlot(craftslot+firstCraftSlot+rowadjust).getStack().getCount();
+                    remaining=maxCraftableStacks-screen.getScreenHandler().getSlot(craftslot+firstCraftSlot+rowadjust).getStack().getCount();
                 }
             }
             if (underMouse instanceof ShapedRecipe && ((craftslot+1)%((ShapedRecipe)underMouse).getWidth())==0) {
@@ -788,7 +789,7 @@ public class RecipeBook {
 
         int bestItemSlot=-1, worstItemSlot=-1;
         for (int slot=0; slot<36; slot++) {
-            Slot invitem=screen.getContainer().getSlot(slot+firstInventorySlotNo);
+            Slot invitem=screen.getScreenHandler().getSlot(slot+firstInventorySlotNo);
             ItemStack slotcontent=invitem.getStack();
             if (slotcontent.getItem() == repairRecipe.getItem()
             &&  slotcontent.getDamage()>0
@@ -811,7 +812,7 @@ public class RecipeBook {
     }
 
     private void fillBrewingStandSlots(BrewingRecipe recipe) {
-        Container container = screen.getContainer();
+        ScreenHandler container = screen.getScreenHandler();
         ItemStack ingredientStack = container.getSlot(3+firstCraftSlot).getStack();
         List<Ingredient> inputs=recipe.getPreviewInputs();
         ItemStack inputPotionStack = inputs.get(0).getMatchingStacksClient()[0];
@@ -825,7 +826,7 @@ public class RecipeBook {
                 }
             }
         } else if (ingredientStack.getItem() != recipe.getIngredient().getItem()) {
-            MinecraftClient.getInstance().inGameHud.setOverlayMessage("Remove the wrong ingredient from the brewing stand first", true);
+            MinecraftClient.getInstance().inGameHud.setOverlayMessage(new LiteralText("Remove the wrong ingredient from the brewing stand first"), true);
             return;
         }
         for (int potionSlot=0; potionSlot<3; potionSlot++) {
@@ -850,12 +851,12 @@ public class RecipeBook {
     }
     
     private int getDamage(int slot) {
-        ItemStack stack = screen.getContainer().getSlot(slot+firstInventorySlotNo).getStack();
+        ItemStack stack = screen.getScreenHandler().getSlot(slot+firstInventorySlotNo).getStack();
         return stack.getDamage();
     }
 
     private int getRemainingDurability(int slot) {
-        ItemStack stack = screen.getContainer().getSlot(slot+firstInventorySlotNo).getStack();
+        ItemStack stack = screen.getScreenHandler().getSlot(slot+firstInventorySlotNo).getStack();
         int remainingDurability = stack.getMaxDamage() - stack.getDamage();
         return remainingDurability;
     }
@@ -921,7 +922,7 @@ public class RecipeBook {
     }
     
     public void transfer(int from, int to, int amount) {
-        Slot fromSlot=screen.getContainer().getSlot(from);
+        Slot fromSlot=screen.getScreenHandler().getSlot(from);
         ItemStack fromContent=fromSlot.getStack();
         
         //System.out.println("Trying to transfer "+amount+" "+fromContent.getDisplayName()+" from slot "+from+" to "+to);

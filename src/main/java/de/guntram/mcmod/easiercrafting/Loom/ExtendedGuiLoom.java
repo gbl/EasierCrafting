@@ -14,8 +14,7 @@ import net.minecraft.block.BannerBlock;
 import net.minecraft.client.gui.screen.ingame.LoomScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.container.LoomContainer;
-import net.minecraft.container.SlotActionType;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BannerItem;
 import net.minecraft.item.DyeItem;
@@ -23,6 +22,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.screen.LoomScreenHandler;
+import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import org.apache.logging.log4j.LogManager;
@@ -44,7 +46,7 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
     
     private LoomRecipeBook recipeBook;
 
-    public ExtendedGuiLoom(LoomContainer container, PlayerInventory inventory, Text title) {
+    public ExtendedGuiLoom(LoomScreenHandler container, PlayerInventory inventory, Text title) {
         super(container, inventory, title);
         LOGGER=LogManager.getLogger();
     }
@@ -52,8 +54,8 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
     @Override
     protected void init() {
         super.init();
-        saveName = new TextFieldWidget(this.font, 0, -25, this.containerWidth-25, 20, "Save input pattern as...");
-        saveButton = new ButtonWidget(this.containerWidth-20, -25, 20, 20, "Save", (button)->{this.saveButtonPressed();});
+        saveName = new TextFieldWidget(this.textRenderer, 0, -25, this.backgroundWidth-25, 20, new LiteralText("Save input pattern as..."));
+        saveButton = new ButtonWidget(this.backgroundWidth-20, -25, 20, 20, new LiteralText("Save"), (button)->{this.saveButtonPressed();});
         if (savedColorCode == null) {
             savedColorCode = new int[BUTTONCOUNT];
             for (int i=0; i<savedColorCode.length; i++) {
@@ -72,27 +74,27 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
     }
     
     @Override
-    protected void drawForeground(final int mouseX, final int mouseY) {
-        super.drawForeground(mouseX, mouseY);
-        if (((LoomContainer)container).getBannerSlot().hasStack()) {
+    protected void drawForeground(MatrixStack stack, final int mouseX, final int mouseY) {
+        super.drawForeground(stack, mouseX, mouseY);
+        if (((LoomScreenHandler)handler).getBannerSlot().hasStack()) {
             saveButton.active = !(saveName.getText().isEmpty());
-            saveButton.renderButton(mouseX, mouseY, 0);
-            saveName.renderButton(mouseX, mouseY, 0);
+            saveButton.renderButton(stack, mouseX, mouseY, 0);
+            saveName.renderButton(stack, mouseX, mouseY, 0);
         } else {
             saveName.setText("");
             for (int i=0; i<colorButtons.length; i++) {
-                colorButtons[i].renderButton(mouseX, mouseY, 0);
+                colorButtons[i].renderButton(stack, mouseX, mouseY, 0);
             }
             for (int i=0; i<colorButtons.length; i++) {
-                colorButtons[i].renderButtonTooltip(mouseX, mouseY, 0);
+                colorButtons[i].renderButtonTooltip(stack, mouseX, mouseY, 0);
             }
         }
-        recipeBook.drawRecipeList(font, itemRenderer, containerWidth, containerHeight, mouseX-x, mouseY-y);
+        recipeBook.drawRecipeList(stack, textRenderer, itemRenderer, backgroundWidth, backgroundHeight, mouseX-x, mouseY-y);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (((LoomContainer)container).getBannerSlot().hasStack()) {
+        if (((LoomScreenHandler)handler).getBannerSlot().hasStack()) {
             if (saveName != null) {
                 if (saveName.mouseClicked(mouseX-x, mouseY-y, button))
                     return true;
@@ -165,7 +167,7 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
         if (loomRecipeName.isEmpty()) {
             return;
         }
-        ItemStack banners = ((LoomContainer)container).getBannerSlot().getStack();
+        ItemStack banners = ((LoomScreenHandler)handler).getBannerSlot().getStack();
         if (!(banners.getItem() instanceof BannerItem)) {
             return;
         }
@@ -234,7 +236,7 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
         private int clickButton;
 
         ColorButtonWidget(int x, int y, int width, int height, int index, int color) {
-            super(x, y, width, height, "", new PressAction() {
+            super(x, y, width, height, new LiteralText(""), new PressAction() {
                 @Override
                 public void onPress(ButtonWidget button) {
                     colorButtonPressed(index);
@@ -262,20 +264,20 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
         }
 
         @Override
-        public void renderButton(int mouseX, int mouseY, float delta) {
-            super.renderButton(mouseX, mouseY, delta);
-            ItemStack stack = getRenderStack();
-            setBlitOffset(100);
-            itemRenderer.renderGuiItem(stack, x+2, y+2);
-            setBlitOffset(0);
+        public void renderButton(MatrixStack stack, int mouseX, int mouseY, float delta) {
+            super.renderButton(stack, mouseX, mouseY, delta);
+            ItemStack items = getRenderStack();
+            //setBlitOffset(100);
+            itemRenderer.renderGuiItem(items, x+2, y+2);
+            //setBlitOffset(0);
         }
 
-        public void renderButtonTooltip(int mouseX, int mouseY, float delta) {
-            ItemStack stack = getRenderStack();
+        public void renderButtonTooltip(MatrixStack stack, int mouseX, int mouseY, float delta) {
+            ItemStack items = getRenderStack();
             mouseX-=ExtendedGuiLoom.this.x;
             mouseY-=ExtendedGuiLoom.this.y;
             if (mouseX > x && mouseX < x+width && mouseY > y && mouseY < y+width) {
-                renderTooltip(stack, mouseX, mouseY);
+                renderTooltip(stack, items, mouseX, mouseY);
             }
         }
 

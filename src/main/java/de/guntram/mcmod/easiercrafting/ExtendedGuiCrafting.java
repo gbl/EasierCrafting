@@ -1,17 +1,18 @@
 package de.guntram.mcmod.easiercrafting;
 
-import net.minecraft.client.gui.screen.ingame.CraftingTableScreen;
-import net.minecraft.container.CraftingTableContainer;
-import net.minecraft.container.SlotActionType;
+import net.minecraft.client.gui.screen.ingame.CraftingScreen;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.screen.CraftingScreenHandler;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
-public class ExtendedGuiCrafting extends CraftingTableScreen implements SlotClickAccepter {
+public class ExtendedGuiCrafting extends CraftingScreen implements SlotClickAccepter {
 
     private RecipeBook recipeBook;
 
-    public ExtendedGuiCrafting(CraftingTableContainer container, PlayerInventory lowerInv, Text title) {
+    public ExtendedGuiCrafting(CraftingScreenHandler container, PlayerInventory lowerInv, Text title) {
         super(container, lowerInv, title);
     }
     
@@ -29,9 +30,9 @@ public class ExtendedGuiCrafting extends CraftingTableScreen implements SlotClic
     }
 
     @Override
-    protected void drawForeground(final int mouseX, final int mouseY) {
-        super.drawForeground(mouseX, mouseY);
-        recipeBook.drawRecipeList(font, itemRenderer, containerWidth, containerHeight, mouseX-x, mouseY-y);
+    protected void drawForeground(MatrixStack stack, final int mouseX, final int mouseY) {
+        super.drawForeground(stack, mouseX, mouseY);
+        recipeBook.drawRecipeList(stack, textRenderer, itemRenderer, backgroundWidth, backgroundHeight, mouseX-x, mouseY-y);
     }
     
     @Override

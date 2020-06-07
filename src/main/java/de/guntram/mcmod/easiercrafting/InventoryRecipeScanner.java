@@ -11,19 +11,19 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.block.Block;
 import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.container.Container;
-import net.minecraft.container.Slot;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.item.DyeItem;
-import net.minecraft.util.DyeColor;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.DyeColor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,7 +35,7 @@ public class InventoryRecipeScanner {
     
     private static final Logger LOGGER = LogManager.getLogger();
     
-    static List<Recipe> findUnusualRecipes(Container inventory, int firstInventorySlotNo) {
+    static List<Recipe> findUnusualRecipes(ScreenHandler inventory, int firstInventorySlotNo) {
         ArrayList<Recipe> result=new ArrayList<>();
 
         // needed for various recipes; count the number of each dye type

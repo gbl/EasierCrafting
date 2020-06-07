@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.2.6-SNAPSHOT'
+	id 'fabric-loom' version '0.2.7-SNAPSHOT'
 }
 
 repositories {
@@ -15,7 +15,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 ext.Versions = new Properties()
-Versions.load(file("Versionfiles/mcversion-1.15.properties").newReader())
+Versions.load(file("Versionfiles/mcversion-1.16-pre2.properties").newReader())
 
 archivesBaseName = "easiercrafting"
 ext.projectVersion = "1.6.1.beta4"
@@ -44,6 +44,7 @@ dependencies {
     modCompile "net.fabricmc:fabric-loader:${Versions['loader_version']}"
     modCompile "net.fabricmc.fabric-api:fabric-api:${Versions['fabric_version']}"
     modCompile "io.github.prospector:modmenu:${Versions['modmenu_version']}"
+    modCompile "me.shedaniel:RoughlyEnoughItems:3.6.4"
     modCompile "de.guntram.mcmod:GBfabrictools:${Versions['gbfabrictools_version']}"
     include    "de.guntram.mcmod:GBfabrictools:${Versions['gbfabrictools_version']}"
 }

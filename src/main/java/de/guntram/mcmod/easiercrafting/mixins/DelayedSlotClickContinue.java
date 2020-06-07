@@ -2,8 +2,8 @@ package de.guntram.mcmod.easiercrafting.mixins;
 
 import de.guntram.mcmod.easiercrafting.delayedslotclicks.DelayedSlotClickQueue;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.packet.ConfirmGuiActionS2CPacket;
-import net.minecraft.client.network.packet.InventoryS2CPacket;
+import net.minecraft.network.packet.s2c.play.ConfirmGuiActionS2CPacket;
+import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

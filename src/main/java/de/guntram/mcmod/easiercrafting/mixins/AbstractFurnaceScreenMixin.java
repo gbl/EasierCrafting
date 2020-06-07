@@ -5,31 +5,29 @@
  */
 package de.guntram.mcmod.easiercrafting.mixins;
 
-import de.guntram.mcmod.easiercrafting.accessorInterfaces.PropertyDelegateProvider;
-import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 import net.minecraft.client.gui.screen.ingame.AbstractFurnaceScreen;
-import net.minecraft.container.Container;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  *
  * @author gbl
  */
 @Mixin(AbstractFurnaceScreen.class)
-public abstract class AbstractFurnaceScreenMixin extends AbstractContainerScreen {
+public abstract class AbstractFurnaceScreenMixin extends HandledScreen {
 
-    public AbstractFurnaceScreenMixin(Container container_1, PlayerInventory playerInventory_1, Text text_1) {
-        super(container_1, playerInventory_1, text_1);
+    public AbstractFurnaceScreenMixin(ScreenHandler handler, PlayerInventory playerInventory_1, Text text_1) {
+        super(handler, playerInventory_1, text_1);
     }
     
+/* TODO injection point doesn't exist any more
+
     @Inject(method="drawForeground", at=@At("HEAD"), cancellable = true)
-    private void patchTitleWithBurntime(int x, int y, CallbackInfo ci) {
-        PropertyDelegateProvider pde = (PropertyDelegateProvider) container;
+    private void patchTitleWithBurntime(MatrixStack stack, int x, int y, CallbackInfo ci) {
+        PropertyDelegateProvider pde = (PropertyDelegateProvider) handler;
         int itemsLeft=0, fuelLeftPercent=0, itemDonePercent=0;
         if (pde.getPropertyDelegate(3) != 0) {
             itemsLeft = pde.getPropertyDelegate(0)/pde.getPropertyDelegate(3);
@@ -39,11 +37,11 @@ public abstract class AbstractFurnaceScreenMixin extends AbstractContainerScreen
             fuelLeftPercent = pde.getPropertyDelegate(0)*100/pde.getPropertyDelegate(1);
         }
 
-        String titleText = this.title.asFormattedString() + " (" + itemsLeft + " more items)";
-        this.font.draw(titleText, (float)(this.containerWidth / 2 - this.font.getStringWidth(titleText) / 2), 6.0F, 4210752);
-        this.font.draw(this.playerInventory.getDisplayName().asFormattedString(), 8.0F, (float)(this.containerHeight - 96 + 2), 4210752);
-        this.font.draw(itemDonePercent+" %", 20, 22, 4210752);
-        this.font.draw(fuelLeftPercent+" %", 20, 58, 4210752);
+        String titleText = this.title.getString() + " (" + itemsLeft + " more items)";
+        this.textRenderer.draw(stack, titleText, (float)(this.backgroundWidth / 2 - this.textRenderer.getWidth(titleText) / 2), 6.0F, 4210752);
+        this.textRenderer.draw(stack, this.playerInventory.getDisplayName().getString(), 8.0F, (float)(this.backgroundHeight - 96 + 2), 4210752);
+        this.textRenderer.draw(stack, itemDonePercent+" %", 20, 22, 4210752);
+        this.textRenderer.draw(stack, fuelLeftPercent+" %", 20, 58, 4210752);
         
         //for (int i=0; i<4; i++) {
         //    this.font.draw(""+((PropertyDelegateProvider)container).getPropertyDelegate(i), 5, 10+i*10, 0x000000);
@@ -51,4 +49,6 @@ public abstract class AbstractFurnaceScreenMixin extends AbstractContainerScreen
         
         ci.cancel();
     }
+*/
+
 }

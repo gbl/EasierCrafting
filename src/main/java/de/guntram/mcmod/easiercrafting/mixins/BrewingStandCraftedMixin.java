@@ -1,26 +1,21 @@
 package de.guntram.mcmod.easiercrafting.mixins;
 
 import de.guntram.mcmod.easiercrafting.ExtendedGuiBrewingStand;
+import static de.guntram.mcmod.easiercrafting.RecipeBook.LOGGER;
+import net.minecraft.block.entity.BrewingStandBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
-import org.apache.logging.log4j.Logger;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ClientPlayNetworkHandler.class)
+@Mixin(BrewingStandBlockEntity.class) 
 
-public class BrewingstandRefreshMixin {
-    
-    @Shadow @Final static Logger LOGGER;
-    
-    @Inject(method="onInventory", at=@At("RETURN"))
-    private void dumpInventoryInfo(InventoryS2CPacket packet, CallbackInfo ci) {
+public class BrewingStandCraftedMixin {
+    @Inject(method="craft", at=@At("RETURN"))
+    private void updateRecipesWhenCrafted(CallbackInfo info) {
+        LOGGER.info("brewing stand playing done sound");
         Screen screen = MinecraftClient.getInstance().currentScreen;
         if (screen != null && screen instanceof ExtendedGuiBrewingStand) {
             LOGGER.info("updating brewing stand recipes");

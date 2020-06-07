@@ -7,9 +7,11 @@
         "GuiActionConfirmDebug", 
         "ClickWindowC2SPacketMixin"        
 ,       
-        "BrewingstandRefreshMixin",
-        "GuiCraftMixin", "AbstractFurnaceScreenMixin", "AbstractFurnaceContainerMixin", "GuiInventoryMixin",
-        "ServerPlayNetworkHandlerMixin", "BrewingRecipeRegistryExporter"
+        "AbstractFurnaceScreenMixin", "AbstractFurnaceContainerMixin", 
+        "BrewingRecipeRegistryExporter", "BrewingstandRefreshMixin", "BrewingStandCraftedMixin",
+        "DelayedSlotClickContinue",
+        "GuiCraftMixin", "GuiInventoryMixin",
+        "ServerPlayNetworkHandlerMixin"
     ],
     "client-disabled": [
     ],

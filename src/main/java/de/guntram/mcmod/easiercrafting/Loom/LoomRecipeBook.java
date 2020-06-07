@@ -16,16 +16,16 @@ import java.util.regex.Pattern;
 import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.container.LoomContainer;
-import net.minecraft.container.Slot;
-import net.minecraft.container.SlotActionType;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.screen.LoomScreenHandler;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.DyeColor;
 
 /**
@@ -34,7 +34,7 @@ import net.minecraft.util.DyeColor;
  */
 public class LoomRecipeBook extends RecipeBook {
     
-    public LoomRecipeBook(AbstractContainerScreen<LoomContainer> screen) {
+    public LoomRecipeBook(HandledScreen<LoomScreenHandler> screen) {
         super(screen, 0, 0, 3, 4);
     }
     
@@ -149,7 +149,7 @@ public class LoomRecipeBook extends RecipeBook {
                     if (pattern.ordinal() <= BannerPattern.LOOM_APPLICABLE_COUNT) {
                         LOGGER.info("click container button "+pattern.ordinal());
                         MinecraftClient.getInstance().interactionManager
-                                .clickButton((screen.getContainer()).syncId, pattern.ordinal());// click loom button
+                                .clickButton((screen.getScreenHandler()).syncId, pattern.ordinal());// click loom button
                     } else {
                         Item item = bannerPatternItemFromId(pattern.getId());
                         if (item == null) {
@@ -213,7 +213,7 @@ public class LoomRecipeBook extends RecipeBook {
     private int findBlankBannerSlot() {
         ItemStack blankBanner = ((ExtendedGuiLoom)screen).getBannerItemStack();
         for (int i=0; i<36; i++) {
-            Slot slot=screen.getContainer().getSlot(i+firstInventorySlotNo);
+            Slot slot=screen.getScreenHandler().getSlot(i+firstInventorySlotNo);
             if (slot.getStack().getItem() != blankBanner.getItem()) {
                 continue;
             }
@@ -228,7 +228,7 @@ public class LoomRecipeBook extends RecipeBook {
     
     private int findItemSlot(Item item) {
         for (int i=0; i<36; i++) {
-            Slot slot=screen.getContainer().getSlot(i+firstInventorySlotNo);
+            Slot slot=screen.getScreenHandler().getSlot(i+firstInventorySlotNo);
             if (slot.getStack().getItem() == item) {
                 return i+firstInventorySlotNo;
             }
