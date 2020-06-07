@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
+import me.shedaniel.rei.api.ConfigObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.StairsBlock;
@@ -156,6 +157,14 @@ public class RecipeBook {
                 // doh - in 1.15, changeFocus toggles the focus and ignores the parameter
                 pattern.changeFocus(true);
             }
+        }
+        
+        try {
+            if (ConfigObject.getInstance().isOverlayVisible()) {
+                return;
+            }
+        } catch (NoClassDefFoundError ex) {
+            ;
         }
 
         boolean underMouseIsCraftable=true;

@@ -34,7 +34,7 @@ public class ExtendedGuiBrewingStand extends BrewingStandScreen implements SlotC
     @Override
     protected void drawForeground(final int mouseX, final int mouseY) {
         super.drawForeground(mouseX, mouseY);
-        recipeBook.drawRecipeList(font, itemRenderer, containerWidth, containerHeight, mouseX-x, mouseY-y);
+            recipeBook.drawRecipeList(font, itemRenderer, containerWidth, containerHeight, mouseX-x, mouseY-y);
     }
     
     @Override
