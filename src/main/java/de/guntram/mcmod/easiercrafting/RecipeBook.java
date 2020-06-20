@@ -300,7 +300,7 @@ public class RecipeBook {
         int toRender=0;
         if (stacks.length>1)
             toRender=(int) ((System.currentTimeMillis()/333)%stacks.length);
-        itemRenderer.renderGuiItem(stacks[toRender], x, y);
+        itemRenderer.renderInGuiWithOverrides(stacks[toRender], x, y);
         itemRenderer.renderGuiItemOverlay(fontRenderer, stacks[toRender], x, y);
     }
     

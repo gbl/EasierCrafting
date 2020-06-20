@@ -45,7 +45,7 @@ public class LocalRecipeManager extends RecipeManager implements ResourceManager
         forcedZips.add(name);
     }
 
-/* 1.15.2 code 
+/* 1.15.2 code @TODO
     public static void load() {
         Map<Identifier, JsonObject> map = instance.prepare(instance, null);
         instance.apply(map, instance, null);
@@ -53,7 +53,7 @@ public class LocalRecipeManager extends RecipeManager implements ResourceManager
 */
     
     @Override
-    public Stream<ResourcePack> method_29213() {
+    public Stream<ResourcePack> streamResourcePacks() {
         return Stream.of();
     }
 

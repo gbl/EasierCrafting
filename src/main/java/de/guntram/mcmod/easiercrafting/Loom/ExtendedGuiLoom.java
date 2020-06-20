@@ -268,7 +268,7 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
             super.renderButton(stack, mouseX, mouseY, delta);
             ItemStack items = getRenderStack();
             //setBlitOffset(100);
-            itemRenderer.renderGuiItem(items, x+2, y+2);
+            itemRenderer.renderInGuiWithOverrides(items, x+2, y+2);
             //setBlitOffset(0);
         }
 
