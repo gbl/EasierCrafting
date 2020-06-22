@@ -25,6 +25,7 @@
     
     "easiercrafting.error.removepotions":   "Remove the wrong ingredient from the brewing stand first",
     "easiercrafting.loom.save":             "Save",
-    "easiercrafting.loom.banner":           "Banner"
+    "easiercrafting.loom.banner":           "Banner",
+    "easiercrafting.furnace.itemsleft":     "items left"
     
 }

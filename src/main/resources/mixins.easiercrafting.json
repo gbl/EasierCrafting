@@ -4,7 +4,7 @@
     "refmap": "EasierCrafting-refmap.json",
     "minVersion": "0.6",
     "client": [
-        "AbstractFurnaceScreenMixin", "AbstractFurnaceContainerMixin", 
+        "AbstractFurnaceScreenMixin", "AbstractFurnaceScreenHandlerMixin", 
         "BrewingRecipeRegistryExporter", "BrewingstandRefreshMixin", "BrewingStandCraftedMixin",
         "DelayedSlotClickContinue",
         "GuiCraftMixin", "GuiInventoryMixin",

@@ -19,11 +19,11 @@ import org.spongepowered.asm.mixin.Shadow;
  * @author gbl
  */
 @Mixin(AbstractFurnaceScreenHandler.class)
-public abstract class AbstractFurnaceContainerMixin extends AbstractRecipeScreenHandler implements PropertyDelegateProvider {
+public abstract class AbstractFurnaceScreenHandlerMixin extends AbstractRecipeScreenHandler implements PropertyDelegateProvider {
     
     @Shadow @Final private PropertyDelegate propertyDelegate;
     
-    public AbstractFurnaceContainerMixin(ScreenHandlerType containerType_1, int int_1) {
+    public AbstractFurnaceScreenHandlerMixin(ScreenHandlerType containerType_1, int int_1) {
         super(containerType_1, int_1);
     }
     
