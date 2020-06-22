@@ -1,0 +1,32 @@
+{
+    "easiercrafting:fire_resistance_stew":	"Fire Resistance Stew",
+    "easiercrafting:blindness_stew":	"Blindness Stew",
+    "easiercrafting:jumpboost_stew":	"Jump Boost Stew",
+    "easiercrafting:saturation_stew":	"Saturation Stew",
+    "easiercrafting:poison_stew":		"Poison Stew",
+    "easiercrafting:weakness_stew_orange":	"Weakness Stew (Orange)",
+    "easiercrafting:saturation_stew":	"Saturation Stew",
+    "easiercrafting:regeneration_stew":	"Regeneration Stew",
+    "easiercrafting:weakness_stew_pink":	"Weakness Stew (Pink)",
+    "easiercrafting:nightvision_stew":	"Night Vision Stew",
+    "easiercrafting:weakness_stew_red":	"Weakness Stew (Red)",
+    "easiercrafting:weakness_stew_white":	"Weakness Stew (White)",
+    "easiercrafting:wither_stew":		"Wither Stew",
+    
+    "easiercrafting.brewingcategory.effect":        "Effekt",
+    "easiercrafting.brewingcategory.improvement":   "Verbesserung",
+    
+    "easiercrafting.category.possible":     "Vorhandene Rezepte",
+    "easiercrafting.category.special":      "Spezielle Rezepte",
+    "easiercrafting.category.stairs":       "Treppen",
+    "easiercrafting.category.slabs":        "Stufen",
+    "easiercrafting.category.walls":        "Mauern",
+    "easiercrafting.category.blocks":       "Blöcke",
+    
+    "easiercrafting.error.removepotions":   "Erst die unpassende Zutat aus dem Braustand entfernen!",
+    "easiercrafting.loom.save":             "Speichern",
+    "easiercrafting.loom.banner":           "Banner",
+    "easiercrafting.furnace.itemsleft":     "übrig",
+    "easiercrafting.brewing.takeall":       "Nehmen"
+    
+}
