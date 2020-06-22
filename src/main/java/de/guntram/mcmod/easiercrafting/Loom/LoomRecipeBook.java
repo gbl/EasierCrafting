@@ -18,6 +18,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -34,8 +35,11 @@ import net.minecraft.util.DyeColor;
  */
 public class LoomRecipeBook extends RecipeBook {
     
+    String category;
+
     public LoomRecipeBook(HandledScreen<LoomScreenHandler> screen) {
         super(screen, 0, 0, 3, 4);
+        category = I18n.translate("easiercrafting.loom.banner");
     }
     
     @Override
@@ -44,7 +48,7 @@ public class LoomRecipeBook extends RecipeBook {
         RecipeTreeSet recipes = new RecipeTreeSet();
         recipes.addAll(LoomRecipeRegistry.getAllRecipes());
         craftableCategories = new TreeMap<>();
-        craftableCategories.put("Banners", recipes);
+        craftableCategories.put(category, recipes);
         recalcListSize();
     }
     
