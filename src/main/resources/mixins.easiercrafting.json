@@ -4,13 +4,15 @@
     "refmap": "EasierCrafting-refmap.json",
     "minVersion": "0.6",
     "client": [
+        "BrewingstandRefreshMixin",
         "HandledScreenMixin", "AbstractFurnaceScreenHandlerMixin", 
-        "BrewingRecipeRegistryExporter", "BrewingstandRefreshMixin", "BrewingStandCraftedMixin",
+        "BrewingRecipeRegistryExporter",
         "DelayedSlotClickContinue",
         "GuiCraftMixin", "GuiInventoryMixin",
         "ServerPlayNetworkHandlerMixin"
     ],
     "client-disabled": [
+        "BrewingStandCraftedMixin",
         "GuiActionConfirmDebug", 
         "ClickWindowC2SPacketDebugMixin"        
     ],

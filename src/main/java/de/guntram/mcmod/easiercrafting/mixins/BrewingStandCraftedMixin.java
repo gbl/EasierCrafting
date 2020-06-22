@@ -12,6 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BrewingStandBlockEntity.class) 
 
+// THIS IS DISABLED - it runs on the server, not the client. Only here for reference. Not referenced in mixin.json.
+
 public class BrewingStandCraftedMixin {
     @Inject(method="craft", at=@At("RETURN"))
     private void updateRecipesWhenCrafted(CallbackInfo info) {

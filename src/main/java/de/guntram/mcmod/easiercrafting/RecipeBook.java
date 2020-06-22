@@ -305,6 +305,10 @@ public class RecipeBook {
         itemRenderer.renderGuiItemOverlay(fontRenderer, stacks[toRender], x, y);
     }
     
+    public void updateRecipesIn(int ms) {
+        recipeUpdateTime = System.currentTimeMillis() + ms;
+    }
+    
     public void updateRecipes() {
         ScreenHandler inventory = screen.getScreenHandler();
         List<Recipe> recipes = new ArrayList<>();
@@ -701,7 +705,7 @@ public class RecipeBook {
 
             if (mouseButton==0) {
                 slotClick(resultSlotNo, mouseButton, SlotActionType.QUICK_MOVE);     // which is really PICKUP ALL
-                recipeUpdateTime=System.currentTimeMillis()+ConfigurationHandler.getAutoUpdateRecipeTimer()*1000;
+                updateRecipesIn(ConfigurationHandler.getAutoUpdateRecipeTimer()*1000);
             }
 //            LOGGER.info("mousebutton = "+mouseButton);
 //            LOGGER.info("hasControl = "+Screen.hasControlDown());

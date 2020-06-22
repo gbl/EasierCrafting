@@ -43,6 +43,12 @@ public class ExtendedGuiBrewingStand extends BrewingStandScreen implements SlotC
         }
     }
     
+    public void updateRecipesIn(int ms) {
+        if (recipeBook != null) {
+            recipeBook.updateRecipesIn(ms);
+        }
+    }
+    
     @Override
     protected void drawForeground(MatrixStack stack, final int mouseX, final int mouseY) {
         super.drawForeground(stack, mouseX, mouseY);
