@@ -17,9 +17,9 @@ public class RecipeTreeSet extends TreeSet<Recipe> {
                     if (sameName != 0) {
                         return sameName;
                     } else {
-                        return ((Ingredient)(a.getPreviewInputs().get(0))).getMatchingStacksClient()[0].getItem().getName().asString()
+                        return ((Ingredient)(a.getPreviewInputs().get(0))).getMatchingStacksClient()[0].getItem().getName().getString()
                         .compareToIgnoreCase(
-                               ((Ingredient)(b.getPreviewInputs().get(0))).getMatchingStacksClient()[0].getItem().getName().asString()
+                               ((Ingredient)(b.getPreviewInputs().get(0))).getMatchingStacksClient()[0].getItem().getName().getString()
                         );
                     }
                 } else if (a.getType() == BrewingRecipe.recipeType || b.getType() == BrewingRecipe.recipeType) {
@@ -27,12 +27,12 @@ public class RecipeTreeSet extends TreeSet<Recipe> {
                         return sameName;
                     }
                     if (PotionUtil.getPotion(a.getOutput()) == PotionUtil.getPotion(b.getOutput())
-                    ||  PotionUtil.getPotionEffects(a.getOutput()).size() == 0
-                    ||  PotionUtil.getPotionEffects(b.getOutput()).size() == 0
+                    ||  PotionUtil.getPotionEffects(a.getOutput()).isEmpty()
+                    ||  PotionUtil.getPotionEffects(b.getOutput()).isEmpty()
                     ) {
                         return 0;
                     }
-                    //LOGGER.info("comparing potions seems equal, name="+a.getOutput().getName().asString());
+                    //LOGGER.info("comparing potions seems equal, name="+a.getOutput().getName().getString());
                     //LOGGER.info("first potion is "+PotionUtil.getPotion(a.getOutput()).getName(""));
                     //try { LOGGER.info("First dur. "+PotionUtil.getPotionEffects(a.getOutput()).get(0).getDuration()); } catch (Exception ex) {}
                     //LOGGER.info("secnd potion is "+PotionUtil.getPotion(b.getOutput()).getName(""));

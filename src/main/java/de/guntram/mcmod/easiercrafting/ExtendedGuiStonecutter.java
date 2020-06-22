@@ -19,9 +19,6 @@ public class ExtendedGuiStonecutter extends StonecutterScreen implements SlotCli
     @Override
     protected void init() {
         super.init();
-        //if (!ConfigurationHandler.getAllowMinecraftRecipeBook()) {
-        //    this.buttons.clear();
-        //}
         this.recipeBook.afterInitGui();
     }
 

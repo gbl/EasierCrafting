@@ -1,15 +1,30 @@
 {
- "easiercrafting:fire_resistance_stew":	"Fire Resistance Stew",
- "easiercrafting:blindness_stew":	"Blindness Stew",
- "easiercrafting:jumpboost_stew":	"Jump Boost Stew",
- "easiercrafting:saturation_stew":	"Saturation Stew",
- "easiercrafting:poison_stew":		"Poison Stew",
- "easiercrafting:weakness_stew_orange":	"Weakness Stew (Orange)",
- "easiercrafting:saturation_stew":	"Saturation Stew",
- "easiercrafting:regeneration_stew":	"Regeneration Stew",
- "easiercrafting:weakness_stew_pink":	"Weakness Stew (Pink)",
- "easiercrafting:nightvision_stew":	"Night Vision Stew",
- "easiercrafting:weakness_stew_red":	"Weakness Stew (Red)",
- "easiercrafting:weakness_stew_white":	"Weakness Stew (White)",
- "easiercrafting:wither_stew":		"Wither Stew"
+    "easiercrafting:fire_resistance_stew":	"Fire Resistance Stew",
+    "easiercrafting:blindness_stew":	"Blindness Stew",
+    "easiercrafting:jumpboost_stew":	"Jump Boost Stew",
+    "easiercrafting:saturation_stew":	"Saturation Stew",
+    "easiercrafting:poison_stew":		"Poison Stew",
+    "easiercrafting:weakness_stew_orange":	"Weakness Stew (Orange)",
+    "easiercrafting:saturation_stew":	"Saturation Stew",
+    "easiercrafting:regeneration_stew":	"Regeneration Stew",
+    "easiercrafting:weakness_stew_pink":	"Weakness Stew (Pink)",
+    "easiercrafting:nightvision_stew":	"Night Vision Stew",
+    "easiercrafting:weakness_stew_red":	"Weakness Stew (Red)",
+    "easiercrafting:weakness_stew_white":	"Weakness Stew (White)",
+    "easiercrafting:wither_stew":		"Wither Stew",
+    
+    "easiercrafting.brewingcategory.effect":        "Effect",
+    "easiercrafting.brewingcategory.improvement":   "Improvement",
+    
+    "easiercrafting.category.possible":     "Possible Recipes",
+    "easiercrafting.category.special":      "Special Recipes",
+    "easiercrafting.category.stairs":       "Stairs",
+    "easiercrafting.category.slabs":        "Slabs",
+    "easiercrafting.category.walls":        "Walls",
+    "easiercrafting.category.blocks":       "Blocks",
+    
+    "easiercrafting.error.removepotions":   "Remove the wrong ingredient from the brewing stand first",
+    "easiercrafting.loom.save":             "Save",
+    "easiercrafting.loom.banner":           "Banner"
+    
 }

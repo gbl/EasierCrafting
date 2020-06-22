@@ -41,6 +41,7 @@ import net.minecraft.screen.StonecutterScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import org.apache.logging.log4j.Level;
@@ -134,7 +135,7 @@ public class RecipeBook {
         if (ConfigurationHandler.getShowGuiRight())
             tempXOffset=176 /* screen.containerWidth */  + distanceFromGui;
         if (tempItemsPerRow < 2) {
-            System.out.println("forcing tempItemsPerRow to 2 when it's "+tempItemsPerRow);
+            LOGGER.warn("forcing tempItemsPerRow to 2 when it's "+tempItemsPerRow);
             tempItemsPerRow = 2;
         }
         this.itemsPerRow=tempItemsPerRow;
@@ -221,7 +222,7 @@ public class RecipeBook {
             fontRenderer.draw(stack, displayName, 0, height+3, 0xffff00);
             if (underMouse instanceof ShapedRecipe) {
                 DefaultedList<Ingredient> ingredients = underMouse.getPreviewInputs();
-                fontRenderer.draw(stack, "sr", left-20, height, 0x202020);
+                // fontRenderer.draw(stack, "sr", left-20, height, 0x202020);
                 for (int x=0; x<((ShapedRecipe)underMouse).getWidth(); x++) {
                     for (int y=0; y<((ShapedRecipe)underMouse).getHeight(); y++) {
                         renderIngredient(itemRenderer, fontRenderer, 
@@ -229,15 +230,15 @@ public class RecipeBook {
                     }
                 }
             } else if (underMouse instanceof ShapelessRecipe) {
-                fontRenderer.draw(stack, "slr", left-20, height, 0x202020);
+                // fontRenderer.draw(stack, "slr", left-20, height, 0x202020);
                 xpos=0;
                 for (Ingredient ingredient: ((ShapelessRecipe)underMouse).getPreviewInputs()) {
                     renderIngredient(itemRenderer, fontRenderer, ingredient, itemSize*xpos, height+itemSize);
                     xpos++;
                 }
             } else if (underMouse instanceof CuttingRecipe) {
-                fontRenderer.draw(stack, "from "+((Ingredient)(underMouse.getPreviewInputs().get(0))).getMatchingStacksClient()[0].getName().asString(),
-                        0, height+itemSize, 0xffff00);
+                // fontRenderer.draw(stack, "from "+((Ingredient)(underMouse.getPreviewInputs().get(0))).getMatchingStacksClient()[0].getName().getString(),
+                //         0, height+itemSize, 0xffff00);
                 xpos=0;
                 for (Ingredient ingredient: ((CuttingRecipe)underMouse).getPreviewInputs()) {
                     renderIngredient(itemRenderer, fontRenderer, ingredient, itemSize*xpos, height+2*itemSize);
@@ -321,7 +322,7 @@ public class RecipeBook {
                 Potion potionType = PotionUtil.getPotion(stack);
                 if (!stack.isEmpty() && potionType != Potions.EMPTY) {
                     BrewingRecipe newRecipe;
-                    LOGGER.log(level, "slot "+i+" has "+stack.getCount()+" of "+stack.getItem().getName().asString() + " potion type "+potionType.finishTranslationKey(""));
+                    LOGGER.log(level, "slot "+i+" has "+stack.getCount()+" of "+stack.getItem().getName().getString() + " potion type "+potionType.finishTranslationKey(""));
                     for (BrewingRecipe br: itemRecipes) {
                         if (br.getInputPotion().getItem() == stack.getItem()) {
                             // This potion item can be converted to a different item.
@@ -368,22 +369,22 @@ public class RecipeBook {
             ItemGroup tab = item.getGroup();
             String category;
             if (!ConfigurationHandler.getCategorizeRecipes()) {
-                category="Possible Recipes";
+                category=I18n.translate("easiercrafting.category.possible");
             } else if (recipe.getGroup().startsWith(EasierCrafting.MODID+":")) {
-                category = "Special Recipes";
+                category = I18n.translate("easiercrafting.category.special");
             } else if (tab==null) {
                     category=recipe.getGroup();
             } else {
                 if (wantedRecipeType == RecipeType.STONECUTTING) {
                     Block block = Block.getBlockFromItem(item);
                     if (block instanceof StairsBlock) {
-                        category = "Stairs";
+                        category = I18n.translate("easiercrafting.category.stairs");;
                     } else if (block instanceof SlabBlock) {
-                        category = "Slabs";
+                        category = I18n.translate("easiercrafting.category.slabs");
                     } else if (block instanceof WallBlock) {
-                        category = "Walls";
+                        category = I18n.translate("easiercrafting.category.walls");
                     } else {
-                        category = "Blocks";
+                        category = I18n.translate("easiercrafting.category.blocks");
                     }
                 } else if (wantedRecipeType == BrewingRecipe.recipeType) {
                     category=((BrewingRecipe)recipe).getCategory();
@@ -396,7 +397,7 @@ public class RecipeBook {
                 catRecipes=new RecipeTreeSet();
                 craftableCategories.put(category, catRecipes);
             }
-            //System.out.println("adding "+result.getDisplayName()+" in "+category);
+            LOGGER.log(Level.DEBUG, "adding "+result.getName().getString()+" in "+category);
             catRecipes.add((Recipe)recipe);
         }
         recalcListSize();
@@ -472,13 +473,13 @@ public class RecipeBook {
             return recipe.fits(gridSize, gridSize);
         } else if (recipe instanceof CuttingRecipe) {
             ItemStack stack = recipe.getOutput();
-            LOGGER.debug("output: " + stack.getItem().getName().asString());
+            LOGGER.debug("output: " + stack.getItem().getName().getString());
             for (Ingredient ing : (List<Ingredient>) recipe.getPreviewInputs()) {
                 ItemStack[] stacks = ing.getMatchingStacksClient();
                 if (stacks.length > 1) {
-                    LOGGER.debug(stacks.length + " possible inputs for " + stack.getItem().getName().asString());
+                    LOGGER.debug(stacks.length + " possible inputs for " + stack.getItem().getName().getString());
                     for (ItemStack stack2 : stacks) {
-                        LOGGER.debug("    " + stack2.getItem().getName().asString());
+                        LOGGER.debug("    " + stack2.getItem().getName().getString());
                     }
                 }
             }
@@ -580,11 +581,11 @@ public class RecipeBook {
         }
 
 /*        LOGGER.log(level, "Check for "+(recipe.isItemRecipe() ? "Item recipe " : "Potion recipe ")+
-                PotionUtil.getPotion(recipe.getOutput()).getName(recipe.getOutput().getItem().getName().asString()+" ")+
+                PotionUtil.getPotion(recipe.getOutput()).getName(recipe.getOutput().getItem().getName().getString()+" ")+
                 " from "+
-                PotionUtil.getPotion(inputPotionStack).getName(inputPotionStack.getItem().getName().asString()+" ")+
+                PotionUtil.getPotion(inputPotionStack).getName(inputPotionStack.getItem().getName().getString()+" ")+
                 " and "+
-                ingredient.getName().asString()); */
+                ingredient.getName().getString()); */
         // check if the brewing stand has a usable input potion
         for (int i=0; i<3; i++) {
             ItemStack inventoryItemStack = inventory.getSlot(i+firstCraftSlot).getStack();
@@ -695,7 +696,7 @@ public class RecipeBook {
                 }
             }
 
-//            LOGGER.info("Item in result slot is "+screen.getContainer().getSlot(resultSlotNo).getStack().getItem().getName().asString());
+//            LOGGER.info("Item in result slot is "+screen.getContainer().getSlot(resultSlotNo).getStack().getItem().getName().getString());
 
 
             if (mouseButton==0) {
@@ -826,7 +827,9 @@ public class RecipeBook {
                 }
             }
         } else if (ingredientStack.getItem() != recipe.getIngredient().getItem()) {
-            MinecraftClient.getInstance().inGameHud.setOverlayMessage(new LiteralText("Remove the wrong ingredient from the brewing stand first"), true);
+            MinecraftClient.getInstance().inGameHud.setOverlayMessage(
+                    new TranslatableText("easiercrafting.error.removepotions"), true
+            );
             return;
         }
         for (int potionSlot=0; potionSlot<3; potionSlot++) {

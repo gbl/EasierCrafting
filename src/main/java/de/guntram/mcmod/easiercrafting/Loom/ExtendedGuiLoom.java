@@ -26,6 +26,7 @@ import net.minecraft.screen.LoomScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.DyeColor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,7 +56,8 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
     protected void init() {
         super.init();
         saveName = new TextFieldWidget(this.textRenderer, 0, -25, this.backgroundWidth-25, 20, new LiteralText("Save input pattern as..."));
-        saveButton = new ButtonWidget(this.backgroundWidth-20, -25, 20, 20, new LiteralText("Save"), (button)->{this.saveButtonPressed();});
+        saveButton = new ButtonWidget(this.backgroundWidth-20, -25, 20, 20,
+                new TranslatableText("easiercrafting.loom.save"), (button)->{this.saveButtonPressed();});
         if (savedColorCode == null) {
             savedColorCode = new int[BUTTONCOUNT];
             for (int i=0; i<savedColorCode.length; i++) {
@@ -162,7 +164,7 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
     }
 
     private void saveButtonPressed() {
-        System.out.println("save");
+        LOGGER.debug("save");
         String loomRecipeName = saveName.getText();
         if (loomRecipeName.isEmpty()) {
             return;

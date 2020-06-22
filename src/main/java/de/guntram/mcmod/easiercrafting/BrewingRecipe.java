@@ -1,5 +1,6 @@
 package de.guntram.mcmod.easiercrafting;
 
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionUtil;
@@ -76,7 +77,7 @@ public class BrewingRecipe<C extends Inventory> implements Recipe<C> {
     }
 
     public String getCategory() {
-        return isPotionRecipe ? "Effect" : "Improvement";
+        return I18n.translate(isPotionRecipe ? "easiercrafting.brewingcategory.effect" : "easiercrafting.brewingcategory.improvement");
     }
 
     public boolean isPotionRecipe() {
