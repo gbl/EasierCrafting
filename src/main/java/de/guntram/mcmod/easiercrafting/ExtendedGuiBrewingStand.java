@@ -1,11 +1,13 @@
 package de.guntram.mcmod.easiercrafting;
 
 import net.minecraft.client.gui.screen.ingame.BrewingStandScreen;
+import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.BrewingStandScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.lwjgl.glfw.GLFW;
 
 public class ExtendedGuiBrewingStand extends BrewingStandScreen implements SlotClickAccepter {
@@ -19,6 +21,15 @@ public class ExtendedGuiBrewingStand extends BrewingStandScreen implements SlotC
     @Override
     protected void init() {
         super.init();
+        this.addButton(new AbstractButtonWidget(x+130, y+50, 40, 20, new TranslatableText("easiercrafting.brewing.takeall")) {
+            @Override
+            public void onClick(double x, double y) {
+                // for some reason, this order seems to work better than 0 1 2
+                slotClick(1, 0, SlotActionType.QUICK_MOVE);
+                slotClick(2, 0, SlotActionType.QUICK_MOVE);
+                slotClick(0, 0, SlotActionType.QUICK_MOVE);
+            }
+        });
         this.recipeBook.afterInitGui();
     }
 
