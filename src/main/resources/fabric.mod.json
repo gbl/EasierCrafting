@@ -8,7 +8,11 @@
         "modmenu": [ "de.guntram.mcmod.easiercrafting.MMConfigurationHandler" ]
     },
     "custom": {
-        "modmenu:clientsideOnly": true
+        "modmenu:clientsideOnly": true,
+        "modupdater": {
+            "strategy": "json",
+            "url": "https://raw.githubusercontent.com/gbl/ModVersionInfo/master/EasierCrafting.json"
+        }
     },
     "mixins": [
       	"mixins.easiercrafting.json"
@@ -17,11 +21,12 @@
       "fabric": "*"
     },
     "recommends": {
-      "modmenu" : "*"
+      "modmenu" : "*",
+      "modupdater": ">=1.1.7"        
     },
     "name": "EasierCrafting",
     "description": "One-click Crafting",
-    "icon": "pack.png",
+    "icon": "icon.png",
     "authors": [ "Giselbaer" ],
     "contact": {
         "homepage": "https://www.curseforge.com/minecraft/mc-mods/easiercrafting",
