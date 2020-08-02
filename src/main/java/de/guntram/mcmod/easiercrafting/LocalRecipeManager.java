@@ -5,6 +5,7 @@
  */
 package de.guntram.mcmod.easiercrafting;
 
+import com.google.gson.JsonElement;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +15,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -45,12 +47,10 @@ public class LocalRecipeManager extends RecipeManager implements ResourceManager
         forcedZips.add(name);
     }
 
-/* 1.15.2 code @TODO
     public static void load() {
-        Map<Identifier, JsonObject> map = instance.prepare(instance, null);
+        Map<Identifier, JsonElement> map = instance.prepare(instance, null);
         instance.apply(map, instance, null);
     }
-*/
     
     @Override
     public Stream<ResourcePack> streamResourcePacks() {
@@ -94,11 +94,6 @@ public class LocalRecipeManager extends RecipeManager implements ResourceManager
         return result;
     }
     
-    @Override
-    public Collection<Identifier> findResources(Identifier resourceType, Predicate<String> pathPredicate) {
-        return findResources("", pathPredicate);
-    }
-
     @Override
     public Collection<Identifier> findResources(String resourceType, Predicate<String> pathPredicate) {
         final Set<Identifier> result = new HashSet<>();

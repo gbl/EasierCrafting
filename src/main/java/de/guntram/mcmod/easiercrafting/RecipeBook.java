@@ -249,7 +249,7 @@ public class RecipeBook {
                 for (Object i: ((BrewingRecipe)underMouse).getPreviewInputs()) {
                     Ingredient ingredient = (Ingredient) i;
                     renderIngredient(itemRenderer, fontRenderer, ingredient, 0, height+ypos*itemSize);
-                    fontRenderer.draw(stack, ingredient.getMatchingStacksClient()[0].getName(), itemSize, height+5+ypos*itemSize, 0xffff00);
+                    fontRenderer.draw(stack, ingredient.getMatchingStacksClient()[0].getName().method_30937(), itemSize, height+5+ypos*itemSize, 0xffff00);
                     ypos++;
                 }
             }
@@ -393,7 +393,7 @@ public class RecipeBook {
                 } else if (wantedRecipeType == BrewingRecipe.recipeType) {
                     category=((BrewingRecipe)recipe).getCategory();
                 } else {
-                    category=I18n.translate(tab.getTranslationKey(), new Object[0]);
+                    category=I18n.translate(tab.getTranslationKey().getString(), new Object[0]);
                 }
             }
             RecipeTreeSet catRecipes=craftableCategories.get(category);
