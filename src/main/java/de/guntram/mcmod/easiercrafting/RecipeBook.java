@@ -249,7 +249,7 @@ public class RecipeBook {
                 for (Object i: ((BrewingRecipe)underMouse).getPreviewInputs()) {
                     Ingredient ingredient = (Ingredient) i;
                     renderIngredient(itemRenderer, fontRenderer, ingredient, 0, height+ypos*itemSize);
-                    fontRenderer.draw(stack, ingredient.getMatchingStacksClient()[0].getName().method_30937(), itemSize, height+5+ypos*itemSize, 0xffff00);
+                    fontRenderer.draw(stack, ingredient.getMatchingStacksClient()[0].getName().asOrderedText(), itemSize, height+5+ypos*itemSize, 0xffff00);
                     ypos++;
                 }
             }
