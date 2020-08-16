@@ -42,13 +42,22 @@ public class ConfigurationHandler implements ModConfigurationHandler {
     }
     
     private void loadConfig() {
-        autoUpdateRecipeTimer=config.getInt("Auto update recipe timer", Configuration.CATEGORY_CLIENT, 5, 0, 30, "Update recipe list after this many seconds after last click");
-        autoFocusSearch=config.getBoolean("Auto focus search text", Configuration.CATEGORY_CLIENT, false, "Automatically focus the search box when opening craft GUI");
-        allowRecipeBook=config.getBoolean("Allow MC internal recipe book", Configuration.CATEGORY_CLIENT, true, "Allow opening the MC internal recipe book (since 1.12)");
-        showGuiRight=config.getBoolean("Show GUI right of inventory", Configuration.CATEGORY_CLIENT, true, "Show the GUI right of the inventory, where it could conflict with Just Enough Items, instead of left, where it conflicts with active buffs");
-        allowGeneratedRecipes=config.getBoolean("Allow special recipes", Configuration.CATEGORY_CLIENT, true, "Add Shulker box coloring, tipped arrows, fireworks, repairs to the craftable list");
-        maxEnchantsAllowedForRepair=config.getInt("Max. enchants", Configuration.CATEGORY_CLIENT, 0, 0, 10, "Don't consider items for workbench repair if they have more than this number of enchants");
-        categorizeRecipes=config.getBoolean("Categorize recipes", Configuration.CATEGORY_CLIENT, true, "Categorize recipes by their creative mode tab");
+        
+        config.migrate("Auto update recipe timer", "easiercrafting.config.autoupdate");
+        config.migrate("Auto focus search text", "easiercrafting.config.autofocus");
+        config.migrate("Allow MC internal recipe book", "easiercrafting.config.allowinternalbutton");
+        config.migrate("Show GUI right of inventory", "easiercrafting.config.guiright");
+        config.migrate("Allow special recipes", "easiercrafting.config.specialrecipes");
+        config.migrate("Max. enchants", "easiercrafting.config.maxenchants");
+        config.migrate("Categorize recipes", "easiercrafting.config.categorize");
+        
+        autoUpdateRecipeTimer=config.getInt("easiercrafting.config.autoupdate", Configuration.CATEGORY_CLIENT, 5, 0, 30, "easiercrafting.config.tt.autoupdate");
+        autoFocusSearch=config.getBoolean("easiercrafting.config.autofocus", Configuration.CATEGORY_CLIENT, false, "easiercrafting.config.tt.autofocus");
+        allowRecipeBook=config.getBoolean("easiercrafting.config.allowinternalbutton", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.allowinternalbutton");
+        showGuiRight=config.getBoolean("easiercrafting.config.guiright", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.guiright");
+        allowGeneratedRecipes=config.getBoolean("easiercrafting.config.specialrecipes", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.specialrecipes");
+        maxEnchantsAllowedForRepair=config.getInt("easiercrafting.config.maxenchants", Configuration.CATEGORY_CLIENT, 0, 0, 10, "easiercrafting.config.tt.maxenchants");
+        categorizeRecipes=config.getBoolean("easiercrafting.config.categorize", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.categorize");
         
         if (config.hasChanged())
             config.save();
