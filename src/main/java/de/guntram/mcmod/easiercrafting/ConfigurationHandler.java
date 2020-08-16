@@ -19,6 +19,7 @@ public class ConfigurationHandler implements ModConfigurationHandler {
     private boolean allowGeneratedRecipes;
     private int maxEnchantsAllowedForRepair;
     private boolean categorizeRecipes;
+    private boolean hideWhenReiShown;
 
     public static ConfigurationHandler getInstance() {
         if (instance==null)
@@ -58,6 +59,7 @@ public class ConfigurationHandler implements ModConfigurationHandler {
         allowGeneratedRecipes=config.getBoolean("easiercrafting.config.specialrecipes", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.specialrecipes");
         maxEnchantsAllowedForRepair=config.getInt("easiercrafting.config.maxenchants", Configuration.CATEGORY_CLIENT, 0, 0, 10, "easiercrafting.config.tt.maxenchants");
         categorizeRecipes=config.getBoolean("easiercrafting.config.categorize", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.categorize");
+        hideWhenReiShown=config.getBoolean("easiercrafting.config.hidewithrei", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.hidewithrei");
         
         if (config.hasChanged())
             config.save();
@@ -98,5 +100,9 @@ public class ConfigurationHandler implements ModConfigurationHandler {
     
     public static boolean getCategorizeRecipes() {
         return getInstance().categorizeRecipes;
+    }
+
+    public static boolean hideWhenReiShown() {
+        return getInstance().hideWhenReiShown;
     }
 }
