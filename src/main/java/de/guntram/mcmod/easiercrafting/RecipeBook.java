@@ -161,13 +161,15 @@ public class RecipeBook {
                 pattern.changeFocus(true);
             }
         }
-        
-        try {
-            if (ConfigObject.getInstance().isOverlayVisible()) {
-                return;
+
+        if (ConfigurationHandler.hideWhenReiShown()) {
+            try {
+                if (ConfigObject.getInstance().isOverlayVisible()) {
+                    return;
+                }
+            } catch (NoClassDefFoundError ex) {
+                ;
             }
-        } catch (NoClassDefFoundError ex) {
-            ;
         }
 
         boolean underMouseIsCraftable=true;

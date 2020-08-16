@@ -31,11 +31,13 @@
     "easiercrafting.config.specialrecipes": "Spezielle Rezepte erlauben",
     "easiercrafting.config.maxenchants": "Max. Verzauberungen",
     "easiercrafting.config.categorize": "Rezepte kategorisieren",
+    "easiercrafting.config.hidewithrei": "GUI ausblenden wenn REI angezeigt wird",
     "easiercrafting.config.tt.autoupdate": "Rezeptliste nach dieser Zeit nach dem letzten Klick aktualisieren",
     "easiercrafting.config.tt.autofocus": "Automatisches Fokussieren des Suchfeldes beim Öffnen der Craft-GUI",
     "easiercrafting.config.tt.allowinternalbutton": "Erlaube das Öffnen des MC-internen Rezeptbuchs (seit 1.12)",
     "easiercrafting.config.tt.guiright": "Zeigt die GUI rechts des Inventars, wo sie mit Just Enough Items kollidieren könnte, statt links, wo sie mit aktiven Buffs kollidiert",
     "easiercrafting.config.tt.specialrecipes": "Füge Shulkerbox-Färbung, getränkte Pfeile, Feuerwerk, Reparaturen zu der Handwerksliste hinzu",
     "easiercrafting.config.tt.maxenchants": "Gegenstände, die mehr als so viele Verzauberungen haben, nicht bei Reparaturen berücksichtigen",
-    "easiercrafting.config.tt.categorize": "Rezepte nach Kreativmodus-Tab kategorisieren"
+    "easiercrafting.config.tt.categorize": "Rezepte nach Kreativmodus-Tab kategorisieren",
+    "easiercrafting.config.tt.hidewithrei": "Wenn REI installiert ist, wird EasierCrafting nur angezeigt, wenn REI ausgeschaltet ist (Standard STRG-O)"
 }
