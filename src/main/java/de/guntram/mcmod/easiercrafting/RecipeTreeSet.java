@@ -39,6 +39,12 @@ public class RecipeTreeSet extends TreeSet<Recipe> {
                     //try { LOGGER.info("Secnd dur. "+PotionUtil.getPotionEffects(b.getOutput()).get(0).getDuration()); } catch (Exception ex) {}
 
                     return PotionUtil.getPotionEffects(a.getOutput()).get(0).getDuration() - PotionUtil.getPotionEffects(b.getOutput()).get(0).getDuration();
+                } else if (a.getType() == RecipeType.CRAFTING && b.getType() == RecipeType.CRAFTING) {
+                    if (sameName != 0) {
+                        return sameName;
+                    } else {
+                        return a.getId().compareTo(b.getId());
+                    }
                 } else {
                     return sameName;
                 }
