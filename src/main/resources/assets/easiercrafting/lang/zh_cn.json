@@ -16,7 +16,7 @@
     "easiercrafting.brewingcategory.effect":        "效果",
     "easiercrafting.brewingcategory.improvement":   "提升",
     
-    "easiercrafting.category.possible":     "可行配方",
+    "easiercrafting.category.possible":     "可用配方",
     "easiercrafting.category.special":      "特殊配方",
     "easiercrafting.category.stairs":       "楼梯",
     "easiercrafting.category.slabs":        "台阶",
@@ -27,7 +27,7 @@
     "easiercrafting.loom.save":             "保存",
     "easiercrafting.loom.banner":           "旗帜",
     "easiercrafting.furnace.itemsleft":     "剩余物品",
-    "easiercrafting.brewing.takeall":       "取出",
+    "easiercrafting.brewing.takeall":       "取出药水",
     
     "easiercrafting.config.autoupdate":     "自动更新配方的计时器", 
     "easiercrafting.config.autofocus":      "自动将焦点设于搜索栏", 
