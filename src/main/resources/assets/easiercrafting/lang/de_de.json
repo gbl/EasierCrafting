@@ -31,7 +31,7 @@
     "easiercrafting.config.specialrecipes": "Spezielle Rezepte erlauben",
     "easiercrafting.config.maxenchants": "Max. Verzauberungen",
     "easiercrafting.config.categorize": "Rezepte kategorisieren",
-    "easiercrafting.config.hidewithrei": "GUI ausblenden wenn REI angezeigt wird",
+    "easiercrafting.config.hidewithrei": "GUI ausblenden, wenn REI angezeigt wird",
     "easiercrafting.config.tt.autoupdate": "Rezeptliste nach dieser Zeit nach dem letzten Klick aktualisieren",
     "easiercrafting.config.tt.autofocus": "Automatisches Fokussieren des Suchfeldes beim Öffnen der Craft-GUI",
     "easiercrafting.config.tt.allowinternalbutton": "Erlaube das Öffnen des MC-internen Rezeptbuchs (seit 1.12)",
