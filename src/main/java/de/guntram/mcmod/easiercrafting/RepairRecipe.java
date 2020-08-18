@@ -62,7 +62,7 @@ public class RepairRecipe<C  extends Inventory> implements Recipe<C> {
 
     @Override
     public Identifier getId() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new Identifier(EasierCrafting.MODID, item.getTranslationKey());
     }
 
     @Override
