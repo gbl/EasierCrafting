@@ -44,6 +44,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.MathHelper;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -180,6 +181,7 @@ public class RecipeBook {
 
         int xpos, ypos=0;
         int neededHeight=patternListSize+listSize;
+        neededHeight += itemSize;       // search box
         
         if (neededHeight>height) {
             ypos-=(neededHeight-height)/2;
@@ -644,9 +646,11 @@ public class RecipeBook {
     }
     
     public void scrollBy(int ticks) {
-        int old=mouseScroll;
-        if (ticks<=-100 && mouseScroll*itemSize < listSize+patternListSize)      mouseScroll++;
-        if (ticks>= 100 && mouseScroll>0)                                        mouseScroll--;
+        System.out.println("Scrolling by "+ticks);
+        int maxScrollPos = ((listSize + patternListSize - screen.height + itemSize) / itemSize);
+        // Add 2 to maxScrollPos for search bar, arrows, and one for safety
+        maxScrollPos += 3;
+        mouseScroll=MathHelper.clamp(mouseScroll-ticks, 0, maxScrollPos);
     }
 
     public void mouseClicked(int mouseX, int mouseY, int mouseButton, int guiLeft, int guiTop) {
@@ -654,13 +658,11 @@ public class RecipeBook {
             pattern.mouseClicked(mouseX-guiLeft, mouseY-guiTop, mouseButton);
         }
 
-        // mouseXY are screen coords here!
-        //System.out.println("mouseY="+mouseY+", guiTop="+guiTop+", mouseX="+mouseX+", xOffset+guiLeft="+(xOffset+container.guiLeft()));
         if (mouseY>0 && mouseY<20 && mouseX>xOffset+containerLeft && mouseX<xOffset+containerLeft+textBoxSize) {
             if (mouseX<xOffset+containerLeft+20)
-                scrollBy(-100);
+                scrollBy(-1);
             else if (mouseX>xOffset+containerLeft+textBoxSize-20)
-                scrollBy(100);
+                scrollBy(1);
             return;
         }
         
