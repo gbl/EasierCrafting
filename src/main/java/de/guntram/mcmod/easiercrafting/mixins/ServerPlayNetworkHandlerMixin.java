@@ -1,6 +1,6 @@
 package de.guntram.mcmod.easiercrafting.mixins;
 
-import net.minecraft.network.packet.c2s.play.ClickWindowC2SPacket;
+import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -15,10 +15,10 @@ public class ServerPlayNetworkHandlerMixin {
 
     @Shadow public ServerPlayerEntity player;
     
-    @Inject(method="onClickWindow", at=@At("RETURN"))
-    private void clickWindowSendsCraftResult(ClickWindowC2SPacket packet, CallbackInfo ci) {
+    @Inject(method="onClickSlot", at=@At("RETURN"))
+    private void clickWindowSendsCraftResult(ClickSlotC2SPacket packet, CallbackInfo ci) {
         if (packet.getSlot() == 0 && packet.getActionType() == SlotActionType.QUICK_MOVE) {
-            this.player.openHandledScreen(this.player.currentScreenHandler);
+            this.player.refreshScreenHandler(this.player.currentScreenHandler);
         }
     }
 }

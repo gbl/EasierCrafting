@@ -1,5 +1,6 @@
 package de.guntram.mcmod.easiercrafting;
 
+import de.guntram.mcmod.crowdintranslate.CrowdinTranslate;
 import de.guntram.mcmod.easiercrafting.Loom.LoomRecipeRegistry;
 import de.guntram.mcmod.fabrictools.ConfigurationProvider;
 import java.io.File;
@@ -22,6 +23,7 @@ public class EasierCrafting implements ClientModInitializer
 
     @Override
     public void onInitializeClient() {
+        CrowdinTranslate.downloadTranslations(MODID);        
         ConfigurationHandler confHandler = ConfigurationHandler.getInstance();
         ConfigurationProvider.register("EasierCrafting", confHandler);
         confHandler.load(ConfigurationProvider.getSuggestedFile(MODID));
