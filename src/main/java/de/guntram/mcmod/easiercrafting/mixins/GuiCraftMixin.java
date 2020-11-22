@@ -31,20 +31,20 @@ public class GuiCraftMixin {
         ScreenHandler handler;
         HandledScreen screen;
         if (type == ScreenHandlerType.CRAFTING) {
-            handler = ScreenHandlerType.CRAFTING.create(any, client.player.inventory);
-            screen = new ExtendedGuiCrafting((CraftingScreenHandler) handler, client.player.inventory, component);
+            handler = ScreenHandlerType.CRAFTING.create(any, client.player.getInventory());
+            screen = new ExtendedGuiCrafting((CraftingScreenHandler) handler, client.player.getInventory(), component);
             ((ExtendedGuiCrafting)screen).setRecipeBook(new RecipeBook(screen, 1, 3, 0, 10));
         } else if (type == ScreenHandlerType.STONECUTTER) {
-            handler = ScreenHandlerType.STONECUTTER.create(any, client.player.inventory);
-            screen = new ExtendedGuiStonecutter((StonecutterScreenHandler) handler, client.player.inventory, component);
+            handler = ScreenHandlerType.STONECUTTER.create(any, client.player.getInventory());
+            screen = new ExtendedGuiStonecutter((StonecutterScreenHandler) handler, client.player.getInventory(), component);
             ((ExtendedGuiStonecutter)screen).setRecipeBook(new RecipeBook(screen, 0, 1, 1, 2));
         } else if (type == ScreenHandlerType.BREWING_STAND) {
-            handler=ScreenHandlerType.BREWING_STAND.create(any, client.player.inventory);
-            screen = new ExtendedGuiBrewingStand((BrewingStandScreenHandler) handler, client.player.inventory, component);
+            handler=ScreenHandlerType.BREWING_STAND.create(any, client.player.getInventory());
+            screen = new ExtendedGuiBrewingStand((BrewingStandScreenHandler) handler, client.player.getInventory(), component);
             ((ExtendedGuiBrewingStand)screen).setRecipeBook(new RecipeBook(screen, 0, 0, 0, 5));
         } else if (type == ScreenHandlerType.LOOM) {
-            handler=ScreenHandlerType.LOOM.create(any, client.player.inventory);
-            screen = new ExtendedGuiLoom((LoomScreenHandler) handler, client.player.inventory, component);
+            handler=ScreenHandlerType.LOOM.create(any, client.player.getInventory());
+            screen = new ExtendedGuiLoom((LoomScreenHandler) handler, client.player.getInventory(), component);
             ((ExtendedGuiLoom)screen).setRecipeBook(new LoomRecipeBook(screen));
         } else {
             return;
