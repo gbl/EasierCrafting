@@ -32,6 +32,7 @@
     "easiercrafting.config.maxenchants": "最高魔咒数",
     "easiercrafting.config.categorize": "配方分类",
     "easiercrafting.config.hidewithrei": "在 REI 模组显示时隐藏 GUI",
+    "easiercrafting.config.hidebrewingstandbutton": "Hide 'Take' button in brewing stand",
     "easiercrafting.config.tt.autoupdate": "在最后一次点击的多少秒后更新配方列表",
     "easiercrafting.config.tt.autofocus": "在打开合成界面时自动聚焦于配方搜索栏",
     "easiercrafting.config.tt.allowinternalbutton": "允许打开自 1.12 以来加入的原版配方书",
@@ -39,5 +40,6 @@
     "easiercrafting.config.tt.specialrecipes": "在配方列表中加入潜影盒染色、药箭、烟花火箭和物品修复的配方",
     "easiercrafting.config.tt.maxenchants": "如果物品拥有超过该数量的魔咒, 则不显示其用工作台修复的配方",
     "easiercrafting.config.tt.categorize": "用创造模式背包的标签分类配方",
-    "easiercrafting.config.tt.hidewithrei": "如果你安装了 REI, 则 EasierCrafting 将仅在 REI 界面关闭时显示 §7(默认快捷键 CTRL-O)"
+    "easiercrafting.config.tt.hidewithrei": "如果你安装了 REI, 则 EasierCrafting 将仅在 REI 界面关闭时显示 §7(默认快捷键 CTRL-O)",
+    "easiercrafting.config.tt.hidebrewingstandbutton": "Hide the TAKE button that conflicts with some resource packs"
 }

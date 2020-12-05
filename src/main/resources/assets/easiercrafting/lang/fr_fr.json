@@ -32,6 +32,7 @@
     "easiercrafting.config.maxenchants": "Max. enchantements",
     "easiercrafting.config.categorize": "Catégoriser les recettes",
     "easiercrafting.config.hidewithrei": "Cacher l'interface lorsque la REI est affichée",
+    "easiercrafting.config.hidebrewingstandbutton": "Hide 'Take' button in brewing stand",
     "easiercrafting.config.tt.autoupdate": "Mettre à jour la liste des recettes après ce nombre de secondes après le dernier clic",
     "easiercrafting.config.tt.autofocus": "Activer automatiquement la zone de recherche lors de l'ouverture de l'interface de fabrication",
     "easiercrafting.config.tt.allowinternalbutton": "Autoriser l'ouverture du livre de recettes interne MC (depuis 1.12)",
@@ -39,5 +40,6 @@
     "easiercrafting.config.tt.specialrecipes": "Ajoutez la couleur de la boîte de Shulker, les flèches pointues, les feux d'artifice, les réparations à la liste des objets fabriqués",
     "easiercrafting.config.tt.maxenchants": "Ne pas considérer les objets pour la réparation de l'établi s'ils ont plus que ce nombre d'enchantements",
     "easiercrafting.config.tt.categorize": "Catégoriser les recettes par leur onglet mode créatif",
-    "easiercrafting.config.tt.hidewithrei": "Si vous avez des REI, l'artisanat facile ne s'affichera que lorsque le REI est désactivé (par défaut CTRL-O)"
+    "easiercrafting.config.tt.hidewithrei": "Si vous avez des REI, l'artisanat facile ne s'affichera que lorsque le REI est désactivé (par défaut CTRL-O)",
+    "easiercrafting.config.tt.hidebrewingstandbutton": "Hide the TAKE button that conflicts with some resource packs"
 }
