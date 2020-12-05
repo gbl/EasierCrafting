@@ -37,6 +37,7 @@
     "easiercrafting.config.maxenchants":    "Max. enchants", 
     "easiercrafting.config.categorize":     "Categorize recipes",
     "easiercrafting.config.hidewithrei":    "Hide GUI when REI is shown",
+    "easiercrafting.config.hidebrewingstandbutton": "Hide 'Take' button in brewing stand",
     
     "easiercrafting.config.tt.autoupdate":          "Update recipe list after this many seconds after last click",
     "easiercrafting.config.tt.autofocus":           "Automatically focus the search box when opening craft GUI",
@@ -45,5 +46,6 @@
     "easiercrafting.config.tt.specialrecipes":      "Add Shulker box coloring, tipped arrows, fireworks, repairs to the craftable list",
     "easiercrafting.config.tt.maxenchants":         "Don't consider items for workbench repair if they have more than this number of enchants",
     "easiercrafting.config.tt.categorize":          "Categorize recipes by their creative mode tab",
-    "easiercrafting.config.tt.hidewithrei":         "If you have REI, EasierCrafting will only show when REI is turned off (default CTRL-O)"
+    "easiercrafting.config.tt.hidewithrei":         "If you have REI, EasierCrafting will only show when REI is turned off (default CTRL-O)",
+    "easiercrafting.config.tt.hidebrewingstandbutton":  "Hide the TAKE button that conflicts with some resource packs"
 }

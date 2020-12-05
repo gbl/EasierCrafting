@@ -32,6 +32,7 @@
     "easiercrafting.config.maxenchants": "最大附魔",
     "easiercrafting.config.categorize": "配方分類",
     "easiercrafting.config.hidewithrei": "當REI顯示時關閉視窗",
+    "easiercrafting.config.hidebrewingstandbutton": "Hide 'Take' button in brewing stand",
     "easiercrafting.config.tt.autoupdate": "在最後一次點擊的多少秒後更新配方列表",
     "easiercrafting.config.tt.autofocus": "打開GUI時自動關注搜索框",
     "easiercrafting.config.tt.allowinternalbutton": "允許打開自 1.12 以來加入的原版配方",
@@ -39,5 +40,6 @@
     "easiercrafting.config.tt.specialrecipes": "\n將界伏盒染色、藥水箭、煙花火箭和物品修復添加到配方中",
     "easiercrafting.config.tt.maxenchants": "如果物品擁有超過數量的附魔, 則不顯示配方",
     "easiercrafting.config.tt.categorize": "用創造模式背包的標籤分類配方",
-    "easiercrafting.config.tt.hidewithrei": "如果你安裝了 REI, 則本程式將僅在 REI 界面關閉時顯示(默認快捷鍵 CTRL-O)"
+    "easiercrafting.config.tt.hidewithrei": "如果你安裝了 REI, 則本程式將僅在 REI 界面關閉時顯示(默認快捷鍵 CTRL-O)",
+    "easiercrafting.config.tt.hidebrewingstandbutton": "Hide the TAKE button that conflicts with some resource packs"
 }

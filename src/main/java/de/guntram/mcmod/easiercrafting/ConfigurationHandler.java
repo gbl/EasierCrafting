@@ -20,6 +20,7 @@ public class ConfigurationHandler implements ModConfigurationHandler {
     private int maxEnchantsAllowedForRepair;
     private boolean categorizeRecipes;
     private boolean hideWhenReiShown;
+    private boolean hideBrewingStandTakeButton;
 
     public static ConfigurationHandler getInstance() {
         if (instance==null)
@@ -60,6 +61,7 @@ public class ConfigurationHandler implements ModConfigurationHandler {
         maxEnchantsAllowedForRepair=config.getInt("easiercrafting.config.maxenchants", Configuration.CATEGORY_CLIENT, 0, 0, 10, "easiercrafting.config.tt.maxenchants");
         categorizeRecipes=config.getBoolean("easiercrafting.config.categorize", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.categorize");
         hideWhenReiShown=config.getBoolean("easiercrafting.config.hidewithrei", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.hidewithrei");
+        hideBrewingStandTakeButton=config.getBoolean("easiercrafting.config.hidebrewingstandbutton", Configuration.CATEGORY_CLIENT, false, "easiercrafting.config.tt.hidebrewingstandbutton");
         
         if (config.hasChanged())
             config.save();
@@ -104,5 +106,9 @@ public class ConfigurationHandler implements ModConfigurationHandler {
 
     public static boolean hideWhenReiShown() {
         return getInstance().hideWhenReiShown;
+    }
+
+    public static boolean hideBrewingStandTakeButton() {
+        return getInstance().hideBrewingStandTakeButton;
     }
 }
