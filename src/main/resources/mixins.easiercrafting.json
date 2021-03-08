@@ -8,13 +8,13 @@
         "HandledScreenMixin", "AbstractFurnaceScreenHandlerMixin", 
         "BrewingRecipeRegistryExporter",
         "DelayedSlotClickContinue",
-        "GuiCraftMixin", "GuiInventoryMixin",
-        "ServerPlayNetworkHandlerMixin"
+        "GuiCraftMixin", "GuiInventoryMixin"
     ],
     "client-disabled": [
-        "BrewingStandCraftedMixin",
-        "GuiActionConfirmDebug", 
-        "ClickWindowC2SPacketDebugMixin"        
+        "ServerPlayNetworkHandlerMixin",
+        "GuiActionConfirmDebug",
+        "ClickWindowC2SPacketDebugMixin",
+        "BrewingStandCraftedMixin"
     ],
     "injectors": {
         "defaultRequire": 1

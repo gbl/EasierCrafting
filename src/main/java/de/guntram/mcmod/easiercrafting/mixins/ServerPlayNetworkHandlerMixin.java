@@ -10,6 +10,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/*
+ * Version 1.6.7:
+ * This is probably not needed any more with the new useInventoryRefreshHack
+ * functionality, but left in for reference if we need it again. Not referenced
+ * in the mixins json file.
+ */
 @Mixin(ServerPlayNetworkHandler.class)
 public class ServerPlayNetworkHandlerMixin {
 
