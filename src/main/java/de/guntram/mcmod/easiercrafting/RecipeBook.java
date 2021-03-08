@@ -26,6 +26,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
@@ -709,6 +710,9 @@ public class RecipeBook {
 
             if (mouseButton==0) {
                 slotClick(resultSlotNo, mouseButton, SlotActionType.QUICK_MOVE);     // which is really PICKUP ALL
+                if (ConfigurationHandler.useInventoryRefreshHack()) {
+                    fakeWrongSlotClickToMakeServerSendInventory();
+                }
                 updateRecipesIn(ConfigurationHandler.getAutoUpdateRecipeTimer()*1000);
             }
 //            LOGGER.info("mousebutton = "+mouseButton);
@@ -967,5 +971,20 @@ public class RecipeBook {
     
     public void slotClick(int slot, int mouseButton, SlotActionType clickType) {
         ((SlotClickAccepter)screen).slotClick(slot, mouseButton, clickType);
+    }
+    
+    /*
+     * This is an evil hack to make the server send the inventory to us. We 
+     * deliberately send a click that, hopefully, CAN'T be correct, so the 
+     * server will send the inventory. Doing this after the final QUICK_MOVE
+     * packet that executes the craft should update our inventory allright.
+     */
+    private void fakeWrongSlotClickToMakeServerSendInventory() {
+        short s = player.currentScreenHandler.getNextActionId(player.inventory);
+        int syncId = screen.getScreenHandler().syncId;
+        ItemStack fakeStack = new ItemStack(Items.BEDROCK);         // some item the player "shouldn't" have in their inventory, much less use it to craft
+        MinecraftClient.getInstance().getNetworkHandler().sendPacket(
+                new ClickSlotC2SPacket(syncId, 0, 0, SlotActionType.QUICK_MOVE, fakeStack, s)
+        );
     }
 }

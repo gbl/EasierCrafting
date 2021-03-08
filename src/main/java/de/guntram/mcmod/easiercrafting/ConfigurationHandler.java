@@ -21,6 +21,7 @@ public class ConfigurationHandler implements ModConfigurationHandler {
     private boolean categorizeRecipes;
     private boolean hideWhenReiShown;
     private boolean hideBrewingStandTakeButton;
+    private boolean useInventoryRefreshHack;
 
     public static ConfigurationHandler getInstance() {
         if (instance==null)
@@ -62,6 +63,7 @@ public class ConfigurationHandler implements ModConfigurationHandler {
         categorizeRecipes=config.getBoolean("easiercrafting.config.categorize", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.categorize");
         hideWhenReiShown=config.getBoolean("easiercrafting.config.hidewithrei", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.hidewithrei");
         hideBrewingStandTakeButton=config.getBoolean("easiercrafting.config.hidebrewingstandbutton", Configuration.CATEGORY_CLIENT, false, "easiercrafting.config.tt.hidebrewingstandbutton");
+        useInventoryRefreshHack=config.getBoolean("easiercrafting.config.useinventoryrefreshhack", Configuration.CATEGORY_CLIENT, false, "easiercrafting.config.tt.useinventoryrefreshhack");
         
         if (config.hasChanged())
             config.save();
@@ -111,4 +113,9 @@ public class ConfigurationHandler implements ModConfigurationHandler {
     public static boolean hideBrewingStandTakeButton() {
         return getInstance().hideBrewingStandTakeButton;
     }
+
+    public static boolean useInventoryRefreshHack() {
+        return getInstance().useInventoryRefreshHack;
+    }
+
 }
