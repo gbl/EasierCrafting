@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
-import me.shedaniel.rei.api.ConfigObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.StairsBlock;
@@ -26,7 +25,6 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
@@ -165,6 +163,7 @@ public class RecipeBook {
         }
 
         if (ConfigurationHandler.hideWhenReiShown()) {
+/* TODO restore REI show/hide
             try {
                 if (ConfigObject.getInstance().isOverlayVisible()) {
                     return;
@@ -172,6 +171,7 @@ public class RecipeBook {
             } catch (NoClassDefFoundError ex) {
                 ;
             }
+*/            
         }
 
         boolean underMouseIsCraftable=true;
@@ -978,13 +978,17 @@ public class RecipeBook {
      * deliberately send a click that, hopefully, CAN'T be correct, so the 
      * server will send the inventory. Doing this after the final QUICK_MOVE
      * packet that executes the craft should update our inventory allright.
+    
+     * And maybe we don't even need this anymore with the new way of confirming inventories.
      */
     private void fakeWrongSlotClickToMakeServerSendInventory() {
-        short s = player.currentScreenHandler.getNextActionId(player.inventory);
+        /* 
+        short s = player.currentScreenHandler.getNextActionId(player.getInventory());
         int syncId = screen.getScreenHandler().syncId;
         ItemStack fakeStack = new ItemStack(Items.BEDROCK);         // some item the player "shouldn't" have in their inventory, much less use it to craft
         MinecraftClient.getInstance().getNetworkHandler().sendPacket(
                 new ClickSlotC2SPacket(syncId, 0, 0, SlotActionType.QUICK_MOVE, fakeStack, s)
         );
+        */
     }
 }

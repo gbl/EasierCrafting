@@ -19,6 +19,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -78,10 +79,16 @@ public class LoomRecipeBook extends RecipeBook {
     public void renderSingleRecipeOutput(ItemRenderer itemRenderer, TextRenderer fontRenderer,
             ItemStack items, int x, int y) {
 
-        RenderSystem.pushMatrix();
-        RenderSystem.scaled(1.5, 1.5, 1.5);
+        MatrixStack stack = RenderSystem.getModelViewStack();
+        stack.push();
+        stack.scale(1.5f, 1.5f, 1.5f);
+        RenderSystem.applyModelViewMatrix();
+        
         itemRenderer.renderGuiItemIcon(items, x*2/3, y*2/3);
-        RenderSystem.popMatrix();
+        
+        stack.pop();
+        RenderSystem.applyModelViewMatrix();
+        
         itemRenderer.renderGuiItemOverlay(fontRenderer, items, x, y);
 
 /*

@@ -17,7 +17,6 @@ import net.minecraft.screen.BrewingStandScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,10 +33,11 @@ public abstract class HandledScreenMixin extends Screen {
     @Shadow protected int backgroundWidth = 176;
     @Shadow protected int backgroundHeight = 166;
     @Shadow protected ScreenHandler handler;
-    @Shadow @Final protected PlayerInventory playerInventory;
+    final PlayerInventory playerInventory;
 
-    public HandledScreenMixin(ScreenHandler handler, PlayerInventory playerInventory_1, Text title) {
+    public HandledScreenMixin(ScreenHandler handler, PlayerInventory playerInventory, Text title) {
         super(title);
+        this.playerInventory = playerInventory;
     }
     
     @Inject(method="drawForeground", at=@At("HEAD"), cancellable = true)
