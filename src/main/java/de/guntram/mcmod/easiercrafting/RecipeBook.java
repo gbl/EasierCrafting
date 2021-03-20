@@ -24,7 +24,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
@@ -909,7 +909,7 @@ public class RecipeBook {
         boolean tagForbidsItem = false;
 
         if (inventoryItem.hasTag()) {
-            CompoundTag tag = inventoryItem.getTag();
+            NbtCompound tag = inventoryItem.getTag();
             for (String tagName: tag.getKeys()) {
                 if (!(tagName.equals("Damage")) || tag.getInt(tagName) != 0) {
                     tagForbidsItem = true;

@@ -7,8 +7,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
@@ -86,16 +86,16 @@ public class LoomRecipe implements Recipe {
             ItemStack bannerStack = screen.getBannerItemStack();
             // ItemStack bannerStack = new ItemStack(new WallBannerBlock(DyeColor.byId(screen.getColor(0)),
             //         Block.Settings.of(Material.WOOD)).asItem());
-            CompoundTag compoundTag = bannerStack.getOrCreateSubTag("BlockEntityTag");
-            ListTag patterns;
+            NbtCompound compoundTag = bannerStack.getOrCreateSubTag("BlockEntityTag");
+            NbtList patterns;
             if (compoundTag.contains("Patterns", 9)) {
                patterns = compoundTag.getList("Patterns", 10);
             } else {
-               patterns = new ListTag();
+               patterns = new NbtList();
                compoundTag.put("Patterns", patterns);
             }            
             for (int i=1; i<steps.size(); i++) {            // start at 1 as [0] is the banner itself
-                CompoundTag patternElement = new CompoundTag();
+                NbtCompound patternElement = new NbtCompound();
                 patternElement.putString("Pattern", steps.get(i).pattern);
                 patternElement.putInt("Color", screen.getColor(steps.get(i).colorCode-'A'));
                 patterns.add(patternElement);

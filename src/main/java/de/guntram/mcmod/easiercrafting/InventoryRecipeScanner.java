@@ -15,8 +15,8 @@ import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.recipe.Recipe;
@@ -62,7 +62,7 @@ public class InventoryRecipeScanner {
             Item item = stack.getItem();
 
             if (item.isDamageable()&& stack.isDamaged()) {
-                ListTag enchantments = stack.getEnchantments();
+                NbtList enchantments = stack.getEnchantments();
                 if (enchantments.size() <= ConfigurationHandler.getMaxEnchantsAllowedForRepair()) {
                     Integer previous=hasRepairable.get(item);
                     hasRepairable.put(item, previous == null ? 1 : previous+1);
@@ -171,7 +171,7 @@ public class InventoryRecipeScanner {
             for (int power=1; power<=3; power++) {
                 if (availableGunPowder>=power) {
                     ItemStack resultItem = new ItemStack(Items.FIREWORK_ROCKET, 3);
-                    CompoundTag nbttagcompound = resultItem.getOrCreateSubTag("Fireworks");
+                    NbtCompound nbttagcompound = resultItem.getOrCreateSubTag("Fireworks");
                     nbttagcompound.putByte("Flight", (byte)power);
                     resultItem.setCustomName(new LiteralText("Strength "+power));
 

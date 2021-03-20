@@ -5,9 +5,9 @@
  */
 package de.guntram.mcmod.debug;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 public class TagDump {
     static final Logger LOGGER = LogManager.getLogger(TagDump.class);
 
-    public static void dump(CompoundTag tag, int indent) {
+    public static void dump(NbtCompound tag, int indent) {
         StringBuilder res;
         if (tag == null) {
             LOGGER.info("dumping null tag");
@@ -29,7 +29,7 @@ public class TagDump {
             return;
         }
         for (String s: tag.getKeys()) {
-            Tag elem = tag.get(s);
+            NbtElement elem = tag.get(s);
             res=new StringBuilder();
             for (int i=0; i<indent; i++)
                 res.append("    ");
@@ -42,8 +42,8 @@ public class TagDump {
             } else if (elem.getType() == 10) {
                 res.append(s).append("(Compound):");
             } else if (elem.getType() == 9) {
-                ListTag list=(ListTag) elem;
-                res.append(s).append(": List of type ").append(list.getElementType()).append(" count ").append(list.size());
+                NbtList list=(NbtList) elem;
+                res.append(s).append(": List of type ").append(list.getType()).append(" count ").append(list.size());
             } else {
                 res.append(s).append("(Type ").append(elem.getType()).append(")");
             }
@@ -52,7 +52,7 @@ public class TagDump {
                 dump(tag.getCompound(s), indent+1);
             }
             if (elem.getType() == 9) {
-                ListTag list=(ListTag) elem;
+                NbtList list=(NbtList) elem;
                 for (int i=0; i<list.size(); i++) {
                     // list.get(i)
                 }

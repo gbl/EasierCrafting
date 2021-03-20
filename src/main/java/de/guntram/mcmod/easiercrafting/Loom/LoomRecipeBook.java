@@ -24,7 +24,7 @@ import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.LoomScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -228,7 +228,7 @@ public class LoomRecipeBook extends RecipeBook {
             if (slot.getStack().getItem() != blankBanner.getItem()) {
                 continue;
             }
-            CompoundTag cTag = slot.getStack().getOrCreateSubTag("BlockEntityTag");
+            NbtCompound cTag = slot.getStack().getOrCreateSubTag("BlockEntityTag");
             if (!cTag.contains("Patterns", 9)
             ||  cTag.getList("Patterns", 10).isEmpty()) {
                 return i+firstInventorySlotNo;

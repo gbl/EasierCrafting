@@ -20,8 +20,8 @@ import net.minecraft.item.BannerItem;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.screen.LoomScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.LiteralText;
@@ -173,11 +173,11 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
         if (!(banners.getItem() instanceof BannerItem)) {
             return;
         }
-        CompoundTag tag = banners.getSubTag("BlockEntityTag");
+        NbtCompound tag = banners.getSubTag("BlockEntityTag");
         if (tag == null) {
             return;
         }
-        ListTag patterns = tag.getList("Patterns", 10);
+        NbtList patterns = tag.getList("Patterns", 10);
         if (patterns == null) {
             return;
         }
@@ -188,7 +188,7 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
         recipe.addStep(new LoomStep("bannerbase", 'A'));
 
         for (int i=0; i<patterns.size(); i++) {
-            CompoundTag patternTag = (CompoundTag) patterns.get(i);
+            NbtCompound patternTag = (NbtCompound) patterns.get(i);
             String stepName = patternTag.getString("Pattern");
             int stepColor = patternTag.getInt("Color");
             int colorMapIndex = -1;
