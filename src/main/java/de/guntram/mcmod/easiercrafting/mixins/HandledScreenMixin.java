@@ -33,11 +33,10 @@ public abstract class HandledScreenMixin extends Screen {
     @Shadow protected int backgroundWidth = 176;
     @Shadow protected int backgroundHeight = 166;
     @Shadow protected ScreenHandler handler;
-    final PlayerInventory playerInventory;
+    @Shadow protected Text displayName;
 
     public HandledScreenMixin(ScreenHandler handler, PlayerInventory playerInventory, Text title) {
         super(title);
-        this.playerInventory = playerInventory;
     }
     
     @Inject(method="drawForeground", at=@At("HEAD"), cancellable = true)
@@ -56,7 +55,7 @@ public abstract class HandledScreenMixin extends Screen {
 
             String titleText = this.title.getString() + " (" + itemsLeft + " " + I18n.translate("easiercrafting.furnace.itemsleft")+")";
             this.textRenderer.draw(stack, titleText, (float)(this.backgroundWidth / 2 - this.textRenderer.getWidth(titleText) / 2), 6.0F, 4210752);
-            this.textRenderer.draw(stack, this.playerInventory.getDisplayName().asOrderedText(), 8.0F, (float)(this.backgroundHeight - 96 + 2), 4210752);
+            this.textRenderer.draw(stack, displayName, 8.0F, (float)(this.backgroundHeight - 96 + 2), 4210752);
             this.textRenderer.draw(stack, itemDonePercent+" %", 20, 22, 4210752);
             this.textRenderer.draw(stack, fuelLeftPercent+" %", 20, 58, 4210752);
 
@@ -75,7 +74,7 @@ public abstract class HandledScreenMixin extends Screen {
                 titleText = this.title;
             }
             this.textRenderer.draw(stack, titleText.getString(), (float)(this.backgroundWidth / 2 - this.textRenderer.getWidth(titleText) / 2), 6.0F, 4210752);
-            this.textRenderer.draw(stack, this.playerInventory.getDisplayName().asOrderedText(), 8.0F, (float)(this.backgroundHeight - 96 + 2), 4210752);
+            this.textRenderer.draw(stack, displayName, 8.0F, (float)(this.backgroundHeight - 96 + 2), 4210752);
             ci.cancel();
         }
     }
