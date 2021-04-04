@@ -11,6 +11,8 @@ import org.lwjgl.glfw.GLFW;
 public class ExtendedGuiStonecutter extends StonecutterScreen implements SlotClickAccepter {
 
     private RecipeBook recipeBook;
+    // temp kludge -- field_2776 and field_2800 seem to have been renamed with 21w13a
+    private int x, y;
 
     public ExtendedGuiStonecutter(StonecutterScreenHandler container, PlayerInventory lowerInv, Text title) {
         super(container, lowerInv, title);
@@ -19,6 +21,8 @@ public class ExtendedGuiStonecutter extends StonecutterScreen implements SlotCli
     @Override
     protected void init() {
         super.init();
+        x = field_2776;
+        y = field_2800;        
         this.recipeBook.afterInitGui();
     }
 

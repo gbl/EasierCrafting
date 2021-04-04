@@ -10,6 +10,8 @@ import org.lwjgl.glfw.GLFW;
 public class ExtendedGuiInventory extends InventoryScreen implements SlotClickAccepter {
 
     private RecipeBook recipeBook;
+    // temp kludge -- field_2776 and field_2800 seem to have been renamed with 21w13a
+    private int x, y;    
 
     public ExtendedGuiInventory(PlayerEntity player) {
         super(player);
@@ -18,6 +20,8 @@ public class ExtendedGuiInventory extends InventoryScreen implements SlotClickAc
     @Override
     public void init() {
         super.init();
+        x = field_2776;
+        y = field_2800;
         if (!ConfigurationHandler.getAllowMinecraftRecipeBook())
             this.buttons.clear();
         this.recipeBook.afterInitGui();

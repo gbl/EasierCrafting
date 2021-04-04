@@ -47,6 +47,9 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
     
     private LoomRecipeBook recipeBook;
 
+    // temp kludge -- field_2776 and field_2800 seem to have been renamed with 21w13a
+    private int x, y;
+
     public ExtendedGuiLoom(LoomScreenHandler container, PlayerInventory inventory, Text title) {
         super(container, inventory, title);
         LOGGER=LogManager.getLogger();
@@ -55,6 +58,9 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
     @Override
     protected void init() {
         super.init();
+        x = field_2776;
+        y = field_2800;
+
         saveName = new TextFieldWidget(this.textRenderer, 0, -25, this.backgroundWidth-25, 20, new LiteralText("Save input pattern as..."));
         saveButton = new ButtonWidget(this.backgroundWidth-20, -25, 20, 20,
                 new TranslatableText("easiercrafting.loom.save"), (button)->{this.saveButtonPressed();});

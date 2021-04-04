@@ -140,6 +140,11 @@ class LocalRecipeResource implements Resource {
         }
         return null;
     }
+    
+    @Override
+    public boolean hasMetadata() { 
+        return false;
+    }
 
     @Override
     public <T> T getMetadata(ResourceMetadataReader<T> metaReader) {
