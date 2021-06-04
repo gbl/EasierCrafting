@@ -33,6 +33,7 @@
     "easiercrafting.config.categorize": "Kategoriseeri retseptid",
     "easiercrafting.config.hidewithrei": "Peida liides, kui REI on kuvatud",
     "easiercrafting.config.hidebrewingstandbutton": "Peida pruulimisaluselt \"võta\" nupp",
+    "easiercrafting.config.useinventoryrefreshhack": "Request inventory refresh after every craft",
     "easiercrafting.config.tt.autoupdate": "Uuenda retseptiloetelu viimase klõpsu järel pärast nii mitut sekundit",
     "easiercrafting.config.tt.autofocus": "Fookusta meisterdusliidese avamisel otsingukast automaatselt",
     "easiercrafting.config.tt.allowinternalbutton": "Luba MC-sisese retseptiraamatu avamine (alates 1.12st)",
@@ -41,5 +42,6 @@
     "easiercrafting.config.tt.maxenchants": "Ära arvesta esemeid meisterduslaual parandamiseks, kui neil on rohkem kui see arv loitse",
     "easiercrafting.config.tt.categorize": "Kategoriseeri retseptid nende loomingurežiimi kaardi alusel",
     "easiercrafting.config.tt.hidewithrei": "Kui sul on REI, kuvatakse EasierCrafting vaid siis, kui REI on välja lülitatud (vaikimisi Ctrl+O)",
-    "easiercrafting.config.tt.hidebrewingstandbutton": "Peida VÕTA nupp, mis tekitab konflikti teatud ressursipakkidega"
+    "easiercrafting.config.tt.hidebrewingstandbutton": "Peida VÕTA nupp, mis tekitab konflikti teatud ressursipakkidega",
+    "easiercrafting.config.tt.useinventoryrefreshhack": "Turn this on if you experience synchronization problems after crafting"
 }

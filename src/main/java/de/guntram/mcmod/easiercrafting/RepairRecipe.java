@@ -53,7 +53,7 @@ public class RepairRecipe<C  extends Inventory> implements Recipe<C> {
     }
 
     @Override
-    public DefaultedList<Ingredient> getPreviewInputs() {
+    public DefaultedList<Ingredient> getIngredients() {
         DefaultedList<Ingredient> ingredients = DefaultedList.of();
         ingredients.add(Ingredient.ofStacks(new ItemStack(item)));
         ingredients.add(Ingredient.ofStacks(new ItemStack(item)));

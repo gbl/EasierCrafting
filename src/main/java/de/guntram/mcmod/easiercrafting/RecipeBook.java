@@ -226,7 +226,7 @@ public class RecipeBook {
             String displayName = EasierCrafting.recipeDisplayName(underMouse);
             fontRenderer.draw(stack, displayName, 0, height+3, 0xffff00);
             if (underMouse instanceof ShapedRecipe) {
-                DefaultedList<Ingredient> ingredients = underMouse.getPreviewInputs();
+                DefaultedList<Ingredient> ingredients = underMouse.getIngredients();
                 // fontRenderer.draw(stack, "sr", left-20, height, 0x202020);
                 for (int x=0; x<((ShapedRecipe)underMouse).getWidth(); x++) {
                     for (int y=0; y<((ShapedRecipe)underMouse).getHeight(); y++) {
@@ -237,21 +237,21 @@ public class RecipeBook {
             } else if (underMouse instanceof ShapelessRecipe) {
                 // fontRenderer.draw(stack, "slr", left-20, height, 0x202020);
                 xpos=0;
-                for (Ingredient ingredient: ((ShapelessRecipe)underMouse).getPreviewInputs()) {
+                for (Ingredient ingredient: ((ShapelessRecipe)underMouse).getIngredients()) {
                     renderIngredient(itemRenderer, fontRenderer, ingredient, itemSize*xpos, height+itemSize);
                     xpos++;
                 }
             } else if (underMouse instanceof CuttingRecipe) {
-                // fontRenderer.draw(stack, "from "+((Ingredient)(underMouse.getPreviewInputs().get(0))).getMatchingStacksClient()[0].getName().getString(),
+                // fontRenderer.draw(stack, "from "+((Ingredient)(underMouse.getIngredients().get(0))).getMatchingStacksClient()[0].getName().getString(),
                 //         0, height+itemSize, 0xffff00);
                 xpos=0;
-                for (Ingredient ingredient: ((CuttingRecipe)underMouse).getPreviewInputs()) {
+                for (Ingredient ingredient: ((CuttingRecipe)underMouse).getIngredients()) {
                     renderIngredient(itemRenderer, fontRenderer, ingredient, itemSize*xpos, height+2*itemSize);
                     xpos++;
                 }
             } else if (underMouse instanceof BrewingRecipe) {
                 ypos=1;
-                for (Object i: ((BrewingRecipe)underMouse).getPreviewInputs()) {
+                for (Object i: ((BrewingRecipe)underMouse).getIngredients()) {
                     Ingredient ingredient = (Ingredient) i;
                     renderIngredient(itemRenderer, fontRenderer, ingredient, 0, height+ypos*itemSize);
                     fontRenderer.draw(stack, ingredient.getMatchingStacksClient()[0].getName().asOrderedText(), itemSize, height+5+ypos*itemSize, 0xffff00);
@@ -483,7 +483,7 @@ public class RecipeBook {
         } else if (recipe instanceof CuttingRecipe) {
             ItemStack stack = recipe.getOutput();
             LOGGER.debug("output: " + stack.getItem().getName().getString());
-            for (Ingredient ing : (List<Ingredient>) recipe.getPreviewInputs()) {
+            for (Ingredient ing : (List<Ingredient>) recipe.getIngredients()) {
                 ItemStack[] stacks = ing.getMatchingStacksClient();
                 if (stacks.length > 1) {
                     LOGGER.debug(stacks.length + " possible inputs for " + stack.getItem().getName().getString());
@@ -502,7 +502,7 @@ public class RecipeBook {
     }
     
     private boolean canCraftShapeless(ShapelessRecipe recipe, ScreenHandler inventory) {
-        DefaultedList<Ingredient> neededList = recipe.getPreviewInputs();
+        DefaultedList<Ingredient> neededList = recipe.getIngredients();
         return canCraft(recipe, neededList, inventory);
     }
 
@@ -510,12 +510,12 @@ public class RecipeBook {
         if (!recipe.fits(gridSize, gridSize)) {
             return false;
         }
-        DefaultedList<Ingredient> neededList = recipe.getPreviewInputs();
+        DefaultedList<Ingredient> neededList = recipe.getIngredients();
         return canCraft(recipe, neededList, inventory);
     }
     
     private boolean canCraftCutting(CuttingRecipe recipe, ScreenHandler inventory) {
-        DefaultedList<Ingredient> neededList = recipe.getPreviewInputs();
+        DefaultedList<Ingredient> neededList = recipe.getIngredients();
         return canCraft(recipe, neededList, inventory);
     }
 
@@ -577,7 +577,7 @@ public class RecipeBook {
     // in his inventory), we might want to act somehow to prevent crafting the wrong input ...
 
     private boolean canBrew(BrewingRecipe recipe, ScreenHandler inventory) {
-        List<Ingredient> inputs=recipe.getPreviewInputs();
+        List<Ingredient> inputs=recipe.getIngredients();
         Item ingredient = inputs.get(1).getMatchingStacksClient()[0].getItem();
         ItemStack inputPotionStack = inputs.get(0).getMatchingStacksClient()[0];
         Potion inputPotion = PotionUtil.getPotion(inputs.get(0).getMatchingStacksClient()[0]);
@@ -827,10 +827,10 @@ public class RecipeBook {
     private void fillBrewingStandSlots(BrewingRecipe recipe) {
         ScreenHandler container = screen.getScreenHandler();
         ItemStack ingredientStack = container.getSlot(3+firstCraftSlot).getStack();
-        List<Ingredient> inputs=recipe.getPreviewInputs();
+        List<Ingredient> inputs=recipe.getIngredients();
         ItemStack inputPotionStack = inputs.get(0).getMatchingStacksClient()[0];
         if (ingredientStack.isEmpty()) {
-            Item neededItem = ((Ingredient)(recipe.getPreviewInputs().get(1))).getMatchingStacksClient()[0].getItem();
+            Item neededItem = ((Ingredient)(recipe.getIngredients().get(1))).getMatchingStacksClient()[0].getItem();
             for (int slot=0; slot<36; slot++) {
                 if (container.getSlot(slot+firstInventorySlotNo).getStack().getItem() == neededItem) {
                     LOGGER.debug("transfer from inv slot "+slot+" to ingred. slot "+3);
@@ -901,7 +901,7 @@ public class RecipeBook {
     }
     
     private DefaultedList<Ingredient> getIngredientsAsList(Recipe recipe) {
-        return recipe.getPreviewInputs();
+        return recipe.getIngredients();
     }
     
     private boolean canActAsIngredient(Ingredient recipeComponent, ItemStack inventoryItem) {

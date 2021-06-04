@@ -33,6 +33,7 @@
     "easiercrafting.config.categorize": "Sortowanie receptur",
     "easiercrafting.config.hidewithrei": "Ukryj GUI kiedy REI jest wyświetlane",
     "easiercrafting.config.hidebrewingstandbutton": "Ukryj przycisk 'Weź' w statywie alchemicznym",
+    "easiercrafting.config.useinventoryrefreshhack": "Request inventory refresh after every craft",
     "easiercrafting.config.tt.autoupdate": "Aktualizowanie listy receptur po kilku sekundach po kliknięciu",
     "easiercrafting.config.tt.autofocus": "Automatycznie fokusuj pole wyszukiwania kiedy crafting jest otwarty",
     "easiercrafting.config.tt.allowinternalbutton": "Zezwalaj na otwieranie książki receptur (od wersji 1.12)",
@@ -41,5 +42,6 @@
     "easiercrafting.config.tt.maxenchants": "Nie uwzględniaj przedmiotów do naprawy jeżeli mają większą ilość zaklęć niż ta ustawiona",
     "easiercrafting.config.tt.categorize": "Kategoryzuj receptury przez zakładki z trybu Kreatywnego",
     "easiercrafting.config.tt.hidewithrei": "Jeżeli posiadasz REI EasierCrafting pokaże się tylko gdy REI zostanie schowane (domyślnie klikając CTRL-O)",
-    "easiercrafting.config.tt.hidebrewingstandbutton": "Ukryj przycisk WEŹ który może konfliktować z niektórymi paczkami zasobów"
+    "easiercrafting.config.tt.hidebrewingstandbutton": "Ukryj przycisk WEŹ który może konfliktować z niektórymi paczkami zasobów",
+    "easiercrafting.config.tt.useinventoryrefreshhack": "Turn this on if you experience synchronization problems after crafting"
 }

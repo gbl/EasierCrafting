@@ -31,8 +31,9 @@
     "easiercrafting.config.specialrecipes": "Разрешить специальные рецепты",
     "easiercrafting.config.maxenchants": "Макс. зачарования",
     "easiercrafting.config.categorize": "Категоризировать рецепты",
-    "easiercrafting.config.hidewithrei": "Скрыть интерфейс, когда отображается REI",
-    "easiercrafting.config.hidebrewingstandbutton": "Скрыть кнопку 'Взять' в варочной стойке",
+    "easiercrafting.config.hidewithrei": "Скрывать интерфейс мода при включённом REI",
+    "easiercrafting.config.hidebrewingstandbutton": "Спрятать кнопку 'Взять' в варочной стойке",
+    "easiercrafting.config.useinventoryrefreshhack": "Обновлять инвентарь после каждого создания",
     "easiercrafting.config.tt.autoupdate": "Обновить список рецептов после этого количества секунд после последнего клика",
     "easiercrafting.config.tt.autofocus": "Автоматически фокусироваться на поле поиска при открытии GUI создания",
     "easiercrafting.config.tt.allowinternalbutton": "Разрешить открытие внутренней книги рецептов MC (с 1.12)",
@@ -41,5 +42,6 @@
     "easiercrafting.config.tt.maxenchants": "Не рассматривать предметы для починки в верстаке если у них есть больше чем это количество зачарований",
     "easiercrafting.config.tt.categorize": "Категоризировать рецепты по их вкладке творческого режима",
     "easiercrafting.config.tt.hidewithrei": "Если у вас установлен REI, EasierCrafting будет показываться только при отключении REI (по умолчанию CTRL-O)",
-    "easiercrafting.config.tt.hidebrewingstandbutton": "Скрыть кнопку Взять, которая конфликтует с некоторыми наборами ресурсов"
+    "easiercrafting.config.tt.hidebrewingstandbutton": "Скрыть кнопку Взять, которая конфликтует с некоторыми наборами ресурсов",
+    "easiercrafting.config.tt.useinventoryrefreshhack": "Включите это, если после создания у вас возникли проблемы с \"фантомными\" предметами"
 }

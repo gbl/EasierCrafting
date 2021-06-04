@@ -33,6 +33,7 @@
     "easiercrafting.config.categorize": "Tarifleri gruplandır",
     "easiercrafting.config.hidewithrei": "REI göründüğü zaman GUI'yi gizle",
     "easiercrafting.config.hidebrewingstandbutton": "Hide 'Take' button in brewing stand",
+    "easiercrafting.config.useinventoryrefreshhack": "Request inventory refresh after every craft",
     "easiercrafting.config.tt.autoupdate": "Son tıklamadan saniye sonra tarif listesini güncelle",
     "easiercrafting.config.tt.autofocus": "Üretim GUI'sini açarken arama kutusuna otomatik olarak odakla",
     "easiercrafting.config.tt.allowinternalbutton": "Minecraft'ın kendi tarif kitabına izin ver (1.12'den beri)",
@@ -41,5 +42,6 @@
     "easiercrafting.config.tt.maxenchants": "Sayılarından fazla büyülere sahiplerse, tezgah onarımı için öğeleri es geç",
     "easiercrafting.config.tt.categorize": "Yaratıcılık modunda tarifleri sınıflandır",
     "easiercrafting.config.tt.hidewithrei": "REI var ise, EasierCrafting modu sadece REI kapatıldığında çalışacaktır. (varsayılan CTRL-O)",
-    "easiercrafting.config.tt.hidebrewingstandbutton": "Hide the TAKE button that conflicts with some resource packs"
+    "easiercrafting.config.tt.hidebrewingstandbutton": "Hide the TAKE button that conflicts with some resource packs",
+    "easiercrafting.config.tt.useinventoryrefreshhack": "Turn this on if you experience synchronization problems after crafting"
 }

@@ -54,7 +54,7 @@ public class InventoryGeneratedRecipe<C extends Inventory> implements Recipe<C> 
     }
 
     @Override
-    public DefaultedList<Ingredient> getPreviewInputs() {
+    public DefaultedList<Ingredient> getIngredients() {
         return ingredients;
     }
 

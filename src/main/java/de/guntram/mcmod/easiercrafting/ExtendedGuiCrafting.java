@@ -11,8 +11,6 @@ import org.lwjgl.glfw.GLFW;
 public class ExtendedGuiCrafting extends CraftingScreen implements SlotClickAccepter {
 
     private RecipeBook recipeBook;
-    // temp kludge -- field_2776 and field_2800 seem to have been renamed with 21w13a
-    private int x, y;    
 
     public ExtendedGuiCrafting(CraftingScreenHandler container, PlayerInventory lowerInv, Text title) {
         super(container, lowerInv, title);
@@ -21,10 +19,8 @@ public class ExtendedGuiCrafting extends CraftingScreen implements SlotClickAcce
     @Override
     protected void init() {
         super.init();
-        x = field_2776;
-        y = field_2800;        
         if (!ConfigurationHandler.getAllowMinecraftRecipeBook()) {
-            this.buttons.clear();
+            this.children().clear();
         }
         this.recipeBook.afterInitGui();
     }

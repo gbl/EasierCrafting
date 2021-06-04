@@ -1,7 +1,8 @@
 package de.guntram.mcmod.easiercrafting;
 
 import net.minecraft.client.gui.screen.ingame.BrewingStandScreen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.BrewingStandScreenHandler;
@@ -13,8 +14,6 @@ import org.lwjgl.glfw.GLFW;
 public class ExtendedGuiBrewingStand extends BrewingStandScreen implements SlotClickAccepter {
 
     private RecipeBook recipeBook;
-    // temp kludge -- field_2776 and field_2800 seem to have been renamed with 21w13a
-    private int x, y;    
 
     public ExtendedGuiBrewingStand(BrewingStandScreenHandler container, PlayerInventory lowerInv, Text title) {
         super(container, lowerInv, title);
@@ -23,16 +22,18 @@ public class ExtendedGuiBrewingStand extends BrewingStandScreen implements SlotC
     @Override
     protected void init() {
         super.init();
-        x = field_2776;
-        y = field_2800;        
         if (!ConfigurationHandler.hideBrewingStandTakeButton()) {
-            this.addButton(new AbstractButtonWidget(x+130, y+50, 40, 20, new TranslatableText("easiercrafting.brewing.takeall")) {
+            this.addDrawableChild(new ClickableWidget(x+130, y+50, 40, 20, new TranslatableText("easiercrafting.brewing.takeall")) {
                 @Override
                 public void onClick(double x, double y) {
                     // for some reason, this order seems to work better than 0 1 2
                     slotClick(1, 0, SlotActionType.QUICK_MOVE);
                     slotClick(2, 0, SlotActionType.QUICK_MOVE);
                     slotClick(0, 0, SlotActionType.QUICK_MOVE);
+                }
+
+                @Override
+                public void appendNarrations(NarrationMessageBuilder builder) {
                 }
             });
         }
