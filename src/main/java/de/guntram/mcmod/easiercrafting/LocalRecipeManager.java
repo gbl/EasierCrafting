@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -28,6 +29,8 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.metadata.ResourceMetadataReader;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.profiler.Profiler;
+import net.minecraft.util.profiler.SampleType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,10 +49,23 @@ public class LocalRecipeManager extends RecipeManager implements ResourceManager
     public static void addZipfile(String name) {
         forcedZips.add(name);
     }
+    
+    static class EmptyProfiler implements Profiler {
+            @Override public void startTick() {}
+            @Override public void endTick() {}
+            @Override public void push(String location) {}
+            @Override public void push(Supplier<String> locationGetter) {}
+            @Override public void pop() {}
+            @Override public void swap(String location) {}
+            @Override public void swap(Supplier<String> locationGetter) {}
+            @Override public void markSampleType(SampleType type) {}
+            @Override public void visit(String marker) {}
+            @Override public void visit(Supplier<String> markerGetter) {}
+    }
 
     public static void load() {
         Map<Identifier, JsonElement> map = instance.prepare(instance, null);
-        instance.apply(map, instance, null);
+        instance.apply(map, instance, new EmptyProfiler());
     }
     
     @Override
