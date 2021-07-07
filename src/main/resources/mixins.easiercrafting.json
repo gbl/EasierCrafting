@@ -13,7 +13,6 @@
     "client-disabled": [
         "ServerPlayNetworkHandlerMixin",
         "GuiActionConfirmDebug",
-        "ClickWindowC2SPacketDebugMixin",
         "BrewingStandCraftedMixin"
     ],
     "injectors": {

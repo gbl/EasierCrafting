@@ -1,4 +1,4 @@
-package de.guntram.mcmod.easiercrafting.mixins;
+package de.guntram.mcmod.debug.mixins;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.item.ItemStack;

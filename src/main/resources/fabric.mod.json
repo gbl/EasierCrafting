@@ -14,7 +14,8 @@
         }
     },
     "mixins": [
-      	"mixins.easiercrafting.json"
+      	"mixins.easiercrafting.json",
+        "mixins.easiercrafting_debug.json"
     ],
     "depends": {
       "fabric": "*"
