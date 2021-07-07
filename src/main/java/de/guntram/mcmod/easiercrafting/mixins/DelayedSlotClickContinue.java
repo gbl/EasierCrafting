@@ -8,6 +8,7 @@ public class DelayedSlotClickContinue {
 /*
     TODO restore this when the new way of handling slot clicks is understood,
     and fields are mapped
+    20210707 no; don't restore this; we need to do this in Client Ticks now.
     
     @Inject(method="onConfirmScreenAction", at=@At("RETURN"))
     private void nextClickOnConfirm(ConfirmScreenActionS2CPacket packet, CallbackInfo ci) {

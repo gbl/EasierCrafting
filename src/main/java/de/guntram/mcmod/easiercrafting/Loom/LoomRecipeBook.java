@@ -90,38 +90,16 @@ public class LoomRecipeBook extends RecipeBook {
         RenderSystem.applyModelViewMatrix();
         
         itemRenderer.renderGuiItemOverlay(fontRenderer, items, x, y);
-
-/*
-        BannerBlockEntity bbe =  new BannerBlockEntity();
-        bbe.readFrom(items, ((BannerItem)items.getItem()).getColor());
-        bbe.setPreview(true);
-        MatrixStack stack = new MatrixStack();
-        stack.translate(x, y, 0);
-        VertexConsumerProvider.Immediate immediate = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
-        ModelPart modelPart = BannerBlockEntityRenderer.createField();
-        BannerBlockEntityRenderer.method_23802(bbe, stack, immediate, 
-                15728880, OverlayTexture.DEFAULT_UV, modelPart, ModelLoader.BANNER_BASE, true);
-*/
     }
     
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton, int guiLeft, int guiTop) {
         if (underMouse != null) {
-            System.out.println("try to craft "+underMouse.getGroup());
+            LOGGER.info("try to craft "+underMouse.getGroup());
             craftRecipe((LoomRecipe) underMouse);
         } else {
             super.mouseClicked(mouseX, mouseY, mouseButton, guiLeft, guiTop);
         }
-    }
-    
-    @Override
-    public boolean charTyped(char chr, int keyCode) {
-        System.out.println("char '"+chr+"'");
-        if (chr == ' ') {
-            DelayedSlotClickQueue.execute();
-            return true;
-        }
-        return super.charTyped(chr, keyCode);
     }
     
     public void craftRecipe(final LoomRecipe recipe) {
@@ -153,12 +131,12 @@ public class LoomRecipeBook extends RecipeBook {
                         DelayedSlotClickQueue.clear();
                         return;
                     }
-                    LOGGER.info("transfer dye from "+dyeSlotIndex+" to 1");
+                    LOGGER.debug("transfer dye from "+dyeSlotIndex+" to 1");
                     transfer(dyeSlotIndex, 1, 1);
                     
                     int patternSlot = -1;
                     if (pattern.ordinal() <= BannerPattern.LOOM_APPLICABLE_COUNT) {
-                        LOGGER.info("click container button "+pattern.ordinal());
+                        LOGGER.debug("click container button "+pattern.ordinal());
                         MinecraftClient.getInstance().interactionManager
                                 .clickButton((screen.getScreenHandler()).syncId, pattern.ordinal());// click loom button
                     } else {

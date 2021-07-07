@@ -709,9 +709,6 @@ public class RecipeBook {
 
             if (mouseButton==0) {
                 slotClick(resultSlotNo, mouseButton, SlotActionType.QUICK_MOVE);     // which is really PICKUP ALL
-                if (ConfigurationHandler.useInventoryRefreshHack()) {
-                    fakeWrongSlotClickToMakeServerSendInventory();
-                }
                 updateRecipesIn(ConfigurationHandler.getAutoUpdateRecipeTimer()*1000);
             }
 //            LOGGER.info("mousebutton = "+mouseButton);

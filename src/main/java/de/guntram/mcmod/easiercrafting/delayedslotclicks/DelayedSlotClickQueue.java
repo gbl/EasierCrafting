@@ -5,8 +5,10 @@
  */
 package de.guntram.mcmod.easiercrafting.delayedslotclicks;
 
+import de.guntram.mcmod.easiercrafting.ConfigurationHandler;
 import de.guntram.mcmod.easiercrafting.SlotClickAccepter;
 import java.util.LinkedList;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.screen.slot.SlotActionType;
 
 /**
@@ -41,13 +43,15 @@ public class DelayedSlotClickQueue {
         }
     }
     
-    private LinkedList<ClickInfo> pendingClicks;
-    private LinkedList<Runnable> pendingGenerators;
     private static DelayedSlotClickQueue instance;
+    private final LinkedList<ClickInfo> pendingClicks;
+    private final LinkedList<Runnable> pendingGenerators;
+    private int tickCount;
     
     private DelayedSlotClickQueue() {
         pendingClicks=new LinkedList<>();
         pendingGenerators = new LinkedList<>();
+        ClientTickEvents.END_CLIENT_TICK.register(e->executeEveryNTicks());
     }
     
     public static DelayedSlotClickQueue getInstance() {
@@ -63,6 +67,13 @@ public class DelayedSlotClickQueue {
     
     public static void addGenerator(Runnable generator) {
         getInstance().pendingGenerators.offerLast(generator);
+    }
+    
+    private void executeEveryNTicks() {
+        if (--tickCount <= 0) {
+            tickCount = ConfigurationHandler.getLoomClickSpeed();
+            internalExecute(true);
+        }
     }
     
     public static void execute() {

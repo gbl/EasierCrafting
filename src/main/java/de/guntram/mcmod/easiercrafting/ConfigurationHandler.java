@@ -21,7 +21,7 @@ public class ConfigurationHandler implements ModConfigurationHandler {
     private boolean categorizeRecipes;
     private boolean hideWhenReiShown;
     private boolean hideBrewingStandTakeButton;
-    private boolean useInventoryRefreshHack;
+    private int loomClickSpeed;
 
     public static ConfigurationHandler getInstance() {
         if (instance==null)
@@ -36,7 +36,7 @@ public class ConfigurationHandler implements ModConfigurationHandler {
             loadConfig();
         }
     }
-    
+
     @Override
     public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
         if (event.getModID().equalsIgnoreCase(EasierCrafting.MODID)) {
@@ -54,6 +54,8 @@ public class ConfigurationHandler implements ModConfigurationHandler {
         config.migrate("Max. enchants", "easiercrafting.config.maxenchants");
         config.migrate("Categorize recipes", "easiercrafting.config.categorize");
         
+        config.forget("easiercrafting.config.useinventoryrefreshhack");
+        
         autoUpdateRecipeTimer=config.getInt("easiercrafting.config.autoupdate", Configuration.CATEGORY_CLIENT, 5, 0, 30, "easiercrafting.config.tt.autoupdate");
         autoFocusSearch=config.getBoolean("easiercrafting.config.autofocus", Configuration.CATEGORY_CLIENT, false, "easiercrafting.config.tt.autofocus");
         allowRecipeBook=config.getBoolean("easiercrafting.config.allowinternalbutton", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.allowinternalbutton");
@@ -63,7 +65,7 @@ public class ConfigurationHandler implements ModConfigurationHandler {
         categorizeRecipes=config.getBoolean("easiercrafting.config.categorize", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.categorize");
         hideWhenReiShown=config.getBoolean("easiercrafting.config.hidewithrei", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.hidewithrei");
         hideBrewingStandTakeButton=config.getBoolean("easiercrafting.config.hidebrewingstandbutton", Configuration.CATEGORY_CLIENT, false, "easiercrafting.config.tt.hidebrewingstandbutton");
-        useInventoryRefreshHack=config.getBoolean("easiercrafting.config.useinventoryrefreshhack", Configuration.CATEGORY_CLIENT, false, "easiercrafting.config.tt.useinventoryrefreshhack");
+        loomClickSpeed = config.getInt("easiercrafting.config.loomclickspeed", Configuration.CATEGORY_CLIENT, 3, 0, 20, "easiercrafting.config.tt.loomclickspeed");
         
         if (config.hasChanged())
             config.save();
@@ -113,9 +115,7 @@ public class ConfigurationHandler implements ModConfigurationHandler {
     public static boolean hideBrewingStandTakeButton() {
         return getInstance().hideBrewingStandTakeButton;
     }
-
-    public static boolean useInventoryRefreshHack() {
-        return getInstance().useInventoryRefreshHack;
+    public static int getLoomClickSpeed() {
+        return getInstance().loomClickSpeed;
     }
-
 }
