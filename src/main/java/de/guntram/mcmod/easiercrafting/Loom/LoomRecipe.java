@@ -5,14 +5,18 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
 public class LoomRecipe implements Recipe {
@@ -104,6 +108,21 @@ public class LoomRecipe implements Recipe {
         } else {
             return new ItemStack(Items.AIR);
         }
+    }
+    
+    @Override
+    public DefaultedList<Ingredient> getIngredients() {
+        DefaultedList<Ingredient> ingredients = DefaultedList.of();
+        if (MinecraftClient.getInstance().currentScreen instanceof ExtendedGuiLoom) {
+            ExtendedGuiLoom screen = (ExtendedGuiLoom) MinecraftClient.getInstance().currentScreen;
+            ingredients.add(Ingredient.ofStacks(screen.getBannerItemStack()));
+            for (LoomStep step: steps) {
+                ingredients.add(
+                    Ingredient.ofStacks(new ItemStack(DyeItem.byColor(DyeColor.byId(screen.getColor(step.colorCode-'A')))))
+                );
+            }
+        }        
+        return ingredients;
     }
 
     @Override

@@ -109,7 +109,7 @@ public class LoomRecipeBook extends RecipeBook {
             return;
         }
         DelayedSlotClickQueue.addGenerator(() -> {
-            LOGGER.info("transfer banner from "+originalBannerSlotIndex+" to 0");
+            LOGGER.debug("transfer banner from "+originalBannerSlotIndex+" to 0");
             transfer(originalBannerSlotIndex, 0, 1);
         });
         
@@ -158,10 +158,10 @@ public class LoomRecipeBook extends RecipeBook {
                     // if (i>0) return;
 
                     if (i == recipe.getStepCount() - 1) {
-                        LOGGER.info("transfer banner back to inventory");
+                        LOGGER.debug("transfer banner back to inventory");
                         slotClick(3, 0, SlotActionType.QUICK_MOVE);
                     } else {
-                        LOGGER.info("transfer banner to input");
+                        LOGGER.debug("transfer banner to input");
                         transfer(3, 0, 1);
                     }
                     
@@ -171,9 +171,6 @@ public class LoomRecipeBook extends RecipeBook {
                 }
             });
         }
-        // DelayedSlotClickQueue.execute(); Or don't as we expect to get a confirm 
-        // for the THROW action that's generated for clicking outside the
-        // GUI
     }
     
     private Item bannerPatternItemFromId(String id) {

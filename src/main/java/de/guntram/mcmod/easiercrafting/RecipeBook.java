@@ -1,5 +1,6 @@
 package de.guntram.mcmod.easiercrafting;
 
+import de.guntram.mcmod.easiercrafting.Loom.LoomRecipe;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -233,11 +234,10 @@ public class RecipeBook {
                                 ingredients.get(x+y*((ShapedRecipe)underMouse).getWidth()), itemSize*x, height+itemSize+itemSize*y);                        
                     }
                 }
-            } else if (underMouse instanceof ShapelessRecipe) {
-                // fontRenderer.draw(stack, "slr", left-20, height, 0x202020);
+            } else if (underMouse instanceof ShapelessRecipe || underMouse instanceof CuttingRecipe || underMouse instanceof LoomRecipe) {
                 xpos=0;
-                for (Ingredient ingredient: ((ShapelessRecipe)underMouse).getIngredients()) {
-                    renderIngredient(itemRenderer, fontRenderer, ingredient, itemSize*xpos, height+itemSize);
+                for (Object ingredient: underMouse.getIngredients()) {
+                    renderIngredient(itemRenderer, fontRenderer, (Ingredient) ingredient, itemSize*xpos, height+itemSize);
                     xpos++;
                 }
             } else if (underMouse instanceof CuttingRecipe) {
@@ -259,7 +259,6 @@ public class RecipeBook {
             }
         }
      
-//        GuiLighting.disable();
         if (!underMouseIsCraftable) {
             // prevent action when clicking the output icon
             underMouse=null;
