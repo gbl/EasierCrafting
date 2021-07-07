@@ -10,10 +10,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import net.minecraft.block.BannerBlock;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.LoomScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BannerItem;
@@ -279,7 +282,7 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
             mouseX-=ExtendedGuiLoom.this.x;
             mouseY-=ExtendedGuiLoom.this.y;
             if (mouseX > x && mouseX < x+width && mouseY > y && mouseY < y+width) {
-                renderTooltip(stack, items, mouseX, mouseY);
+                ExtendedGuiLoom.this.renderTooltip(stack, items, mouseX, mouseY);
             }
         }
 
