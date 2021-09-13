@@ -1,6 +1,5 @@
 package de.guntram.mcmod.easiercrafting;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import de.guntram.mcmod.easiercrafting.Loom.LoomRecipe;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -483,7 +482,7 @@ public class RecipeBook {
     private boolean canCraftRecipe(Recipe recipe, ScreenHandler inventory, int gridSize) {
         if (recipe instanceof ShapelessRecipe shapelessRecipe) {
             if (recipe.getIngredients().size() > gridSize*gridSize) {
-                System.out.println("shapeless for "+recipe.getOutput().getTranslationKey()+" has "+recipe.getIngredients().size()+" items while gridSizs is "+gridSize);
+                // System.out.println("shapeless for "+recipe.getOutput().getTranslationKey()+" has "+recipe.getIngredients().size()+" items while gridSizs is "+gridSize);
                 return false;
             }
             return canCraftShapeless(shapelessRecipe, inventory);
@@ -721,6 +720,20 @@ public class RecipeBook {
                 slotClick(resultSlotNo, mouseButton, SlotActionType.QUICK_MOVE);     // which is really PICKUP ALL
                 updateRecipesIn(ConfigurationHandler.getAutoUpdateRecipeTimer()*1000);
             }
+            
+            /* Special case honey blocks which leave glass bottles in the input slots */
+            
+            if (underMouse.getOutput().getItem() == Items.HONEY_BLOCK) {
+                slotClick(1, 0, SlotActionType.QUICK_MOVE);
+                slotClick(2, 0, SlotActionType.QUICK_MOVE);
+                slotClick(4, 0, SlotActionType.QUICK_MOVE);
+                if (gridSize == 2) {
+                    slotClick(3, 0, SlotActionType.QUICK_MOVE);
+                } else {
+                    slotClick(5, 0, SlotActionType.QUICK_MOVE);
+                }
+            }
+            
 //            LOGGER.info("mousebutton = "+mouseButton);
 //            LOGGER.info("hasControl = "+Screen.hasControlDown());
 //            LOGGER.info("hasShift = "+Screen.hasShiftDown());

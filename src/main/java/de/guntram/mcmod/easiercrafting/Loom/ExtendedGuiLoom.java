@@ -212,7 +212,7 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
         try {
             Files.write(Paths.get(path), recipe.toSaveString().getBytes());
             LoomRecipeRegistry.registerRecipe(recipe);
-            System.out.println(recipe.toSaveString());
+            // System.out.println(recipe.toSaveString());
             saveName.setText("");
             recipeBook.updateRecipes();
             recipeBook.updatePatternMatch();

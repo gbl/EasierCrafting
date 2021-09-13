@@ -76,7 +76,7 @@ public class LocalRecipeManager extends RecipeManager implements ResourceManager
     public static void dumpAll() {
         for (Recipe r: instance.values()) {
             LOGGER.info(r.getId());
-            System.out.println(r.getId() + " produces " + r.getOutput().getTranslationKey());
+            // System.out.println(r.getId() + " produces " + r.getOutput().getTranslationKey());
         }
     }
     
