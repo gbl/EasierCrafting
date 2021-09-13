@@ -22,13 +22,13 @@ public class ConfigurationHandler implements ModConfigurationHandler {
     private boolean hideWhenReiShown;
     private boolean hideBrewingStandTakeButton;
     private int loomClickSpeed;
+    private int fadeOutTime;
 
     public static ConfigurationHandler getInstance() {
         if (instance==null)
             instance=new ConfigurationHandler();
         return instance;
     }
-
     public void load(final File configFile) {
         if (config == null) {
             config = new Configuration(configFile);
@@ -56,7 +56,7 @@ public class ConfigurationHandler implements ModConfigurationHandler {
         
         config.forget("easiercrafting.config.useinventoryrefreshhack");
         
-        autoUpdateRecipeTimer=config.getInt("easiercrafting.config.autoupdate", Configuration.CATEGORY_CLIENT, 5, 0, 30, "easiercrafting.config.tt.autoupdate");
+        autoUpdateRecipeTimer=config.getInt("easiercrafting.config.autoupdate", Configuration.CATEGORY_CLIENT, 2, 0, 30, "easiercrafting.config.tt.autoupdate");
         autoFocusSearch=config.getBoolean("easiercrafting.config.autofocus", Configuration.CATEGORY_CLIENT, false, "easiercrafting.config.tt.autofocus");
         allowRecipeBook=config.getBoolean("easiercrafting.config.allowinternalbutton", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.allowinternalbutton");
         showGuiRight=config.getBoolean("easiercrafting.config.guiright", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.guiright");
@@ -66,6 +66,9 @@ public class ConfigurationHandler implements ModConfigurationHandler {
         hideWhenReiShown=config.getBoolean("easiercrafting.config.hidewithrei", Configuration.CATEGORY_CLIENT, true, "easiercrafting.config.tt.hidewithrei");
         hideBrewingStandTakeButton=config.getBoolean("easiercrafting.config.hidebrewingstandbutton", Configuration.CATEGORY_CLIENT, false, "easiercrafting.config.tt.hidebrewingstandbutton");
         loomClickSpeed = config.getInt("easiercrafting.config.loomclickspeed", Configuration.CATEGORY_CLIENT, 3, 0, 20, "easiercrafting.config.tt.loomclickspeed");
+        
+        /* new in 1.7 */
+        fadeOutTime = config.getInt("easiercrafting.config.fadeout", Configuration.CATEGORY_CLIENT, 500, 0, 2000, "easiercrafting.config.tt.fadeout");
         
         if (config.hasChanged())
             config.save();
@@ -117,5 +120,8 @@ public class ConfigurationHandler implements ModConfigurationHandler {
     }
     public static int getLoomClickSpeed() {
         return getInstance().loomClickSpeed;
+    }
+    public static int getFadeoutTime() {
+        return getInstance().fadeOutTime;
     }
 }

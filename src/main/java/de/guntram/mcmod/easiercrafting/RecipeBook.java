@@ -1,5 +1,6 @@
 package de.guntram.mcmod.easiercrafting;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import de.guntram.mcmod.easiercrafting.Loom.LoomRecipe;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 import me.shedaniel.rei.api.client.config.ConfigObject;
 import net.minecraft.block.Block;
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.StairsBlock;
 import net.minecraft.block.WallBlock;
@@ -19,6 +21,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
@@ -73,7 +76,7 @@ public class RecipeBook {
     private int minYtoDraw=0;               // implements clipping top part of the item list
     private int textBoxSize;
     private long recipeUpdateTime;
-    private RecipeType wantedRecipeType;
+    private final RecipeType wantedRecipeType;
 
     public TextFieldWidget pattern;
     public RecipeTreeSet patternMatchingRecipes;
@@ -170,14 +173,20 @@ public class RecipeBook {
                     return;
                 }
             } catch (NoClassDefFoundError ex) {
-                ;
+                /* do nothing */
             }
         }
 
         boolean underMouseIsCraftable=true;
+        
         if (recipeUpdateTime!=0 && System.currentTimeMillis() > recipeUpdateTime) {
             updateRecipes();
             recipeUpdateTime=0;
+        }
+
+        if (recipeUpdateTime != 0 && System.currentTimeMillis() > recipeUpdateTime - ConfigurationHandler.getFadeoutTime()) {
+            underMouse = null;
+            return;
         }
 
         int xpos, ypos=0;
@@ -225,13 +234,13 @@ public class RecipeBook {
         if (underMouse!=null) {
             String displayName = EasierCrafting.recipeDisplayName(underMouse);
             fontRenderer.draw(stack, displayName, 0, height+3, 0xffff00);
-            if (underMouse instanceof ShapedRecipe) {
+            if (underMouse instanceof ShapedRecipe shapedRecipe) {
                 DefaultedList<Ingredient> ingredients = underMouse.getIngredients();
                 // fontRenderer.draw(stack, "sr", left-20, height, 0x202020);
-                for (int x=0; x<((ShapedRecipe)underMouse).getWidth(); x++) {
-                    for (int y=0; y<((ShapedRecipe)underMouse).getHeight(); y++) {
+                for (int x=0; x<shapedRecipe.getWidth(); x++) {
+                    for (int y=0; y<shapedRecipe.getHeight(); y++) {
                         renderIngredient(itemRenderer, fontRenderer, 
-                                ingredients.get(x+y*((ShapedRecipe)underMouse).getWidth()), itemSize*x, height+itemSize+itemSize*y);                        
+                                ingredients.get(x+y*shapedRecipe.getWidth()), itemSize*x, height+itemSize+itemSize*y);                        
                     }
                 }
             } else if (underMouse instanceof ShapelessRecipe || underMouse instanceof CuttingRecipe || underMouse instanceof LoomRecipe) {
@@ -240,17 +249,17 @@ public class RecipeBook {
                     renderIngredient(itemRenderer, fontRenderer, (Ingredient) ingredient, itemSize*xpos, height+itemSize);
                     xpos++;
                 }
-            } else if (underMouse instanceof CuttingRecipe) {
+            } else if (underMouse instanceof CuttingRecipe cuttingRecipe) {
                 // fontRenderer.draw(stack, "from "+((Ingredient)(underMouse.getIngredients().get(0))).getMatchingStacksClient()[0].getName().getString(),
                 //         0, height+itemSize, 0xffff00);
                 xpos=0;
-                for (Ingredient ingredient: ((CuttingRecipe)underMouse).getIngredients()) {
+                for (Ingredient ingredient: cuttingRecipe.getIngredients()) {
                     renderIngredient(itemRenderer, fontRenderer, ingredient, itemSize*xpos, height+2*itemSize);
                     xpos++;
                 }
-            } else if (underMouse instanceof BrewingRecipe) {
+            } else if (underMouse instanceof BrewingRecipe brewingRecipe) {
                 ypos=1;
-                for (Object i: ((BrewingRecipe)underMouse).getIngredients()) {
+                for (Object i: brewingRecipe.getIngredients()) {
                     Ingredient ingredient = (Ingredient) i;
                     renderIngredient(itemRenderer, fontRenderer, ingredient, 0, height+ypos*itemSize);
                     fontRenderer.draw(stack, ingredient.getMatchingStacksClient()[0].getName().asOrderedText(), itemSize, height+5+ypos*itemSize, 0xffff00);
@@ -385,7 +394,7 @@ public class RecipeBook {
                 if (wantedRecipeType == RecipeType.STONECUTTING) {
                     Block block = Block.getBlockFromItem(item);
                     if (block instanceof StairsBlock) {
-                        category = I18n.translate("easiercrafting.category.stairs");;
+                        category = I18n.translate("easiercrafting.category.stairs");
                     } else if (block instanceof SlabBlock) {
                         category = I18n.translate("easiercrafting.category.slabs");
                     } else if (block instanceof WallBlock) {
@@ -472,16 +481,20 @@ public class RecipeBook {
     };
 
     private boolean canCraftRecipe(Recipe recipe, ScreenHandler inventory, int gridSize) {
-        if (recipe instanceof ShapelessRecipe) {
-            return canCraftShapeless((ShapelessRecipe) recipe, inventory);
-        } else if (recipe instanceof ShapedRecipe) {
-            return canCraftShaped((ShapedRecipe) recipe, inventory, gridSize);
+        if (recipe instanceof ShapelessRecipe shapelessRecipe) {
+            if (recipe.getIngredients().size() > gridSize*gridSize) {
+                System.out.println("shapeless for "+recipe.getOutput().getTranslationKey()+" has "+recipe.getIngredients().size()+" items while gridSizs is "+gridSize);
+                return false;
+            }
+            return canCraftShapeless(shapelessRecipe, inventory);
+        } else if (recipe instanceof ShapedRecipe shapedRecipe) {
+            return canCraftShaped(shapedRecipe, inventory, gridSize);
         } else if (recipe instanceof InventoryGeneratedRecipe || recipe instanceof RepairRecipe) {
             return recipe.fits(gridSize, gridSize);
-        } else if (recipe instanceof CuttingRecipe) {
-            ItemStack stack = recipe.getOutput();
+        } else if (recipe instanceof CuttingRecipe cuttingRecipe) {
+            ItemStack stack = cuttingRecipe.getOutput();
             LOGGER.debug("output: " + stack.getItem().getName().getString());
-            for (Ingredient ing : (List<Ingredient>) recipe.getIngredients()) {
+            for (Ingredient ing : (List<Ingredient>) cuttingRecipe.getIngredients()) {
                 ItemStack[] stacks = ing.getMatchingStacksClient();
                 if (stacks.length > 1) {
                     LOGGER.debug(stacks.length + " possible inputs for " + stack.getItem().getName().getString());
@@ -490,9 +503,9 @@ public class RecipeBook {
                     }
                 }
             }
-            return canCraftCutting((CuttingRecipe) recipe, inventory);
-        } else if (recipe instanceof BrewingRecipe) {
-            return canBrew((BrewingRecipe)recipe, inventory);
+            return canCraftCutting(cuttingRecipe, inventory);
+        } else if (recipe instanceof BrewingRecipe brewingRecipe) {
+            return canBrew(brewingRecipe, inventory);
         } else {
             //System.out.println(recipe.getRecipeOutput().getDisplayName()+" is a "+recipe.getClass().getCanonicalName());
         }
@@ -515,10 +528,6 @@ public class RecipeBook {
     private boolean canCraftCutting(CuttingRecipe recipe, ScreenHandler inventory) {
         DefaultedList<Ingredient> neededList = recipe.getIngredients();
         return canCraft(recipe, neededList, inventory);
-    }
-
-    private boolean canCraftOre(Recipe recipe, DefaultedList<Ingredient>input, ScreenHandler inventory) {
-        return canCraft(recipe, input, inventory);
     }
 
     private boolean canCraft(Recipe recipe, List<Ingredient> neededList, ScreenHandler inventory) {
@@ -578,14 +587,15 @@ public class RecipeBook {
         List<Ingredient> inputs=recipe.getIngredients();
         Item ingredient = inputs.get(1).getMatchingStacksClient()[0].getItem();
         ItemStack inputPotionStack = inputs.get(0).getMatchingStacksClient()[0];
-        Potion inputPotion = PotionUtil.getPotion(inputs.get(0).getMatchingStacksClient()[0]);
         boolean haveIngredient = false;
         boolean haveInputPotion = false;
 
+/*
         Level level=Level.DEBUG;
         if (ingredient == Items.GUNPOWDER || ingredient == Items.NETHER_WART) {
             level = Level.INFO;
         }
+*/
 
 /*        LOGGER.log(level, "Check for "+(recipe.isItemRecipe() ? "Item recipe " : "Potion recipe ")+
                 PotionUtil.getPotion(recipe.getOutput()).getName(recipe.getOutput().getItem().getName().getString()+" ")+
@@ -688,18 +698,19 @@ public class RecipeBook {
             }
 //            if (!empty) return;
 
-            if (underMouse instanceof RepairRecipe) {
-                fillCraftSlotsWithBestRepair((RepairRecipe) underMouse);
+            if (underMouse instanceof RepairRecipe repairRecipe) {
+                fillCraftSlotsWithBestRepair(repairRecipe);
             } else {
                 fillCraftSlotsWithAnyMaterials(underMouse);
             }
             if (underMouse.getType() == RecipeType.STONECUTTING) {
+                ClientPlayerInteractionManager interactionManager = MinecraftClient.getInstance().interactionManager;
                 StonecutterScreenHandler container = (StonecutterScreenHandler) screen.getScreenHandler();
                 List<StonecuttingRecipe> recipes = container.getAvailableRecipes();
                 int index = recipes.indexOf(underMouse);
-                if (index >= 0) {
+                if (index >= 0 && interactionManager != null) {
                     container.onButtonClick(null, index);
-                    MinecraftClient.getInstance().interactionManager.clickButton(container.syncId, index);
+                    interactionManager.clickButton(container.syncId, index);
                 }
             }
 
@@ -865,12 +876,6 @@ public class RecipeBook {
         return stack.getDamage();
     }
 
-    private int getRemainingDurability(int slot) {
-        ItemStack stack = screen.getScreenHandler().getSlot(slot+firstInventorySlotNo).getStack();
-        int remainingDurability = stack.getMaxDamage() - stack.getDamage();
-        return remainingDurability;
-    }
-
     public boolean keyPressed(int code, int scancode, int modifiers) {
         if (pattern==null)
             return false;
@@ -903,15 +908,22 @@ public class RecipeBook {
 
         boolean tagForbidsItem = false;
 
-        if (inventoryItem.hasTag()) {
-            NbtCompound tag = inventoryItem.getTag();
-            for (String tagName: tag.getKeys()) {
-                if (!(tagName.equals("Damage")) || tag.getInt(tagName) != 0) {
-                    tagForbidsItem = true;
+        NbtCompound tag = inventoryItem.getTag();
+        if (tag != null) {
+            Set<String> keys;
+            if ((keys = tag.getKeys()) != null) {
+                for (String tagName: keys) {
+                    if (tagName.equals("Damage") && tag.getInt(tagName) == 0) {
+                        // A damage tag that has "no damage" doesn't prevent using the item
+                    } else if (tagName.equals("BlockEntityTag") && Block.getBlockFromItem(inventoryItem.getItem()) instanceof ShulkerBoxBlock) {
+                        // Shulker boxes can be dyed even if they have contents
+                    } else {
+                        tagForbidsItem = true;
+                    }
                 }
             }
         }
-
+        
         if (!tagForbidsItem && recipeComponent.test(inventoryItem))
             return true;
 
@@ -966,24 +978,5 @@ public class RecipeBook {
     
     public void slotClick(int slot, int mouseButton, SlotActionType clickType) {
         ((SlotClickAccepter)screen).slotClick(slot, mouseButton, clickType);
-    }
-    
-    /*
-     * This is an evil hack to make the server send the inventory to us. We 
-     * deliberately send a click that, hopefully, CAN'T be correct, so the 
-     * server will send the inventory. Doing this after the final QUICK_MOVE
-     * packet that executes the craft should update our inventory allright.
-    
-     * And maybe we don't even need this anymore with the new way of confirming inventories.
-     */
-    private void fakeWrongSlotClickToMakeServerSendInventory() {
-        /* 
-        short s = player.currentScreenHandler.getNextActionId(player.getInventory());
-        int syncId = screen.getScreenHandler().syncId;
-        ItemStack fakeStack = new ItemStack(Items.BEDROCK);         // some item the player "shouldn't" have in their inventory, much less use it to craft
-        MinecraftClient.getInstance().getNetworkHandler().sendPacket(
-                new ClickSlotC2SPacket(syncId, 0, 0, SlotActionType.QUICK_MOVE, fakeStack, s)
-        );
-        */
     }
 }
