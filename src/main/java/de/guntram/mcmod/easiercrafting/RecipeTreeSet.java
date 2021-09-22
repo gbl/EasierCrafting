@@ -17,9 +17,9 @@ public class RecipeTreeSet extends TreeSet<Recipe> {
                     if (sameName != 0) {
                         return sameName;
                     } else {
-                        return ((Ingredient)(a.getIngredients().get(0))).getMatchingStacksClient()[0].getItem().getName().getString()
+                        return ((Ingredient)(a.getIngredients().get(0))).getMatchingStacks()[0].getItem().getName().getString()
                         .compareToIgnoreCase(
-                               ((Ingredient)(b.getIngredients().get(0))).getMatchingStacksClient()[0].getItem().getName().getString()
+                               ((Ingredient)(b.getIngredients().get(0))).getMatchingStacks()[0].getItem().getName().getString()
                         );
                     }
                 } else if (a.getType() == BrewingRecipe.recipeType || b.getType() == BrewingRecipe.recipeType) {

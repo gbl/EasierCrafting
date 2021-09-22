@@ -34,6 +34,7 @@
     "easiercrafting.config.hidewithrei": "GUI ausblenden, wenn REI angezeigt wird",
     "easiercrafting.config.hidebrewingstandbutton": "'Nehmen' Button im Brauständer ausblenden",
     "easiercrafting.config.useinventoryrefreshhack": "Request inventory refresh after every craft",
+    "easiercrafting.config.loomclickspeed": "Speed to click the loom",
     "easiercrafting.config.tt.autoupdate": "Rezeptliste nach dieser Zeit nach dem letzten Klick aktualisieren",
     "easiercrafting.config.tt.autofocus": "Automatisches Fokussieren des Suchfeldes beim Öffnen der Craft-GUI",
     "easiercrafting.config.tt.allowinternalbutton": "Erlaube das Öffnen des MC-internen Rezeptbuchs (seit 1.12)",
@@ -43,5 +44,6 @@
     "easiercrafting.config.tt.categorize": "Rezepte nach Kreativmodus-Tab kategorisieren",
     "easiercrafting.config.tt.hidewithrei": "Wenn REI installiert ist, wird EasierCrafting nur angezeigt, wenn REI ausgeschaltet ist (Standard STRG-O)",
     "easiercrafting.config.tt.hidebrewingstandbutton": "Den Nehmen Button ausblenden, da er mit manchen Ressourcen-Paketen kollidiert",
-    "easiercrafting.config.tt.useinventoryrefreshhack": "Turn this on if you experience synchronization problems after crafting"
+    "easiercrafting.config.tt.useinventoryrefreshhack": "Turn this on if you experience synchronization problems after crafting",
+    "easiercrafting.config.tt.loomclickspeed": "The lower you set this, the faster the loom will be, but too low might get you out of sync, especially on servers"
 }

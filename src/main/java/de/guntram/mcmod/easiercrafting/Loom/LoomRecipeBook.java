@@ -203,7 +203,7 @@ public class LoomRecipeBook extends RecipeBook {
             if (slot.getStack().getItem() != blankBanner.getItem()) {
                 continue;
             }
-            NbtCompound cTag = slot.getStack().getOrCreateSubTag("BlockEntityTag");
+            NbtCompound cTag = slot.getStack().getOrCreateSubNbt("BlockEntityTag");
             if (!cTag.contains("Patterns", 9)
             ||  cTag.getList("Patterns", 10).isEmpty()) {
                 return i+firstInventorySlotNo;

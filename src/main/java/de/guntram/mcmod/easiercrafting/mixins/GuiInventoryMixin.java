@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class GuiInventoryMixin {
     
     @Shadow public ClientPlayerEntity player;
-    @Shadow public void openScreen(Screen screenIn) {}
+    @Shadow public void setScreen(Screen screenIn) {}
     
     @Inject(method="handleInputEvents", at=@At(value="INVOKE",
             target="Lnet/minecraft/client/tutorial/TutorialManager;onInventoryOpened()V"), cancellable = true)
@@ -24,7 +24,7 @@ public class GuiInventoryMixin {
     public void displayExtendedInventory(CallbackInfo ci) {
         ExtendedGuiInventory egi = new ExtendedGuiInventory(this.player);
         egi.setRecipeBook(new RecipeBook(egi, 1, 2, 0, 9));
-        this.openScreen(egi);
+        this.setScreen(egi);
         ci.cancel();
     }
 }

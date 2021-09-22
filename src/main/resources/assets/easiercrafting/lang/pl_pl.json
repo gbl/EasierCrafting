@@ -33,7 +33,8 @@
     "easiercrafting.config.categorize": "Sortowanie receptur",
     "easiercrafting.config.hidewithrei": "Ukryj GUI kiedy REI jest wyświetlane",
     "easiercrafting.config.hidebrewingstandbutton": "Ukryj przycisk 'Weź' w statywie alchemicznym",
-    "easiercrafting.config.useinventoryrefreshhack": "Request inventory refresh after every craft",
+    "easiercrafting.config.useinventoryrefreshhack": "Zażądaj odświeżenia ekwipunku po każdej utworzonej rzeczy",
+    "easiercrafting.config.loomclickspeed": "Szybkość, aby kliknąć na krosno",
     "easiercrafting.config.tt.autoupdate": "Aktualizowanie listy receptur po kilku sekundach po kliknięciu",
     "easiercrafting.config.tt.autofocus": "Automatycznie fokusuj pole wyszukiwania kiedy crafting jest otwarty",
     "easiercrafting.config.tt.allowinternalbutton": "Zezwalaj na otwieranie książki receptur (od wersji 1.12)",
@@ -43,5 +44,6 @@
     "easiercrafting.config.tt.categorize": "Kategoryzuj receptury przez zakładki z trybu Kreatywnego",
     "easiercrafting.config.tt.hidewithrei": "Jeżeli posiadasz REI EasierCrafting pokaże się tylko gdy REI zostanie schowane (domyślnie klikając CTRL-O)",
     "easiercrafting.config.tt.hidebrewingstandbutton": "Ukryj przycisk WEŹ który może konfliktować z niektórymi paczkami zasobów",
-    "easiercrafting.config.tt.useinventoryrefreshhack": "Turn this on if you experience synchronization problems after crafting"
+    "easiercrafting.config.tt.useinventoryrefreshhack": "Włącz tą opcje jeśli doświadczasz problemów ze synchronizacją podczas tworzenia",
+    "easiercrafting.config.tt.loomclickspeed": "Im niższe to ustawisz, tym szybsze będzie krosno, ale za nisko może wyprowadzić Ciebie z synchronizacji, zwłaszcza na serwerach"
 }

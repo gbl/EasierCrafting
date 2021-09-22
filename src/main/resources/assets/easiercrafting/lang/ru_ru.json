@@ -34,14 +34,16 @@
     "easiercrafting.config.hidewithrei": "Скрывать интерфейс мода при включённом REI",
     "easiercrafting.config.hidebrewingstandbutton": "Спрятать кнопку 'Взять' в варочной стойке",
     "easiercrafting.config.useinventoryrefreshhack": "Обновлять инвентарь после каждого создания",
+    "easiercrafting.config.loomclickspeed": "Скорость клика верстака",
     "easiercrafting.config.tt.autoupdate": "Обновить список рецептов после этого количества секунд после последнего клика",
     "easiercrafting.config.tt.autofocus": "Автоматически фокусироваться на поле поиска при открытии GUI создания",
     "easiercrafting.config.tt.allowinternalbutton": "Разрешить открытие внутренней книги рецептов MC (с 1.12)",
-    "easiercrafting.config.tt.guiright": "Показывать GUI справа инвентаря, где оно может конфликтировать с REI, вместо лева, где оно конфликтует с активными эффектами",
+    "easiercrafting.config.tt.guiright": "Показывать GUI справа инвентаря, где оно может конфликтовать с REI, вместо лева, где оно конфликтует с активными эффектами",
     "easiercrafting.config.tt.specialrecipes": "Добавить покраску Шалкеровых ящиков, стрел с эффектами, фейервекров, починок в список рецептов",
     "easiercrafting.config.tt.maxenchants": "Не рассматривать предметы для починки в верстаке если у них есть больше чем это количество зачарований",
     "easiercrafting.config.tt.categorize": "Категоризировать рецепты по их вкладке творческого режима",
     "easiercrafting.config.tt.hidewithrei": "Если у вас установлен REI, EasierCrafting будет показываться только при отключении REI (по умолчанию CTRL-O)",
     "easiercrafting.config.tt.hidebrewingstandbutton": "Скрыть кнопку Взять, которая конфликтует с некоторыми наборами ресурсов",
-    "easiercrafting.config.tt.useinventoryrefreshhack": "Включите это, если после создания у вас возникли проблемы с \"фантомными\" предметами"
+    "easiercrafting.config.tt.useinventoryrefreshhack": "Включите это, если после создания у вас возникли проблемы с \"фантомными\" предметами",
+    "easiercrafting.config.tt.loomclickspeed": "Чем ниже вы установите, тем быстрее будет крафт, но слишком низкая скорость может привести  к невозможности синхронизации, особенно на серверах"
 }

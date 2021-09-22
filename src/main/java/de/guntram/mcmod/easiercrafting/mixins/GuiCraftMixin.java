@@ -50,7 +50,7 @@ public class GuiCraftMixin {
             return;
         }
         client.player.currentScreenHandler = handler;
-        client.openScreen(screen);
+        client.setScreen(screen);
         ci.cancel();
     }
 }

@@ -90,7 +90,7 @@ public class LoomRecipe implements Recipe {
             ItemStack bannerStack = screen.getBannerItemStack();
             // ItemStack bannerStack = new ItemStack(new WallBannerBlock(DyeColor.byId(screen.getColor(0)),
             //         Block.Settings.of(Material.WOOD)).asItem());
-            NbtCompound compoundTag = bannerStack.getOrCreateSubTag("BlockEntityTag");
+            NbtCompound compoundTag = bannerStack.getOrCreateSubNbt("BlockEntityTag");
             NbtList patterns;
             if (compoundTag.contains("Patterns", 9)) {
                patterns = compoundTag.getList("Patterns", 10);

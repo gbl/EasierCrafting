@@ -171,7 +171,7 @@ public class InventoryRecipeScanner {
             for (int power=1; power<=3; power++) {
                 if (availableGunPowder>=power) {
                     ItemStack resultItem = new ItemStack(Items.FIREWORK_ROCKET, 3);
-                    NbtCompound nbttagcompound = resultItem.getOrCreateSubTag("Fireworks");
+                    NbtCompound nbttagcompound = resultItem.getOrCreateSubNbt("Fireworks");
                     nbttagcompound.putByte("Flight", (byte)power);
                     resultItem.setCustomName(new LiteralText("Strength "+power));
 

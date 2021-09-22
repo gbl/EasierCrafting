@@ -34,6 +34,7 @@
     "easiercrafting.config.hidewithrei": "Ocultar GUI cuando se muestre el REI",
     "easiercrafting.config.hidebrewingstandbutton": "Hide 'Take' button in brewing stand",
     "easiercrafting.config.useinventoryrefreshhack": "Request inventory refresh after every craft",
+    "easiercrafting.config.loomclickspeed": "Speed to click the loom",
     "easiercrafting.config.tt.autoupdate": "Update recipe list after this many seconds after last click",
     "easiercrafting.config.tt.autofocus": "Automatically focus the search box when opening craft GUI",
     "easiercrafting.config.tt.allowinternalbutton": "Allow opening the MC internal recipe book (since 1.12)",
@@ -43,5 +44,6 @@
     "easiercrafting.config.tt.categorize": "Categorize recipes by their creative mode tab",
     "easiercrafting.config.tt.hidewithrei": "If you have REI, EasierCrafting will only show when REI is turned off (default CTRL-O)",
     "easiercrafting.config.tt.hidebrewingstandbutton": "Hide the TAKE button that conflicts with some resource packs",
-    "easiercrafting.config.tt.useinventoryrefreshhack": "Turn this on if you experience synchronization problems after crafting"
+    "easiercrafting.config.tt.useinventoryrefreshhack": "Turn this on if you experience synchronization problems after crafting",
+    "easiercrafting.config.tt.loomclickspeed": "The lower you set this, the faster the loom will be, but too low might get you out of sync, especially on servers"
 }

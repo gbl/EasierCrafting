@@ -261,7 +261,7 @@ public class RecipeBook {
                 for (Object i: brewingRecipe.getIngredients()) {
                     Ingredient ingredient = (Ingredient) i;
                     renderIngredient(itemRenderer, fontRenderer, ingredient, 0, height+ypos*itemSize);
-                    fontRenderer.draw(stack, ingredient.getMatchingStacksClient()[0].getName().asOrderedText(), itemSize, height+5+ypos*itemSize, 0xffff00);
+                    fontRenderer.draw(stack, ingredient.getMatchingStacks()[0].getName().asOrderedText(), itemSize, height+5+ypos*itemSize, 0xffff00);
                     ypos++;
                 }
             }
@@ -306,7 +306,7 @@ public class RecipeBook {
     }
     
     public void renderIngredient(ItemRenderer itemRenderer, TextRenderer fontRenderer, Ingredient ingredient, int x, int y) {
-        ItemStack[] stacks=ingredient.getMatchingStacksClient();
+        ItemStack[] stacks=ingredient.getMatchingStacks();
         if (stacks.length==0)
             return;
         int toRender=0;
@@ -494,7 +494,7 @@ public class RecipeBook {
             ItemStack stack = cuttingRecipe.getOutput();
             LOGGER.debug("output: " + stack.getItem().getName().getString());
             for (Ingredient ing : (List<Ingredient>) cuttingRecipe.getIngredients()) {
-                ItemStack[] stacks = ing.getMatchingStacksClient();
+                ItemStack[] stacks = ing.getMatchingStacks();
                 if (stacks.length > 1) {
                     LOGGER.debug(stacks.length + " possible inputs for " + stack.getItem().getName().getString());
                     for (ItemStack stack2 : stacks) {
@@ -532,7 +532,7 @@ public class RecipeBook {
     private boolean canCraft(Recipe recipe, List<Ingredient> neededList, ScreenHandler inventory) {
         ArrayList<Takefrom> source=new ArrayList<>(neededList.size());
         for (Ingredient neededItem: neededList) {                                // iterate over needed items
-            ItemStack[] stacks=neededItem.getMatchingStacksClient();
+            ItemStack[] stacks=neededItem.getMatchingStacks();
             if (stacks.length==0)
                 continue;
             int neededAmount=stacks[0].getCount();
@@ -584,8 +584,8 @@ public class RecipeBook {
 
     private boolean canBrew(BrewingRecipe recipe, ScreenHandler inventory) {
         List<Ingredient> inputs=recipe.getIngredients();
-        Item ingredient = inputs.get(1).getMatchingStacksClient()[0].getItem();
-        ItemStack inputPotionStack = inputs.get(0).getMatchingStacksClient()[0];
+        Item ingredient = inputs.get(1).getMatchingStacks()[0].getItem();
+        ItemStack inputPotionStack = inputs.get(0).getMatchingStacks()[0];
         boolean haveIngredient = false;
         boolean haveInputPotion = false;
 
@@ -755,7 +755,7 @@ public class RecipeBook {
             // this assumes a recipe never needs more than one item in a single input slot (unless more than 1 output item)
             HashMap<String,InputCount> inputCount=new HashMap<>();
             for (Ingredient ingr:recipeInput) {
-                ItemStack[] stacks = ingr.getMatchingStacksClient();
+                ItemStack[] stacks = ingr.getMatchingStacks();
                 if (stacks.length==0)
                     continue;
                 if (stacks[0].getMaxCount()<maxCraftableStacks)                 // limit type a
@@ -847,9 +847,9 @@ public class RecipeBook {
         ScreenHandler container = screen.getScreenHandler();
         ItemStack ingredientStack = container.getSlot(3+firstCraftSlot).getStack();
         List<Ingredient> inputs=recipe.getIngredients();
-        ItemStack inputPotionStack = inputs.get(0).getMatchingStacksClient()[0];
+        ItemStack inputPotionStack = inputs.get(0).getMatchingStacks()[0];
         if (ingredientStack.isEmpty()) {
-            Item neededItem = ((Ingredient)(recipe.getIngredients().get(1))).getMatchingStacksClient()[0].getItem();
+            Item neededItem = ((Ingredient)(recipe.getIngredients().get(1))).getMatchingStacks()[0].getItem();
             for (int slot=0; slot<36; slot++) {
                 if (container.getSlot(slot+firstInventorySlotNo).getStack().getItem() == neededItem) {
                     LOGGER.debug("transfer from inv slot "+slot+" to ingred. slot "+3);
@@ -921,7 +921,7 @@ public class RecipeBook {
 
         boolean tagForbidsItem = false;
 
-        NbtCompound tag = inventoryItem.getTag();
+        NbtCompound tag = inventoryItem.getNbt();
         if (tag != null) {
             Set<String> keys;
             if ((keys = tag.getKeys()) != null) {
@@ -946,7 +946,7 @@ public class RecipeBook {
             return false;
 
         Potion neededType = PotionUtil.getPotion(inventoryItem);
-        ItemStack[] possiblePotions = recipeComponent.getMatchingStacksClient();
+        ItemStack[] possiblePotions = recipeComponent.getMatchingStacks();
         for (ItemStack stack: possiblePotions) {
             // LOGGER.info("in lingering potion check, component = "+recipeComponent.getMatchingStacksClient()[0].getTranslationKey()+", invItem = "+inventoryItem.getTranslationKey());
             if (PotionUtil.getPotion(stack) == neededType && recipeComponent.test(inventoryItem)) {

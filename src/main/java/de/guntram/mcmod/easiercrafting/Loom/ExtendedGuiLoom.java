@@ -176,7 +176,7 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
         if (!(banners.getItem() instanceof BannerItem)) {
             return;
         }
-        NbtCompound tag = banners.getSubTag("BlockEntityTag");
+        NbtCompound tag = banners.getSubNbt("BlockEntityTag");
         if (tag == null) {
             return;
         }
