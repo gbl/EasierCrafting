@@ -404,7 +404,7 @@ public class RecipeBook {
                 } else if (wantedRecipeType == BrewingRecipe.recipeType) {
                     category=((BrewingRecipe)recipe).getCategory();
                 } else {
-                    category=I18n.translate(tab.getTranslationKey().getString(), new Object[0]);
+                    category=I18n.translate(tab.getDisplayName().getString(), new Object[0]);
                 }
             }
             RecipeTreeSet catRecipes=craftableCategories.get(category);
