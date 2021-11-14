@@ -34,7 +34,7 @@
     "easiercrafting.config.hidewithrei": "Skrýt GUI, když je zobrazeno REI",
     "easiercrafting.config.hidebrewingstandbutton": "Skrýt \"vzít\" tlačítko ve varném stojanu",
     "easiercrafting.config.useinventoryrefreshhack": "Požádat o obnovení po každém vyrobení",
-    "easiercrafting.config.loomclickspeed": "Speed to click the loom",
+    "easiercrafting.config.loomclickspeed": "Rychlost kliknutí na tkalcovský stav",
     "easiercrafting.config.tt.autoupdate": "Obnovit list receptů po tolika sekundách po posledním kliknutím",
     "easiercrafting.config.tt.autofocus": "Automaticky zaměřit vyhledávací pole při otevření GUI výroby",
     "easiercrafting.config.tt.allowinternalbutton": "Povolit otevření interní knihy receptů MC (od 1.12)",
@@ -45,5 +45,5 @@
     "easiercrafting.config.tt.hidewithrei": "Pokud máte REI, EasierCrafting se zobrazí pouze při vypnutí REI (výchozí CTRL-O)",
     "easiercrafting.config.tt.hidebrewingstandbutton": "Skrýt tlačítko VZÍT, když je v rozporu s některými balíčky modifikací",
     "easiercrafting.config.tt.useinventoryrefreshhack": "Zapněte, pokud dojde k problémům se synchronizací po výrobě",
-    "easiercrafting.config.tt.loomclickspeed": "The lower you set this, the faster the loom will be, but too low might get you out of sync, especially on servers"
+    "easiercrafting.config.tt.loomclickspeed": "Čím nižší bude nastaveno, tím rychlejší tkalcovský stav bude, ale příliš nízké vás může vyvést ze synchronizace, zejména na serverech"
 }

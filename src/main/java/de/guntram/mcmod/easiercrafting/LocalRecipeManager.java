@@ -61,6 +61,8 @@ public class LocalRecipeManager extends RecipeManager implements ResourceManager
             @Override public void markSampleType(SampleType type) {}
             @Override public void visit(String marker) {}
             @Override public void visit(Supplier<String> markerGetter) {}
+            @Override public void visit(String marker, int i) {}
+            @Override public void visit(Supplier<String> markerGetter, int i) {}
     }
 
     public static void load() {
