@@ -66,8 +66,9 @@ public class LocalRecipeManager extends RecipeManager implements ResourceManager
     }
 
     public static void load() {
-        Map<Identifier, JsonElement> map = instance.prepare(instance, null);
-        instance.apply(map, instance, new EmptyProfiler());
+        Profiler profiler = new EmptyProfiler();
+        Map<Identifier, JsonElement> map = instance.prepare(instance, profiler);
+        instance.apply(map, instance, profiler);
     }
     
     @Override
