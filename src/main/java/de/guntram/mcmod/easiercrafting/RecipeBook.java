@@ -48,14 +48,13 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RecipeBook {
     
-    public static final Logger LOGGER = LogManager.getLogger(RecipeBook.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(RecipeBook.class);
 
     public final HandledScreen screen;
     private final int firstCraftSlot;
@@ -324,8 +323,7 @@ public class RecipeBook {
         ScreenHandler inventory = screen.getScreenHandler();
         List<Recipe> recipes = new ArrayList<>();
         if (wantedRecipeType == BrewingRecipe.recipeType) {
-            Level level = Level.DEBUG;
-            LOGGER.log(level, "recipebook: size= "+inventory.slots.size());
+            LOGGER.debug("recipebook: size= "+inventory.slots.size());
 
             List<BrewingRecipe> potionRecipes = BrewingRecipeRegistryCache.registeredPotionRecipes();
             Set<BrewingRecipe> possiblePotionRecipes = new HashSet<>();
@@ -337,7 +335,7 @@ public class RecipeBook {
                 Potion potionType = PotionUtil.getPotion(stack);
                 if (!stack.isEmpty() && potionType != Potions.EMPTY) {
                     BrewingRecipe newRecipe;
-                    LOGGER.log(level, "slot "+i+" has "+stack.getCount()+" of "+stack.getItem().getName().getString() + " potion type "+potionType.finishTranslationKey(""));
+                    LOGGER.debug("slot "+i+" has "+stack.getCount()+" of "+stack.getItem().getName().getString() + " potion type "+potionType.finishTranslationKey(""));
                     for (BrewingRecipe br: itemRecipes) {
                         if (br.getInputPotion().getItem() == stack.getItem()) {
                             // This potion item can be converted to a different item.
@@ -347,7 +345,7 @@ public class RecipeBook {
                             ItemStack input  = new ItemStack(br.getInputPotion().getItem()); PotionUtil.setPotion(input, potionType);
                             ItemStack output = new ItemStack(br.getOutput().getItem()); PotionUtil.setPotion(output, potionType);
                             possibleItemRecipes.add(newRecipe = new BrewingRecipe(false, input, br.getIngredient(), output));
-                            LOGGER.log(level, "adding recipe "+newRecipe.toString());
+                            LOGGER.debug("adding recipe "+newRecipe.toString());
                         }
                     }
                     for (BrewingRecipe br: potionRecipes) {
@@ -355,7 +353,7 @@ public class RecipeBook {
                             ItemStack input = new ItemStack(stack.getItem()); PotionUtil.setPotion(input, potionType);
                             ItemStack output = new ItemStack(stack.getItem()); PotionUtil.setPotion(output, PotionUtil.getPotion(br.getOutput()));
                             possiblePotionRecipes.add(newRecipe = new BrewingRecipe(true, input, br.getIngredient(), output));
-                            LOGGER.log(level, "adding recipe "+newRecipe.toString());
+                            LOGGER.debug("adding recipe "+newRecipe.toString());
                         }
                     }
                 }
@@ -412,7 +410,7 @@ public class RecipeBook {
                 catRecipes=new RecipeTreeSet();
                 craftableCategories.put(category, catRecipes);
             }
-            LOGGER.log(Level.DEBUG, "adding "+result.getName().getString()+" in "+category);
+            LOGGER.debug("adding "+result.getName().getString()+" in "+category);
             catRecipes.add((Recipe)recipe);
         }
         recalcListSize();

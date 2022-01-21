@@ -6,7 +6,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldEventS2CPacket;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class BrewingstandRefreshMixin {
     
-    @Shadow @Final static Logger LOGGER;
+    @Shadow @Final private static Logger LOGGER;
     
     @Inject(method="onInventory", at=@At("RETURN"))
     private void dumpInventoryInfo(InventoryS2CPacket packet, CallbackInfo ci) {

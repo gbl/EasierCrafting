@@ -31,8 +31,8 @@ import net.minecraft.resource.metadata.ResourceMetadataReader;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.profiler.SampleType;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -40,7 +40,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class LocalRecipeManager extends RecipeManager implements ResourceManager {
     
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger();
     private static final Set<String> namespaces = Collections.singleton( EasierCrafting.MODID );
     private static final List<String> forcedZips = new ArrayList<>();
     private static final LocalRecipeManager instance = new LocalRecipeManager();

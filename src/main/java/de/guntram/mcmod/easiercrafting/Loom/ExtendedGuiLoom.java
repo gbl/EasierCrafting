@@ -31,9 +31,9 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.DyeColor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -52,7 +52,7 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
 
     public ExtendedGuiLoom(LoomScreenHandler container, PlayerInventory inventory, Text title) {
         super(container, inventory, title);
-        LOGGER=LogManager.getLogger();
+        LOGGER=LoggerFactory.getLogger(ExtendedGuiLoom.class);
     }
     
     @Override
@@ -217,7 +217,7 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
             recipeBook.updateRecipes();
             recipeBook.updatePatternMatch();
         } catch (IOException ex) {
-            LOGGER.warn(ex);
+            LOGGER.warn(ex.toString());
         }
     }
     

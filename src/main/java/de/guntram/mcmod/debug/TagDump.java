@@ -8,15 +8,15 @@ package de.guntram.mcmod.debug;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author gbl
  */
 public class TagDump {
-    static final Logger LOGGER = LogManager.getLogger(TagDump.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(TagDump.class);
 
     public static void dump(NbtCompound tag, int indent) {
         StringBuilder res;
@@ -47,7 +47,7 @@ public class TagDump {
             } else {
                 res.append(s).append("(Type ").append(elem.getType()).append(")");
             }
-            LOGGER.info(res);
+            LOGGER.info(String.valueOf(res));
             if (elem.getType() == 10) {
                 dump(tag.getCompound(s), indent+1);
             }

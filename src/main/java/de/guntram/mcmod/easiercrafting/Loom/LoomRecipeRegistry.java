@@ -12,8 +12,8 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeMap;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -28,7 +28,7 @@ public class LoomRecipeRegistry {
     
     private LoomRecipeRegistry() {
         recipes = new TreeMap<>();
-        LOGGER = LogManager.getLogger();
+        LOGGER = LoggerFactory.getLogger(LoomRecipeRegistry.class);
     }
     
     public static LoomRecipeRegistry getInstance() {
