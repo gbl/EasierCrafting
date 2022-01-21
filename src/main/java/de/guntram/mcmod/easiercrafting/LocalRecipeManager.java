@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LocalRecipeManager extends RecipeManager implements ResourceManager {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocalRecipeManager.class);
     private static final Set<String> namespaces = Collections.singleton( EasierCrafting.MODID );
     private static final List<String> forcedZips = new ArrayList<>();
     private static final LocalRecipeManager instance = new LocalRecipeManager();
@@ -78,7 +78,7 @@ public class LocalRecipeManager extends RecipeManager implements ResourceManager
 
     public static void dumpAll() {
         for (Recipe r: instance.values()) {
-            LOGGER.info(r.getId());
+            LOGGER.info(r.getId().toString());
             // System.out.println(r.getId() + " produces " + r.getOutput().getTranslationKey());
         }
     }

@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class InventoryRecipeScanner {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(InventoryRecipeScanner.class);
     
     static List<Recipe> findUnusualRecipes(ScreenHandler inventory, int firstInventorySlotNo) {
         ArrayList<Recipe> result=new ArrayList<>();
