@@ -29,8 +29,8 @@ public class EasierCrafting implements ClientModInitializer
         confHandler.load(ConfigurationProvider.getSuggestedFile(MODID));
         
         File localRecipes = extractBundledFile("localrecipes.zip");
-        LocalRecipeManager.addZipfile(localRecipes.getPath());
-        LocalRecipeManager.load();
+// disabled for 1.19        LocalRecipeManager.addZipfile(localRecipes.getPath());
+// disabled for 1.19        LocalRecipeManager.load();
 
         extractBundledFile("loomrecipes.zip");
         extractConfigFileContents("loomrecipes.zip", "loomrecipes");

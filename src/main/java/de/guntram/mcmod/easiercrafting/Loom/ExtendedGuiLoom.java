@@ -27,9 +27,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.screen.LoomScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.DyeColor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,9 +56,9 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
     @Override
     protected void init() {
         super.init();
-        saveName = new TextFieldWidget(this.textRenderer, 0, -25, this.backgroundWidth-25, 20, new LiteralText("Save input pattern as..."));
+        saveName = new TextFieldWidget(this.textRenderer, 0, -25, this.backgroundWidth-25, 20, Text.literal("Save input pattern as..."));
         saveButton = new ButtonWidget(this.backgroundWidth-20, -25, 20, 20,
-                new TranslatableText("easiercrafting.loom.save"), (button)->{this.saveButtonPressed();});
+                Text.translatable("easiercrafting.loom.save"), (button)->{this.saveButtonPressed();});
         if (savedColorCode == null) {
             savedColorCode = new int[BUTTONCOUNT];
             for (int i=0; i<savedColorCode.length; i++) {
@@ -241,7 +239,7 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
         private int clickButton;
 
         ColorButtonWidget(int x, int y, int width, int height, int index, int color) {
-            super(x, y, width, height, new LiteralText(""), new PressAction() {
+            super(x, y, width, height, Text.literal(""), new PressAction() {
                 @Override
                 public void onPress(ButtonWidget button) {
                     colorButtonPressed(index);

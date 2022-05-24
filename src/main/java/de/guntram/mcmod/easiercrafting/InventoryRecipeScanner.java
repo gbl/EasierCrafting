@@ -22,7 +22,7 @@ import net.minecraft.potion.PotionUtil;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -173,7 +173,7 @@ public class InventoryRecipeScanner {
                     ItemStack resultItem = new ItemStack(Items.FIREWORK_ROCKET, 3);
                     NbtCompound nbttagcompound = resultItem.getOrCreateSubNbt("Fireworks");
                     nbttagcompound.putByte("Flight", (byte)power);
-                    resultItem.setCustomName(new LiteralText("Strength "+power));
+                    resultItem.setCustomName(Text.literal("Strength "+power));
 
                     ItemStack[] gunPowder = new ItemStack[power];
                     for (int k=0; k<power; k++)

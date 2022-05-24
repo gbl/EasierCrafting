@@ -10,12 +10,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -38,7 +38,11 @@ import org.apache.logging.log4j.Logger;
  *
  * @author gbl
  */
-public class LocalRecipeManager extends RecipeManager implements ResourceManager {
+
+/* disabled for now -- I don't know how to port this
+
+
+ public class LocalRecipeManager extends RecipeManager implements ResourceManager {
     
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Set<String> namespaces = Collections.singleton( EasierCrafting.MODID );
@@ -93,29 +97,23 @@ public class LocalRecipeManager extends RecipeManager implements ResourceManager
     }
 
     @Override
-    public Resource getResource(Identifier id) throws IOException {
+    public Optional<Resource> getResource(Identifier id) {
         String[] parts = id.getPath().split(SEPARATOR);
         String zipFile = parts[0];
         String zipPath = parts[1];
-        return new LocalRecipeResource(zipFile, zipPath);
-
+        return Optional.of(new LocalRecipeResource(zipFile, zipPath));
     }
 
     @Override
-    public boolean containsResource(Identifier id) {
-        return true;
-    }
-
-    @Override
-    public List<Resource> getAllResources(Identifier id) throws IOException {
+    public List<Resource> getAllResources(Identifier id) {
         List<Resource> result = new ArrayList<>();
-        result.add(getResource(id));
+        result.add(getResource(id).get());
         return result;
     }
     
     @Override
-    public Collection<Identifier> findResources(String resourceType, Predicate<String> pathPredicate) {
-        final Set<Identifier> result = new HashSet<>();
+    public Map<Identifier, Resource> findResources(String resourceType, Predicate<Identifier> pathPredicate) {
+        final Map<Identifier, Resource> result = new HashMap<>();
         
         for (String filename: forcedZips) {
             try {
@@ -123,8 +121,9 @@ public class LocalRecipeManager extends RecipeManager implements ResourceManager
                 Enumeration<? extends ZipEntry> entries = zip.entries();
                 while (entries.hasMoreElements()) {
                     ZipEntry entry = entries.nextElement();
-                    if (pathPredicate.test(entry.getName())) {
-                        result.add(new Identifier(EasierCrafting.MODID, filename.replace('\\', '/') + SEPARATOR + entry.getName()));
+                    Identifier id = new Identifier(EasierCrafting.MODID, filename.replace('\\', '/') + SEPARATOR + entry.getName());
+                    if (pathPredicate.test(id)) {
+                        result.put(id, getResource(id).get());
                     }
                 }
             } catch (IOException ex) {
@@ -135,7 +134,7 @@ public class LocalRecipeManager extends RecipeManager implements ResourceManager
     }
 }
 
-class LocalRecipeResource implements Resource {
+class LocalRecipeResource extends Resource {
 
     String zipName, entryName;
     LocalRecipeResource(String zipName, String entryName) {
@@ -180,3 +179,5 @@ class LocalRecipeResource implements Resource {
 
     }
 }
+
+*/

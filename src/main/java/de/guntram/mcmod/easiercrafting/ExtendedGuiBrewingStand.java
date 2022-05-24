@@ -8,7 +8,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.BrewingStandScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import org.lwjgl.glfw.GLFW;
 
 public class ExtendedGuiBrewingStand extends BrewingStandScreen implements SlotClickAccepter {
@@ -23,7 +22,7 @@ public class ExtendedGuiBrewingStand extends BrewingStandScreen implements SlotC
     protected void init() {
         super.init();
         if (!ConfigurationHandler.hideBrewingStandTakeButton()) {
-            this.addDrawableChild(new ClickableWidget(x+130, y+50, 40, 20, new TranslatableText("easiercrafting.brewing.takeall")) {
+            this.addDrawableChild(new ClickableWidget(x+130, y+50, 40, 20, Text.translatable("easiercrafting.brewing.takeall")) {
                 @Override
                 public void onClick(double x, double y) {
                     // for some reason, this order seems to work better than 0 1 2

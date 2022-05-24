@@ -43,8 +43,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.StonecutterScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
@@ -159,7 +158,7 @@ public class RecipeBook {
         // We can't do this in the constructor as we don't yet know sizes from initGui.
         // Also, not in afterInitGui() because we don't know fontRender there.
         if (pattern==null) {
-            pattern=new TextFieldWidget(fontRenderer, xOffset, 0, textBoxSize, 20, new LiteralText(""));
+            pattern=new TextFieldWidget(fontRenderer, xOffset, 0, textBoxSize, 20, Text.literal(""));
             if (ConfigurationHandler.getAutoFocusSearch()) {
                 // doh - in 1.15, changeFocus toggles the focus and ignores the parameter
                 pattern.changeFocus(true);
@@ -364,7 +363,7 @@ public class RecipeBook {
             recipes.addAll(possiblePotionRecipes);
         } else {
             recipes.addAll(player.world.getRecipeManager().values());
-            recipes.addAll(LocalRecipeManager.getInstance().values());
+// disabled for 1.19            recipes.addAll(LocalRecipeManager.getInstance().values());
             if (wantedRecipeType == RecipeType.CRAFTING && ConfigurationHandler.getAllowGeneratedRecipes()) {
                 recipes.addAll(InventoryRecipeScanner.findUnusualRecipes(inventory, firstInventorySlotNo));
             }
@@ -445,7 +444,7 @@ public class RecipeBook {
             recipes.addAll(BrewingRecipeRegistryCache.registeredBrewingRecipes());
         } else {
             recipes.addAll(player.world.getRecipeManager().values());
-            recipes.addAll(LocalRecipeManager.getInstance().values());
+// disabled for 1.19            recipes.addAll(LocalRecipeManager.getInstance().values());
         }
         Pattern regex=Pattern.compile(patternText, Pattern.CASE_INSENSITIVE);
         for (Recipe recipe:recipes) {
@@ -859,7 +858,7 @@ public class RecipeBook {
             }
         } else if (ingredientStack.getItem() != recipe.getIngredient().getItem()) {
             MinecraftClient.getInstance().inGameHud.setOverlayMessage(
-                    new TranslatableText("easiercrafting.error.removepotions"), true
+                    Text.translatable("easiercrafting.error.removepotions"), true
             );
             return;
         }

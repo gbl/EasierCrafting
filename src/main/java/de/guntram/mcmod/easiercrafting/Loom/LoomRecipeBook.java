@@ -29,6 +29,7 @@ import net.minecraft.screen.LoomScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.DyeColor;
+import net.minecraft.util.registry.RegistryEntry;
 
 /**
  *
@@ -118,7 +119,7 @@ public class LoomRecipeBook extends RecipeBook {
                 @Override
                 public void runWithInfo(Integer i) {
                     LoomStep step = recipe.getStep(i);
-                    BannerPattern pattern = BannerPattern.byId(step.pattern);
+                    BannerPattern pattern = BannerPattern.byId(step.pattern).value();
                     if (pattern == null) {
                         LOGGER.warn("no BannerPattern found for "+step.pattern);
                         DelayedSlotClickQueue.clear();
@@ -135,11 +136,12 @@ public class LoomRecipeBook extends RecipeBook {
                     transfer(dyeSlotIndex, 1, 1);
                     
                     int patternSlot = -1;
-                    if (pattern.ordinal() <= BannerPattern.LOOM_APPLICABLE_COUNT) {
+
+                    /* if (pattern.ordinal() <= BannerPattern.LOOM_APPLICABLE_COUNT) {
                         LOGGER.debug("click container button "+pattern.ordinal());
                         MinecraftClient.getInstance().interactionManager
                                 .clickButton((screen.getScreenHandler()).syncId, pattern.ordinal());// click loom button
-                    } else {
+                    } else */ {
                         Item item = bannerPatternItemFromId(pattern.getId());
                         if (item == null) {
                             LOGGER.warn("Don't know which pattern to use for "+pattern.getId());

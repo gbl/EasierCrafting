@@ -15,7 +15,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.BrewingStandScreenHandler;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -69,7 +68,7 @@ public abstract class HandledScreenMixin extends Screen {
             Text titleText;
             if (brewTime > 0) {
                 int brewPercent = 100-(brewTime*100/400);
-                titleText = new LiteralText(this.title.getString() + " ( " + brewPercent + "% )");
+                titleText = Text.literal(this.title.getString() + " ( " + brewPercent + "% )");
             } else {
                 titleText = this.title;
             }
