@@ -26,6 +26,7 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -213,7 +214,7 @@ public class RecipeBook {
 
         underMouse=null;
 
-        pattern.y=ypos;
+        pattern.setY(ypos);
         pattern.renderButton(stack, 0, 0, 0f);    // <-- parameters neccessary but unused 
         ypos+=itemSize*3/2;
         minYtoDraw=ypos;
@@ -380,7 +381,13 @@ public class RecipeBook {
             Item item = result.getItem();
             if (item==Items.AIR)
                 continue;
-            ItemGroup tab = item.getGroup();
+            ItemGroup tab = null;
+            for (ItemGroup group: ItemGroups.getGroups()) {
+                if (group.contains(result)) {
+                    tab = group;
+                    break;
+                }
+            }
             String category;
             if (!ConfigurationHandler.getCategorizeRecipes()) {
                 category=I18n.translate("easiercrafting.category.possible");

@@ -1,5 +1,5 @@
 {
-    "easiercrafting:fire_resistance_stew": "Ragoût de résistance au feu",
+    "easiercrafting:fire_resistance_stew": "Ragoût résistant au feu",
     "easiercrafting:blindness_stew": "Ragoût de cécité",
     "easiercrafting:jumpboost_stew": "Ragoût de saut",
     "easiercrafting:saturation_stew": "Ragoût de saturation",
@@ -34,7 +34,7 @@
     "easiercrafting.config.hidewithrei": "Cacher l'interface lorsque la REI est affichée",
     "easiercrafting.config.hidebrewingstandbutton": "Masquer le bouton 'Take' dans l'alambic",
     "easiercrafting.config.useinventoryrefreshhack": "Demander l'actualisation de l'inventaire après chaque fabrication",
-    "easiercrafting.config.loomclickspeed": "Speed to click the loom",
+    "easiercrafting.config.loomclickspeed": "Vitesse pour cliquer le métier à tisser",
     "easiercrafting.config.tt.autoupdate": "Mettre à jour la liste des recettes après ce nombre de secondes après le dernier clic",
     "easiercrafting.config.tt.autofocus": "Activer automatiquement la zone de recherche lors de l'ouverture de l'interface de fabrication",
     "easiercrafting.config.tt.allowinternalbutton": "Autoriser l'ouverture du livre de recettes interne MC (depuis 1.12)",
@@ -45,5 +45,5 @@
     "easiercrafting.config.tt.hidewithrei": "Si vous avez des REI, l'artisanat facile ne s'affichera que lorsque le REI est désactivé (par défaut CTRL-O)",
     "easiercrafting.config.tt.hidebrewingstandbutton": "Masquer le bouton PRENDRE qui entre en conflit avec certains packs de ressources",
     "easiercrafting.config.tt.useinventoryrefreshhack": "Activer cette option si vous rencontrez des problèmes de synchronisation après la fabrication",
-    "easiercrafting.config.tt.loomclickspeed": "The lower you set this, the faster the loom will be, but too low might get you out of sync, especially on servers"
+    "easiercrafting.config.tt.loomclickspeed": "Plus cette valeur est basse, plus le métier à tisser sera rapide, mais si elle est trop basse, vous risquez d'être désynchronisé, surtout sur les serveurs"
 }
