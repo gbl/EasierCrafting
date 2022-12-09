@@ -32,8 +32,7 @@ public class ExtendedGuiBrewingStand extends BrewingStandScreen implements SlotC
                 }
 
                 @Override
-                protected void method_47399(NarrationMessageBuilder narrationMessageBuilder) {
-                    throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+                protected void appendClickableNarrations(NarrationMessageBuilder narrationMessageBuilder) {
                 }
             });
         }

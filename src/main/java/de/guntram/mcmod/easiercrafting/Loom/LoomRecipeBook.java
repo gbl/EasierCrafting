@@ -14,7 +14,6 @@ import de.guntram.mcmod.easiercrafting.delayedslotclicks.DelayedSlotClickQueue;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 import net.minecraft.block.entity.BannerPattern;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.item.ItemRenderer;
@@ -29,7 +28,6 @@ import net.minecraft.screen.LoomScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.DyeColor;
-import net.minecraft.util.registry.RegistryEntry;
 
 /**
  *

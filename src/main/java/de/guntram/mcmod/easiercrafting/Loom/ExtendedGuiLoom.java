@@ -10,14 +10,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.function.Supplier;
 import net.minecraft.block.BannerBlock;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.LoomScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BannerItem;
@@ -28,7 +24,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.screen.LoomScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import org.apache.logging.log4j.LogManager;
@@ -59,9 +54,8 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
     protected void init() {
         super.init();
         saveName = new TextFieldWidget(this.textRenderer, 0, -25, this.backgroundWidth-25, 20, Text.literal("Save input pattern as..."));
-        saveButton = ButtonWidget.createBuilder(Text.translatable("easiercrafting.loom.save"), (button)->{this.saveButtonPressed();})
-                .setPosition(this.backgroundWidth-20, -25)
-                .setSize(20, 20)
+        saveButton = ButtonWidget.builder(Text.translatable("easiercrafting.loom.save"), (button)->{this.saveButtonPressed();})
+                .dimensions(this.backgroundWidth-20, -25, 20, 20)
                 .build();
         if (savedColorCode == null) {
             savedColorCode = new int[BUTTONCOUNT];
