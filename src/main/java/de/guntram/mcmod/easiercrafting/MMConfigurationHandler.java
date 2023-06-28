@@ -9,6 +9,6 @@ public class MMConfigurationHandler implements ModMenuApi
 {
     @Override
     public ConfigScreenFactory getModConfigScreenFactory() {
-        return screen -> new GuiModOptions(screen, EasierCrafting.MODNAME, ConfigurationProvider.getHandler(EasierCrafting.MODNAME));
+        return screen -> GuiModOptions.getGuiModOptions(screen, EasierCrafting.MODNAME, ConfigurationProvider.getHandler(EasierCrafting.MODNAME));
     }
 }

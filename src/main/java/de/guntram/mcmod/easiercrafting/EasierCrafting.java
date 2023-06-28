@@ -45,7 +45,7 @@ public class EasierCrafting implements ClientModInitializer
                 display=display.substring(MODID.length()+1);
             }
         } else {
-            display = recipe.getOutput().getName().getString();
+            display = recipe.getOutput(null).getName().getString();
         }
         return display;
     }

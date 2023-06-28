@@ -1,8 +1,9 @@
 package de.guntram.mcmod.easiercrafting;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.BrewingStandScreen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.BrewingStandScreenHandler;
@@ -22,19 +23,18 @@ public class ExtendedGuiBrewingStand extends BrewingStandScreen implements SlotC
     protected void init() {
         super.init();
         if (!ConfigurationHandler.hideBrewingStandTakeButton()) {
-            this.addDrawableChild(new ClickableWidget(x+130, y+50, 40, 20, Text.translatable("easiercrafting.brewing.takeall")) {
-                @Override
-                public void onClick(double x, double y) {
-                    // for some reason, this order seems to work better than 0 1 2
-                    slotClick(1, 0, SlotActionType.QUICK_MOVE);
-                    slotClick(2, 0, SlotActionType.QUICK_MOVE);
-                    slotClick(0, 0, SlotActionType.QUICK_MOVE);
-                }
-
-                @Override
-                protected void appendClickableNarrations(NarrationMessageBuilder narrationMessageBuilder) {
-                }
-            });
+            ButtonWidget button = ButtonWidget.builder(
+                    Text.translatable("easiercrafting.brewing.takeall"),
+                    (widget) -> {
+                        // for some reason, this order seems to work better than 0 1 2
+                        slotClick(1, 0, SlotActionType.QUICK_MOVE);
+                        slotClick(2, 0, SlotActionType.QUICK_MOVE);
+                        slotClick(0, 0, SlotActionType.QUICK_MOVE);
+                    })
+                    .position(x + 130, y + 50)
+                    .size(40, 20)
+                    .build();
+            this.addDrawableChild(button);
         }
         this.recipeBook.afterInitGui();
     }
@@ -56,9 +56,9 @@ public class ExtendedGuiBrewingStand extends BrewingStandScreen implements SlotC
     }
     
     @Override
-    protected void drawForeground(MatrixStack stack, final int mouseX, final int mouseY) {
-        super.drawForeground(stack, mouseX, mouseY);
-        recipeBook.drawRecipeList(stack, textRenderer, itemRenderer, backgroundWidth, backgroundHeight, mouseX-x, mouseY-y);
+    protected void drawForeground(DrawContext context, final int mouseX, final int mouseY) {
+        super.drawForeground(context, mouseX, mouseY);
+        recipeBook.drawRecipeList(context, textRenderer, backgroundWidth, backgroundHeight, mouseX-x, mouseY-y);
     }
     
     @Override

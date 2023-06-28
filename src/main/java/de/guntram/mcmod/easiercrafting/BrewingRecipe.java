@@ -8,6 +8,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
@@ -31,7 +32,7 @@ public class BrewingRecipe<C extends Inventory> implements Recipe<C> {
     }
 
     @Override
-    public ItemStack craft(C inv) {
+    public ItemStack craft(C inv, DynamicRegistryManager registryManager) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -41,7 +42,7 @@ public class BrewingRecipe<C extends Inventory> implements Recipe<C> {
     }
 
     @Override
-    public ItemStack getOutput() {
+    public ItemStack getOutput(DynamicRegistryManager registryManager) {
         return outputPotion;
     }
 

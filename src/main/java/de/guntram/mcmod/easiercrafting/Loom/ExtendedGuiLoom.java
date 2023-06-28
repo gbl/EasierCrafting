@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import net.minecraft.block.BannerBlock;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.LoomScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -75,22 +76,22 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
     }
     
     @Override
-    protected void drawForeground(MatrixStack stack, final int mouseX, final int mouseY) {
-        super.drawForeground(stack, mouseX, mouseY);
+    protected void drawForeground(DrawContext context, final int mouseX, final int mouseY) {
+        super.drawForeground(context, mouseX, mouseY);
         if (((LoomScreenHandler)handler).getBannerSlot().hasStack()) {
             saveButton.active = !(saveName.getText().isEmpty());
-            saveButton.renderButton(stack, mouseX, mouseY, 0);
-            saveName.renderButton(stack, mouseX, mouseY, 0);
+            saveButton.renderButton(context, mouseX, mouseY, 0);
+            saveName.renderButton(context, mouseX, mouseY, 0);
         } else {
             saveName.setText("");
             for (int i=0; i<colorButtons.length; i++) {
-                colorButtons[i].renderButton(stack, mouseX, mouseY, 0);
+                colorButtons[i].renderButton(context, mouseX, mouseY, 0);
             }
             for (int i=0; i<colorButtons.length; i++) {
-                colorButtons[i].renderButtonTooltip(stack, mouseX, mouseY, 0);
+                colorButtons[i].renderButtonTooltip(context, mouseX, mouseY, 0);
             }
         }
-        recipeBook.drawRecipeList(stack, textRenderer, itemRenderer, backgroundWidth, backgroundHeight, mouseX-x, mouseY-y);
+        recipeBook.drawRecipeList(context, textRenderer, backgroundWidth, backgroundHeight, mouseX-x, mouseY-y);
     }
 
     @Override
@@ -265,20 +266,20 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
         }
 
         @Override
-        public void renderButton(MatrixStack stack, int mouseX, int mouseY, float delta) {
-            super.renderButton(stack, mouseX, mouseY, delta);
+        public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+            super.renderButton(context, mouseX, mouseY, delta);
             ItemStack items = getRenderStack();
             //setBlitOffset(100);
-            itemRenderer.renderInGuiWithOverrides(items, x+2, y+2);
+            context.drawItem(items, x+2, y+2);
             //setBlitOffset(0);
         }
 
-        public void renderButtonTooltip(MatrixStack stack, int mouseX, int mouseY, float delta) {
+        public void renderButtonTooltip(DrawContext context, int mouseX, int mouseY, float delta) {
             ItemStack items = getRenderStack();
             mouseX-=ExtendedGuiLoom.this.x;
             mouseY-=ExtendedGuiLoom.this.y;
             if (mouseX > x && mouseX < x+width && mouseY > y && mouseY < y+width) {
-                ExtendedGuiLoom.this.renderTooltip(stack, items, mouseX, mouseY);
+                context.drawItemTooltip(textRenderer, items, mouseX, mouseY);
             }
         }
 
@@ -295,6 +296,5 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
             clickButton = i;
             return true;
         }
-        
     }
 }

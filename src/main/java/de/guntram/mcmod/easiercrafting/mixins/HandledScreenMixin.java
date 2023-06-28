@@ -6,6 +6,7 @@
 package de.guntram.mcmod.easiercrafting.mixins;
 
 import de.guntram.mcmod.easiercrafting.accessorInterfaces.PropertyDelegateProvider;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.AbstractFurnaceScreen;
 import net.minecraft.client.gui.screen.ingame.BrewingStandScreen;
@@ -39,7 +40,7 @@ public abstract class HandledScreenMixin extends Screen {
     }
     
     @Inject(method="drawForeground", at=@At("HEAD"), cancellable = true)
-    private void patchTitleWithBurntime(MatrixStack stack, int x, int y, CallbackInfo ci) {
+    private void patchTitleWithBurntime(DrawContext context, int x, int y, CallbackInfo ci) {
         Object thisCopy=this;
         if ((thisCopy instanceof AbstractFurnaceScreen)) {
             PropertyDelegateProvider pde = (PropertyDelegateProvider) handler;
@@ -53,14 +54,10 @@ public abstract class HandledScreenMixin extends Screen {
             }
 
             String titleText = this.title.getString() + " (" + itemsLeft + " " + I18n.translate("easiercrafting.furnace.itemsleft")+")";
-            this.textRenderer.draw(stack, titleText, (float)(this.backgroundWidth / 2 - this.textRenderer.getWidth(titleText) / 2), 6.0F, 4210752);
-            this.textRenderer.draw(stack, playerInventoryTitle, 8.0F, (float)(this.backgroundHeight - 96 + 2), 4210752);
-            this.textRenderer.draw(stack, itemDonePercent+" %", 20, 22, 4210752);
-            this.textRenderer.draw(stack, fuelLeftPercent+" %", 20, 58, 4210752);
-
-            //for (int i=0; i<4; i++) {
-            //    this.font.draw(""+((PropertyDelegateProvider)container).getPropertyDelegate(i), 5, 10+i*10, 0x000000);
-            //}
+            context.drawText(textRenderer, titleText, (this.backgroundWidth / 2 - this.textRenderer.getWidth(titleText) / 2), 6, 4210752, false);
+            context.drawText(textRenderer, playerInventoryTitle, 8, (this.backgroundHeight - 96 + 2), 4210752, false);
+            context.drawText(textRenderer, itemDonePercent+" %", 20, 22, 4210752, false);
+            context.drawText(textRenderer, fuelLeftPercent+" %", 20, 58, 4210752, false);
 
             ci.cancel();
         } else if (thisCopy instanceof BrewingStandScreen) {
@@ -72,8 +69,8 @@ public abstract class HandledScreenMixin extends Screen {
             } else {
                 titleText = this.title;
             }
-            this.textRenderer.draw(stack, titleText.getString(), (float)(this.backgroundWidth / 2 - this.textRenderer.getWidth(titleText) / 2), 6.0F, 4210752);
-            this.textRenderer.draw(stack, playerInventoryTitle, 8.0F, (float)(this.backgroundHeight - 96 + 2), 4210752);
+            context.drawText(textRenderer, titleText.getString(), (this.backgroundWidth / 2 - this.textRenderer.getWidth(titleText) / 2), 6, 4210752, false);
+            context.drawText(textRenderer, playerInventoryTitle, 8, (this.backgroundHeight - 96 + 2), 4210752, false);
             ci.cancel();
         }
     }

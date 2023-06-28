@@ -14,6 +14,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
@@ -74,7 +75,7 @@ public class LoomRecipe implements Recipe {
     }
 
     @Override
-    public ItemStack craft(Inventory inv) {
+    public ItemStack craft(Inventory inv, DynamicRegistryManager registryManager) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -84,7 +85,7 @@ public class LoomRecipe implements Recipe {
     }
 
     @Override
-    public ItemStack getOutput() {
+    public ItemStack getOutput(DynamicRegistryManager registryManager) {
         if (MinecraftClient.getInstance().currentScreen instanceof ExtendedGuiLoom) {
             ExtendedGuiLoom screen = (ExtendedGuiLoom) MinecraftClient.getInstance().currentScreen;
             ItemStack bannerStack = screen.getBannerItemStack();

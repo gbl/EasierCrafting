@@ -1,7 +1,7 @@
 package de.guntram.mcmod.easiercrafting;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.slot.SlotActionType;
 import org.lwjgl.glfw.GLFW;
@@ -28,9 +28,9 @@ public class ExtendedGuiInventory extends InventoryScreen implements SlotClickAc
     }
     
     @Override
-    protected void drawForeground(MatrixStack stack, final int mouseX, final int mouseY) {
-        super.drawForeground(stack, mouseX, mouseY);
-        recipeBook.drawRecipeList(stack, textRenderer, itemRenderer, backgroundWidth, backgroundHeight, mouseX-x, mouseY-y);
+    protected void drawForeground(DrawContext context, final int mouseX, final int mouseY) {
+        super.drawForeground(context, mouseX, mouseY);
+        recipeBook.drawRecipeList(context, textRenderer, backgroundWidth, backgroundHeight, mouseX-x, mouseY-y);
     }
     
     @Override

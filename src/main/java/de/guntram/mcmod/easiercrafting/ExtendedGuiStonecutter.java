@@ -1,5 +1,6 @@
 package de.guntram.mcmod.easiercrafting;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.StonecutterScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
@@ -27,9 +28,9 @@ public class ExtendedGuiStonecutter extends StonecutterScreen implements SlotCli
     }
     
     @Override
-    protected void drawForeground(MatrixStack stack, final int mouseX, final int mouseY) {
-        super.drawForeground(stack, mouseX, mouseY);
-        recipeBook.drawRecipeList(stack, textRenderer, itemRenderer, backgroundWidth, backgroundHeight, mouseX-x, mouseY-y);
+    protected void drawForeground(DrawContext context, final int mouseX, final int mouseY) {
+        super.drawForeground(context, mouseX, mouseY);
+        recipeBook.drawRecipeList(context, textRenderer, backgroundWidth, backgroundHeight, mouseX-x, mouseY-y);
     }
     
     @Override

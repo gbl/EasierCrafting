@@ -8,13 +8,13 @@ package de.guntram.mcmod.easiercrafting.Loom;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.guntram.mcmod.easiercrafting.EasierCrafting;
 import de.guntram.mcmod.easiercrafting.RecipeBook;
-import static de.guntram.mcmod.easiercrafting.RecipeBook.LOGGER;
 import de.guntram.mcmod.easiercrafting.RecipeTreeSet;
 import de.guntram.mcmod.easiercrafting.delayedslotclicks.DelayedSlotClickQueue;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.resource.language.I18n;
@@ -70,12 +70,12 @@ public class LoomRecipeBook extends RecipeBook {
     }
 
     @Override
-    public int drawRecipeOutputs(RecipeTreeSet recipes, ItemRenderer itemRenderer, TextRenderer fontRenderer, int xpos, int ypos, int mouseX, int mouseY) {
-        return super.drawRecipeOutputs(recipes, itemRenderer, fontRenderer, xpos, ypos, mouseX, mouseY);
+    public int drawRecipeOutputs(DrawContext context, RecipeTreeSet recipes, TextRenderer fontRenderer, int xpos, int ypos, int mouseX, int mouseY) {
+        return super.drawRecipeOutputs(context, recipes, fontRenderer, xpos, ypos, mouseX, mouseY);
     }
     
     @Override
-    public void renderSingleRecipeOutput(ItemRenderer itemRenderer, TextRenderer fontRenderer,
+    public void renderSingleRecipeOutput(DrawContext context, TextRenderer fontRenderer,
             ItemStack items, int x, int y) {
 
         MatrixStack stack = RenderSystem.getModelViewStack();
@@ -83,12 +83,12 @@ public class LoomRecipeBook extends RecipeBook {
         stack.scale(1.5f, 1.5f, 1.5f);
         RenderSystem.applyModelViewMatrix();
         
-        itemRenderer.renderGuiItemIcon(items, x*2/3, y*2/3);
+        context.drawItem(items, x*2/3, y*2/3);
         
         stack.pop();
         RenderSystem.applyModelViewMatrix();
         
-        itemRenderer.renderGuiItemOverlay(fontRenderer, items, x, y);
+        context.drawItemInSlot(fontRenderer, items, x, y);
     }
     
     @Override
