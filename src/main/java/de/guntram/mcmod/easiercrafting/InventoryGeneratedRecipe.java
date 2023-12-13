@@ -50,18 +50,13 @@ public class InventoryGeneratedRecipe<C extends Inventory> implements Recipe<C> 
     }
 
     @Override
-    public ItemStack getOutput(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(DynamicRegistryManager registryManager) {
         return result;
     }
 
     @Override
     public DefaultedList<Ingredient> getIngredients() {
         return ingredients;
-    }
-
-    @Override
-    public Identifier getId() {
-        return new Identifier(EasierCrafting.MODID, result.getTranslationKey());
     }
 
     @Override

@@ -85,7 +85,7 @@ public class LoomRecipe implements Recipe {
     }
 
     @Override
-    public ItemStack getOutput(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(DynamicRegistryManager registryManager) {
         if (MinecraftClient.getInstance().currentScreen instanceof ExtendedGuiLoom) {
             ExtendedGuiLoom screen = (ExtendedGuiLoom) MinecraftClient.getInstance().currentScreen;
             ItemStack bannerStack = screen.getBannerItemStack();
@@ -124,11 +124,6 @@ public class LoomRecipe implements Recipe {
             }
         }        
         return ingredients;
-    }
-
-    @Override
-    public Identifier getId() {
-        return new Identifier(EasierCrafting.MODID, this.name);
     }
 
     @Override

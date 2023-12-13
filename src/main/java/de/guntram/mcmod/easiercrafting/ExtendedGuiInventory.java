@@ -34,9 +34,9 @@ public class ExtendedGuiInventory extends InventoryScreen implements SlotClickAc
     }
     
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-        recipeBook.scrollBy((int) delta);
-        return super.mouseScrolled(mouseX, mouseY, delta);
+    public boolean mouseScrolled(double mouseX, double mouseY, double xdelta, double ydelta) {
+        recipeBook.scrollBy((int) ydelta);
+        return super.mouseScrolled(mouseX, mouseY, xdelta, ydelta);
     }    
     
     @Override

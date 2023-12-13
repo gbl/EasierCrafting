@@ -80,7 +80,7 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
         super.drawForeground(context, mouseX, mouseY);
         if (((LoomScreenHandler)handler).getBannerSlot().hasStack()) {
             saveButton.active = !(saveName.getText().isEmpty());
-            saveButton.renderButton(context, mouseX, mouseY, 0);
+            saveButton.render(context, mouseX, mouseY, 0);
             saveName.renderButton(context, mouseX, mouseY, 0);
         } else {
             saveName.setText("");

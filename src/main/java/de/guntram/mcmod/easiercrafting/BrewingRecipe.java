@@ -42,7 +42,7 @@ public class BrewingRecipe<C extends Inventory> implements Recipe<C> {
     }
 
     @Override
-    public ItemStack getOutput(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(DynamicRegistryManager registryManager) {
         return outputPotion;
     }
 
@@ -60,11 +60,6 @@ public class BrewingRecipe<C extends Inventory> implements Recipe<C> {
     
     public ItemStack getIngredient() {
         return ingredient;
-    }
-
-    @Override
-    public Identifier getId() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

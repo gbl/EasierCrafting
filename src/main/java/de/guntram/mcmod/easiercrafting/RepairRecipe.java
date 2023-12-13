@@ -49,7 +49,7 @@ public class RepairRecipe<C  extends Inventory> implements Recipe<C> {
     }
     
     @Override
-    public ItemStack getOutput(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(DynamicRegistryManager registryManager) {
         return new ItemStack(item);
     }
 
@@ -59,11 +59,6 @@ public class RepairRecipe<C  extends Inventory> implements Recipe<C> {
         ingredients.add(Ingredient.ofStacks(new ItemStack(item)));
         ingredients.add(Ingredient.ofStacks(new ItemStack(item)));
         return ingredients;
-    }
-
-    @Override
-    public Identifier getId() {
-        return new Identifier(EasierCrafting.MODID, item.getTranslationKey());
     }
 
     @Override

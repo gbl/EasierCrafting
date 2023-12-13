@@ -35,8 +35,8 @@ public class InventoryRecipeScanner {
     
     private static final Logger LOGGER = LogManager.getLogger();
     
-    static List<Recipe> findUnusualRecipes(ScreenHandler inventory, int firstInventorySlotNo) {
-        ArrayList<Recipe> result=new ArrayList<>();
+    static List<Recipe<?>> findUnusualRecipes(ScreenHandler inventory, int firstInventorySlotNo) {
+        ArrayList<Recipe<?>> result=new ArrayList<>();
 
         // needed for various recipes; count the number of each dye type
         Map<DyeColor, Integer> hasDye = new HashMap<>();

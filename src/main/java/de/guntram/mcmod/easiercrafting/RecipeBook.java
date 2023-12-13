@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import me.shedaniel.rei.api.client.config.ConfigObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.ShulkerBoxBlock;
@@ -282,7 +284,7 @@ public class RecipeBook {
 
 //        System.out.println("drawing recipes at "+xpos+"/"+ypos);
         for (Recipe recipe: recipes) {
-            ItemStack items=recipe.getOutput(null);
+            ItemStack items=recipe.getResult(null);
             if (ypos>=minYtoDraw) {
                 renderSingleRecipeOutput(context, fontRenderer, items, xOffset+xpos, ypos-itemLift);
                 if (mouseX>=xpos+xOffset  && mouseX<=xpos+xOffset+itemSize-1
@@ -324,15 +326,15 @@ public class RecipeBook {
     
     public void updateRecipes() {
         ScreenHandler inventory = screen.getScreenHandler();
-        List<Recipe> recipes = new ArrayList<>();
+        List<Recipe<?>> recipes = new ArrayList<>();
         if (wantedRecipeType == BrewingRecipe.recipeType) {
             Level level = Level.DEBUG;
             LOGGER.log(level, "recipebook: size= "+inventory.slots.size());
 
             List<BrewingRecipe> potionRecipes = BrewingRecipeRegistryCache.registeredPotionRecipes();
-            Set<BrewingRecipe> possiblePotionRecipes = new HashSet<>();
+            Set<BrewingRecipe<?>> possiblePotionRecipes = new HashSet<>();
             List<BrewingRecipe> itemRecipes = BrewingRecipeRegistryCache.registeredItemRecipes();
-            Set<BrewingRecipe> possibleItemRecipes = new HashSet<>();
+            Set<BrewingRecipe<?>> possibleItemRecipes = new HashSet<>();
             for (int i=0; i<inventory.slots.size(); i++) {
                 // This loop also looks at the items in the brewing stand, which is fine!
                 ItemStack stack=inventory.getSlot(i).getStack();
@@ -347,7 +349,7 @@ public class RecipeBook {
                             // this will be taken care of in the same way as other recipes
 
                             ItemStack input  = new ItemStack(br.getInputPotion().getItem()); PotionUtil.setPotion(input, potionType);
-                            ItemStack output = new ItemStack(br.getOutput(null).getItem()); PotionUtil.setPotion(output, potionType);
+                            ItemStack output = new ItemStack(br.getResult(null).getItem()); PotionUtil.setPotion(output, potionType);
                             possibleItemRecipes.add(newRecipe = new BrewingRecipe(false, input, br.getIngredient(), output));
                             LOGGER.log(level, "adding recipe "+newRecipe.toString());
                         }
@@ -355,7 +357,7 @@ public class RecipeBook {
                     for (BrewingRecipe br: potionRecipes) {
                         if (PotionUtil.getPotion(br.getInputPotion()) == potionType) {
                             ItemStack input = new ItemStack(stack.getItem()); PotionUtil.setPotion(input, potionType);
-                            ItemStack output = new ItemStack(stack.getItem()); PotionUtil.setPotion(output, PotionUtil.getPotion(br.getOutput(null)));
+                            ItemStack output = new ItemStack(stack.getItem()); PotionUtil.setPotion(output, PotionUtil.getPotion(br.getResult(null)));
                             possiblePotionRecipes.add(newRecipe = new BrewingRecipe(true, input, br.getIngredient(), output));
                             LOGGER.log(level, "adding recipe "+newRecipe.toString());
                         }
@@ -365,7 +367,7 @@ public class RecipeBook {
             recipes.addAll(possibleItemRecipes);
             recipes.addAll(possiblePotionRecipes);
         } else {
-            recipes.addAll(player.getWorld().getRecipeManager().values());
+            recipes.addAll(player.getWorld().getRecipeManager().values().stream().map( x -> x.value()).toList());
 // disabled for 1.19            recipes.addAll(LocalRecipeManager.getInstance().values());
             if (wantedRecipeType == RecipeType.CRAFTING && ConfigurationHandler.getAllowGeneratedRecipes()) {
                 recipes.addAll(InventoryRecipeScanner.findUnusualRecipes(inventory, firstInventorySlotNo));
@@ -382,7 +384,7 @@ public class RecipeBook {
             if (!canCraftRecipe((Recipe)recipe, inventory, gridSize))
                 continue;
             //System.out.println("grid size is "+gridSize+", recipe needs "+recipe.getRecipeSize());
-            ItemStack result=recipe.getOutput(null);
+            ItemStack result=recipe.getResult(null);
             Item item = result.getItem();
             if (item==Items.AIR)
                 continue;
@@ -456,23 +458,27 @@ public class RecipeBook {
         if (wantedRecipeType == BrewingRecipe.recipeType) {
             recipes.addAll(BrewingRecipeRegistryCache.registeredBrewingRecipes());
         } else {
-            recipes.addAll(player.getWorld().getRecipeManager().values());
+            recipes.addAll(player.getWorld().getRecipeManager().values().stream().map( x -> x.value()).toList());
 // disabled for 1.19            recipes.addAll(LocalRecipeManager.getInstance().values());
         }
-        Pattern regex=Pattern.compile(patternText, Pattern.CASE_INSENSITIVE);
-        for (Recipe recipe:recipes) {
-            if (!recipeTypeMatchesWorkstation(recipe))
-                continue;
-            ItemStack result=recipe.getOutput(null);
-            if (result.getItem() == Items.AIR) {
-                continue;
+        try {
+            Pattern regex = Pattern.compile(patternText, Pattern.CASE_INSENSITIVE);
+            for (Recipe recipe : recipes) {
+                if (!recipeTypeMatchesWorkstation(recipe))
+                    continue;
+                ItemStack result = recipe.getResult(null);
+                if (result.getItem() == Items.AIR) {
+                    continue;
+                }
+                if (!regex.matcher(EasierCrafting.recipeDisplayName(recipe)).find()) {
+                    //System.out.println("not adding "+result.getDisplayName()+" because no match");
+                    continue;
+                }
+                //System.out.println("adding "+result.getDisplayName()+" to pattern match "+patternText);
+                patternMatchingRecipes.add(recipe);
             }
-            if (!regex.matcher(EasierCrafting.recipeDisplayName(recipe)).find()) {
-                //System.out.println("not adding "+result.getDisplayName()+" because no match");
-                continue;
-            }
-            //System.out.println("adding "+result.getDisplayName()+" to pattern match "+patternText);
-            patternMatchingRecipes.add(recipe);
+        } catch (PatternSyntaxException ex) {
+            // Do nothing; invalid patterns don't match any recipe
         }
         recalcPatternMatchSize();
     }
@@ -503,7 +509,7 @@ public class RecipeBook {
         } else if (recipe instanceof InventoryGeneratedRecipe || recipe instanceof RepairRecipe) {
             return recipe.fits(gridSize, gridSize);
         } else if (recipe instanceof CuttingRecipe cuttingRecipe) {
-            ItemStack stack = cuttingRecipe.getOutput(null);
+            ItemStack stack = cuttingRecipe.getResult(null);
             LOGGER.debug("output: " + stack.getItem().getName().getString());
             for (Ingredient ing : (List<Ingredient>) cuttingRecipe.getIngredients()) {
                 ItemStack[] stacks = ing.getMatchingStacks();
@@ -549,14 +555,14 @@ public class RecipeBook {
                 continue;
             int neededAmount=stacks[0].getCount();
             // System.out.println("need "+neededAmount+" "+stacks[0].getDisplayName()+" for "+recipe.getRecipeOutput().getDisplayName());
-            if (recipe.getOutput(null).getItem() == Items.DISPENSER) {
+            if (recipe.getResult(null).getItem() == Items.DISPENSER) {
                 LOGGER.debug("look for dispenser item "+I18n.translate(stacks[0].getItem().getTranslationKey()));
             }
             for (int i=0; i<36; i++) {
                 Slot invitem=inventory.getSlot(i+firstInventorySlotNo);
                 ItemStack slotcontent=invitem.getStack();
                 if (canActAsIngredient(neededItem, slotcontent)) {
-                    if (recipe.getOutput(null).getItem() == Items.DISPENSER) {
+                    if (recipe.getResult(null).getItem() == Items.DISPENSER) {
                         LOGGER.debug("Item in inv slot " +i + ":" +I18n.translate(slotcontent.getItem().getTranslationKey()) + " works");
                     }
                     int providedAmount=slotcontent.getCount();                 // check how many items there are
@@ -571,7 +577,7 @@ public class RecipeBook {
                     }
                 }
                 else {
-                    if (recipe.getOutput(null).getItem() == Items.DISPENSER) {
+                    if (recipe.getResult(null).getItem() == Items.DISPENSER) {
                         LOGGER.debug("Item in inv slot " +i + ":" +I18n.translate(stacks[0].getItem().getTranslationKey()) + "doesn't work");
                     }
                 }
@@ -717,7 +723,7 @@ public class RecipeBook {
             if (underMouse.getType() == RecipeType.STONECUTTING) {
                 ClientPlayerInteractionManager interactionManager = MinecraftClient.getInstance().interactionManager;
                 StonecutterScreenHandler container = (StonecutterScreenHandler) screen.getScreenHandler();
-                List<StonecuttingRecipe> recipes = container.getAvailableRecipes();
+                List<StonecuttingRecipe> recipes = container.getAvailableRecipes().stream().map( x -> x.value()).toList();
                 int index = recipes.indexOf(underMouse);
                 if (index >= 0 && interactionManager != null) {
                     container.onButtonClick(null, index);
@@ -735,7 +741,7 @@ public class RecipeBook {
             
             /* Special case honey blocks which leave glass bottles in the input slots */
             
-            if (underMouse.getOutput(null).getItem() == Items.HONEY_BLOCK) {
+            if (underMouse.getResult(null).getItem() == Items.HONEY_BLOCK) {
                 slotClick(1, 0, SlotActionType.QUICK_MOVE);
                 slotClick(2, 0, SlotActionType.QUICK_MOVE);
                 slotClick(4, 0, SlotActionType.QUICK_MOVE);

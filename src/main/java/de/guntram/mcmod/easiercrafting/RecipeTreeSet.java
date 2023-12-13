@@ -26,9 +26,9 @@ public class RecipeTreeSet extends TreeSet<Recipe> {
                     if (sameName != 0) {
                         return sameName;
                     }
-                    if (PotionUtil.getPotion(a.getOutput(null)) == PotionUtil.getPotion(b.getOutput(null))
-                    ||  PotionUtil.getPotionEffects(a.getOutput(null)).isEmpty()
-                    ||  PotionUtil.getPotionEffects(b.getOutput(null)).isEmpty()
+                    if (PotionUtil.getPotion(a.getResult(null)) == PotionUtil.getPotion(b.getResult(null))
+                    ||  PotionUtil.getPotionEffects(a.getResult(null)).isEmpty()
+                    ||  PotionUtil.getPotionEffects(b.getResult(null)).isEmpty()
                     ) {
                         return 0;
                     }
@@ -38,12 +38,13 @@ public class RecipeTreeSet extends TreeSet<Recipe> {
                     //LOGGER.info("secnd potion is "+PotionUtil.getPotion(b.getOutput()).getName(""));
                     //try { LOGGER.info("Secnd dur. "+PotionUtil.getPotionEffects(b.getOutput()).get(0).getDuration()); } catch (Exception ex) {}
 
-                    return PotionUtil.getPotionEffects(a.getOutput(null)).get(0).getDuration() - PotionUtil.getPotionEffects(b.getOutput(null)).get(0).getDuration();
+                    return PotionUtil.getPotionEffects(a.getResult(null)).get(0).getDuration() - PotionUtil.getPotionEffects(b.getResult(null)).get(0).getDuration();
                 } else if (a.getType() == RecipeType.CRAFTING && b.getType() == RecipeType.CRAFTING) {
                     if (sameName != 0) {
                         return sameName;
                     } else {
-                        return a.getId().compareTo(b.getId());
+                        return 0;
+                        // return a.getId().compareTo(b.getId());
                     }
                 } else {
                     return sameName;

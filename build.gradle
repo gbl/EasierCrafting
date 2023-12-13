@@ -39,10 +39,10 @@ sourceCompatibility = 17
 targetCompatibility = 17
 
 ext.Versions = new Properties()
-Versions.load(file("Versionfiles/mcversion-1.20.properties").newReader())
+Versions.load(file("Versionfiles/mcversion-1.20.2.properties").newReader())
 
 archivesBaseName = "easiercrafting"
-ext.projectVersion = "1.7"
+ext.projectVersion = "1.7.1"
 
 version = "${Versions['minecraft_version']}-fabric${Versions['fabric_versiononly']}-${project.projectVersion}"
 
@@ -65,7 +65,6 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${Versions['fabric_version']}"
     modImplementation "com.terraformersmc:modmenu:${Versions['modmenu_version']}"
     compileOnly files('RoughlyEnoughItems-6.0.262-alpha-fabric.jar');
-    // modCompile("me.shedaniel:RoughlyEnoughItems:5.8.9") { transitive(false) }
     modImplementation "de.guntram.mcmod:GBfabrictools:${Versions['gbfabrictools_version']}"
     include    "de.guntram.mcmod:GBfabrictools:${Versions['gbfabrictools_version']}"
     modImplementation "de.guntram.mcmod:crowdin-translate:${Versions['crowdintranslate_version']}"
