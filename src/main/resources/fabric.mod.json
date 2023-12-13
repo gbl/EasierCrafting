@@ -18,7 +18,8 @@
         "mixins.easiercrafting_debug.json"
     ],
     "depends": {
-      "fabric": "*"
+        "fabric-api": "*",
+	"gbfabrictools": ">=1.4+1.20"
     },
     "recommends": {
       "modmenu" : "*"

@@ -218,7 +218,7 @@ public class RecipeBook {
         underMouse=null;
 
         pattern.setY(ypos);
-        pattern.renderButton(context, 0, 0, 0f);    // <-- parameters neccessary but unused
+        pattern.renderWidget(context, 0, 0, 0f);    // <-- parameters neccessary but unused
         ypos+=itemSize*3/2;
         minYtoDraw=ypos;
         ypos-=mouseScroll*itemSize;

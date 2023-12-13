@@ -81,11 +81,11 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
         if (((LoomScreenHandler)handler).getBannerSlot().hasStack()) {
             saveButton.active = !(saveName.getText().isEmpty());
             saveButton.render(context, mouseX, mouseY, 0);
-            saveName.renderButton(context, mouseX, mouseY, 0);
+            saveName.renderWidget(context, mouseX, mouseY, 0);
         } else {
             saveName.setText("");
             for (int i=0; i<colorButtons.length; i++) {
-                colorButtons[i].renderButton(context, mouseX, mouseY, 0);
+                colorButtons[i].renderWidget(context, mouseX, mouseY, 0);
             }
             for (int i=0; i<colorButtons.length; i++) {
                 colorButtons[i].renderButtonTooltip(context, mouseX, mouseY, 0);
@@ -266,8 +266,8 @@ public class ExtendedGuiLoom extends LoomScreen implements SlotClickAccepter {
         }
 
         @Override
-        public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
-            super.renderButton(context, mouseX, mouseY, delta);
+        public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+            super.renderWidget(context, mouseX, mouseY, delta);
             ItemStack items = getRenderStack();
             //setBlitOffset(100);
             context.drawItem(items, x+2, y+2);
